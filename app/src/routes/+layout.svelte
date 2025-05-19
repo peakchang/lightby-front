@@ -1,0 +1,129 @@
+<script>
+	import "../app.css";
+
+	import { page } from "$app/stores";
+	import { fly } from "svelte/transition";
+	import { onDestroy } from "svelte";
+	import { derived } from "svelte/store";
+
+	let { children } = $props();
+
+	// 현재 경로 감지용 key 생성
+	const key = derived(page, ($page) => $page.url.pathname);
+
+	// 현재 경로에 따라 애니메이션 사용할지 결정
+	let useAnimation = $state(false);
+
+	const animatedRoutes = ["/testpage"];
+
+	const unsubscribe = page.subscribe(($page) => {
+		useAnimation = animatedRoutes.includes($page.url.pathname);
+		console.log(useAnimation);
+	});
+
+	onDestroy(() => {
+		unsubscribe();
+	});
+</script>
+
+<svelte:head>
+	<!-- Swiper JS -->
+	<script
+		src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"
+	></script>
+	<!-- Link Swiper's CSS -->
+	<link
+		rel="stylesheet"
+		href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+	/>
+	<!-- SUIT 폰트 CSS -->
+	<link
+		href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css"
+		rel="stylesheet"
+	/>
+
+	<link
+		rel="stylesheet"
+		as="style"
+		href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard-dynamic-subset.css"
+	/>
+
+	<link
+		rel="stylesheet"
+		href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+	/>
+</svelte:head>
+
+<div class="site-wrab">
+	<div class="max-w-[530px] mx-auto px-2 bg-white min-h-screen">
+		{#key key}
+			{#if useAnimation}
+				<div in:fly={{ y: 300, duration: 300 }}>
+					{@render children()}
+				</div>
+			{:else}
+				<div>
+					{@render children()}
+				</div>
+			{/if}
+		{/key}
+	</div>
+</div>
+
+<style>
+	@font-face {
+		font-family: "OKDDUNG";
+		src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2206-02@1.0/OKDDUNG.woff2")
+			format("woff2");
+		font-weight: normal;
+		font-style: normal;
+	}
+	@font-face {
+		font-family: "KBO-Dia-Gothic_bold";
+		src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-2@1.0/KBO-Dia-Gothic_bold.woff")
+			format("woff");
+		font-weight: 700;
+		font-style: normal;
+	}
+
+	:global(.kbo-font) {
+		font-family: "KBO-Dia-Gothic_bold";
+	}
+
+	:global(.title-font) {
+		font-family: "OKDDUNG";
+	}
+
+	:global(.suit-font) {
+		font-family: "SUIT" !important;
+	}
+
+	:global(.input-base) {
+		border-radius: 6px;
+		padding: 7px 5px;
+		border: 1px solid #cfcfcf;
+		width: 100%;
+		background-color: #f6f6f6;
+	}
+	:global(.input-base:focus) {
+		border: 1px solid #40a9ff;
+		outline: none;
+		background-color: #ffffff;
+	}
+	:global(.in-th) {
+		padding: 10px 5px;
+		border: 1px solid #cfcfcf;
+	}
+	:global(.in-td) {
+		border: 1px solid #cfcfcf;
+	}
+
+	@import url("/pretendard/pretendard.css");
+	:global(.pretendard) {
+		font-family: "Pretendard", sans-serif;
+	}
+
+	:global(.site-wrab) {
+		background-color: #f3f6f6;
+	}
+</style>
