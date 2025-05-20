@@ -1,16 +1,29 @@
 <script>
+    import { goto } from "$app/navigation";
     import PdButton from "$lib/components/PdButton.svelte";
     import { page } from "$app/stores";
     import { user_info } from "$lib/store";
     let { children } = $props();
+
+    function movePage(e) {
+        console.log(this.getAttribute("linkdata"));
+
+        if (this.getAttribute("linkdata") == "/my" && !$user_info.idx) {
+            // alert("로그인 후 이용 가능합니다.");
+            // return;
+        }
+        if ($page.url.pathname != this.getAttribute("linkdata")) {
+            goto(this.getAttribute("linkdata"));
+        }
+    }
 </script>
 
 <div
-    class="fixed top-0 left-1/2 max-w-[530px] w-full -translate-x-1/2 bg-white p-3"
+    class="fixed top-0 left-1/2 max-w-[530px] w-full -translate-x-1/2 bg-white p-3 shadow-bottom"
 >
     <div class="flex justify-between">
         <div>
-            <a href="/">logo</a>
+            <img src="/logo.png" alt="" class=" max-w-[110px] cursor-pointer" />
         </div>
         <div>
             <a href="/auth/login">로그인</a>
@@ -24,21 +37,20 @@
 
 <div class="fixed left-0 bottom-0 w-full suit-font z-40">
     <ul
-        class="max-w-[530px] mx-auto flex justify-between w-full gap-3 px-5 z-50 bg-white py-3 relative"
+        class="max-w-[630px] mx-auto flex justify-between w-full gap-3 px-5 z-50 bg-white py-3 relative"
     >
         {#if $page.url.pathname == "/" || $page.url.pathname == "/interest"}
             <div class="absolute right-3 top-[-45px]">
-                <PdButton
-                    classVal="py-1.5 px-4 text-white font-light rounded-full"
-                    backgroundColor="#5587ED"
-                    hoverColor="#6799FF"
-                    on:click={() => {
-                        console.log("lsidjgliwjrefgre93459345");
-                    }}
-                >
-                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                    <span class="ml-1">구인등록</span>
-                </PdButton>
+                <a href="/registjob">
+                    <PdButton
+                        classVal="py-1.5 px-4 text-white font-light rounded-full"
+                        backgroundColor="#5587ED"
+                        hoverColor="#6799FF"
+                    >
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                        <span class="ml-1">구인등록</span>
+                    </PdButton>
+                </a>
                 <!-- svelte-ignore event_directive_deprecated -->
                 <!-- <button
                     class="py-1.5 px-4 bg-[#5587ED] text-white font-light rounded-full"
@@ -162,4 +174,5 @@
 </div>
 
 <style>
+
 </style>

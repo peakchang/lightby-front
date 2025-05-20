@@ -14,7 +14,7 @@
 	// 현재 경로에 따라 애니메이션 사용할지 결정
 	let useAnimation = $state(false);
 
-	const animatedRoutes = ["/testpage"];
+	const animatedRoutes = ["/testpage", "/registjob"];
 
 	const unsubscribe = page.subscribe(($page) => {
 		useAnimation = animatedRoutes.includes($page.url.pathname);
@@ -24,6 +24,9 @@
 	onDestroy(() => {
 		unsubscribe();
 	});
+
+
+	
 </script>
 
 <svelte:head>
@@ -55,7 +58,7 @@
 </svelte:head>
 
 <div class="site-wrab">
-	<div class="max-w-[530px] mx-auto px-2 bg-white min-h-screen">
+	<div class="max-w-[640px] mx-auto bg-white min-h-screen">
 		{#key key}
 			{#if useAnimation}
 				<div in:fly={{ y: 300, duration: 300 }}>

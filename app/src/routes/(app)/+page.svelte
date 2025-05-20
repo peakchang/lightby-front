@@ -60,7 +60,7 @@
             <div class="bg-red-500">sdafjhasdf</div>
             sdkjfjsldfjlsjfd
 
-            <a href="/testpage">테스트 페이지</a>
+            <a href="/registjob">테스트 페이지</a>
 
             <PdButton
                 classVal="px-10 py-1 rounded-full text-white"

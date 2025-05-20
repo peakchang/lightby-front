@@ -1,62 +1,60 @@
-// ✅ 공통 에러 처리 함수
-function handleError(err) {
-    console.error(err);
-    return {
-        status: false,
-        message: err?.message || "서버와의 통신에 실패했습니다. 다시 시도해주세요."
-    };
+export function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes}:${secs.toString().padStart(2, "0")}`;
 }
 
-// ✅ 공통 fetch 옵션 구성
-function buildOptions(method, data = {}, headers = {}, useAuth = false) {
-    const defaultHeaders = {
-        'Content-Type': 'application/json',
-        ...(useAuth ? { Authorization: `Bearer ${localStorage.getItem('access_token')}` } : {}),
-        ...headers
-    };
-
-    const options = {
-        method,
-        headers: defaultHeaders
-    };
-
-    if (method !== 'GET' && method !== 'DELETE') {
-        options.body = JSON.stringify(data);
-    }
-
-    return options;
+export function generateRandomNumber() {
+    return Math.floor(100000 + Math.random() * 900000); // 100000~999999 사이의 숫자
 }
 
-// ✅ 공통 fetch 호출
-async function request(url, method = 'GET', data = {}, headers = {}, useAuth = false) {
+// 정규식을 사용하여 영어 대소문자와 숫자로만 이루어져 있는지 확인
+export function isAlphanumeric(str) {
+    return /^[A-Za-z0-9]+$/.test(str);
+}
+
+// 특수문자 / 공백 전부 제거
+export function removeSpecialCharactersAndSpaces(str) {
+    // 정규 표현식: 알파벳, 숫자를 제외한 모든 문자 제거 (공백 포함)
+    return str.replace(/[^0-9]/g, '');
+}
+
+
+
+
+export async function fetchRequest(method, url, data = {}, headers = {}) {
     const returnObj = { status: true };
-    try {
-        const res = await fetch(url, buildOptions(method, data, headers, useAuth));
-        const json = await res.json();
 
-        if (!res.ok) {
-            return {
-                status: false,
-                message: json?.message || `요청 실패 (status: ${res.status})`
-            };
+    try {
+        const isGet = method.toUpperCase() === 'GET';
+
+        const options = {
+            method: method.toUpperCase(),
+            headers: {
+                'Content-Type': 'application/json',
+                ...headers,
+            },
+        };
+
+        if (!isGet) {
+            options.body = JSON.stringify(data);
         }
 
-        returnObj.data = json;
+        const res = await fetch(url, options);
+
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || '서버 오류');
+        }
+
+        const result = await res.json();
+        returnObj.data = result;
         return returnObj;
+
     } catch (err) {
-        return handleError(err);
+        console.error(`Fetch ${method.toUpperCase()} Error:`, err);
+        returnObj.status = false;
+        returnObj.message = err.message || '서버와의 통신에 실패했습니다.';
+        return returnObj;
     }
 }
-
-
-export const fetchPost = (url, data = {}, headers = {}, useAuth = false) =>
-    request(url, 'POST', data, headers, useAuth);
-
-export const fetchGet = (url, headers = {}, useAuth = false) =>
-    request(url, 'GET', {}, headers, useAuth);
-
-export const fetchPut = (url, data = {}, headers = {}, useAuth = false) =>
-    request(url, 'PUT', data, headers, useAuth);
-
-export const fetchDelete = (url, headers = {}, useAuth = false) =>
-    request(url, 'DELETE', {}, headers, useAuth);
