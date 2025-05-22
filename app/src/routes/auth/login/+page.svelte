@@ -1,51 +1,56 @@
 <script>
     import { goto } from "$app/navigation";
-    import { user_info } from "$lib/store";
+    import { userInfo } from "$lib/stores/stores";
+    import CustomModal from "$lib/components/CustomModal.svelte";
+
+    import { fetchRequest } from "$lib/lib";
 
     let id = $state("");
     let password = $state("");
 
-    console.log($user_info);
+    // 모달 관련
+    let successModal = $state(false);
+    let successMessage = $state("");
+    let alertModal = $state(false);
+    let alertMessage = $state("");
+
+    console.log($userInfo);
 
     $effect(() => {
-        loginedChecked();
-    });
-
-    function loginedChecked() {
-        if ($user_info.idx) {
-            alert("이미 로그인 되어 있습니다.");
-            location.href = "/";
+        // 로그인 되어 있는지 체크~
+        if ($userInfo["idx"]) {
+            alertMessage = "이미 로그인 되어 있습니다.";
+            alertModal = true;
+            setTimeout(() => {
+                alertModal = false;
+                location.href = "/";
+            }, 800);
         }
-    }
+    });
 
     async function loginSubmit(e) {
         e.preventDefault();
 
         let errorMessage = "";
 
-        // try {
-        //     const res = await axios.post(`/auth/login`, { id, password });
-        //     console.log(res);
+        const res = await fetchRequest("POST", `/auth/login`, {
+            id,
+            password,
+        });
 
-        //     if (res.status === 200) {
-        //         alert("로그인 완료!");
-        //         location.href = "/";
-        //     }
-        // } catch (error) {
-        //     console.log(error.response);
+        if (res.status) {
+            successMessage = "로그인 완료! 잠시후 메인으로 이동합니다.";
+            successModal = true;
 
-        //     if (error.response) {
-        //         // 서버에서 보낸 에러 메시지 추출
-        //         console.error("Error Response:", error.response);
-        //         alert(error.response.data.error || "로그인 실패!"); // 에러 메시지 표시
-        //     } else if (error.request) {
-        //         console.error("No response received:", error.request);
-        //         alert("서버로부터 응답이 없습니다.");
-        //     } else {
-        //         console.error("Request error:", error.message);
-        //         alert("요청 중 오류 발생");
-        //     }
-        // }
+            setTimeout(() => {
+                successModal = false;
+                location.href = "/";
+            }, 1800);
+        } else {
+            console.log(res);
+            alertModal = true;
+            alertMessage = res.message + " 다시 시도해주세요.";
+        }
     }
 
     const kakao_login = () => {
@@ -58,6 +63,27 @@
     };
 </script>
 
+<CustomModal bind:visible={successModal} closeBtn={false}>
+    <div class="text-center">
+        <div class=" text-green-700 text-3xl mb-2">
+            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+        </div>
+        <div class="mb-2">{successMessage}</div>
+        <div>
+            <span class="loading loading-ring loading-xl"></span>
+        </div>
+    </div>
+</CustomModal>
+
+<CustomModal bind:visible={alertModal} closeBtn={false}>
+    <div class="text-center">
+        <div class=" text-red-500 text-3xl mb-2">
+            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+        </div>
+        <div>{alertMessage}</div>
+    </div>
+</CustomModal>
+
 <div class="bg-green-50 relative min-h-screen">
     <div
         class="max-w-[530px] mx-auto suit-font pt-12 pb-10 bg-white p-14 min-h-screen"
@@ -69,9 +95,7 @@
         <div class="mt-12">
             <!-- svelte-ignore event_directive_deprecated -->
             <form on:submit={loginSubmit}>
-                <label
-                    class="input input-info mt-5 w-full"
-                >
+                <label class="input input-info mt-5 w-full">
                     <span class="min-w-4 flex justify-center">
                         <i class="fa fa-id-card-o opacity-70" aria-hidden="true"
                         ></i>

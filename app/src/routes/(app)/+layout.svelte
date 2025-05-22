@@ -1,14 +1,22 @@
 <script>
-    import { goto } from "$app/navigation";
     import PdButton from "$lib/components/PdButton.svelte";
+    import CustomModal from "$lib/components/CustomModal.svelte";
+    import { goto } from "$app/navigation";
+
     import { page } from "$app/stores";
-    import { user_info } from "$lib/store";
+    import { userInfo } from "$lib/stores/stores";
+    import { fetchRequest } from "$lib/lib";
     let { children } = $props();
+
+    let successModal = $state(false);
+    let successMessage = $state("");
+
+    console.log($userInfo);
 
     function movePage(e) {
         console.log(this.getAttribute("linkdata"));
 
-        if (this.getAttribute("linkdata") == "/my" && !$user_info.idx) {
+        if (this.getAttribute("linkdata") == "/my" && !$userInfo.idx) {
             // alert("로그인 후 이용 가능합니다.");
             // return;
         }
@@ -16,18 +24,56 @@
             goto(this.getAttribute("linkdata"));
         }
     }
+
+    async function logout() {
+        const res = await fetchRequest("POST", "/auth/logout", {
+            idx: $userInfo.idx,
+        });
+        if (res.status) {
+            successMessage = "로그아웃 되었습니다.";
+            successModal = true;
+            setTimeout(() => {
+                successModal = false;
+            }, 800);
+            $userInfo = {};
+        }
+
+        console.log(res);
+    }
 </script>
 
+<CustomModal bind:visible={successModal} closeBtn={false}>
+    <div class="text-center">
+        <div class=" text-green-700 text-3xl mb-2">
+            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+        </div>
+        <div>{successMessage}</div>
+    </div>
+</CustomModal>
+
 <div
-    class="fixed top-0 left-1/2 max-w-[530px] w-full -translate-x-1/2 bg-white p-3 shadow-bottom"
+    class="fixed top-0 left-1/2 max-w-[640px] w-full -translate-x-1/2 bg-white p-3 shadow-bottom"
 >
     <div class="flex justify-between">
         <div>
             <img src="/logo.png" alt="" class=" max-w-[110px] cursor-pointer" />
         </div>
-        <div>
-            <a href="/auth/login">로그인</a>
-        </div>
+        {#if $userInfo.idx}
+            <button
+                class="btn btn-outline btn-success btn-xs"
+                on:click={logout}
+            >
+                <i class="fa fa-user-circle" aria-hidden="true"></i>
+                <span>로그아웃</span>
+            </button>
+        {:else}
+            <a href="/auth/login">
+                <button class="btn btn-outline btn-success btn-xs">
+                    <i class="fa fa-user-circle" aria-hidden="true"></i>
+                    <span>로그인</span>
+                </button>
+            </a>
+        {/if}
     </div>
 </div>
 
@@ -174,5 +220,4 @@
 </div>
 
 <style>
-
 </style>

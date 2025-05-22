@@ -18,7 +18,6 @@
 
 	const unsubscribe = page.subscribe(($page) => {
 		useAnimation = animatedRoutes.includes($page.url.pathname);
-		console.log(useAnimation);
 	});
 
 	onDestroy(() => {

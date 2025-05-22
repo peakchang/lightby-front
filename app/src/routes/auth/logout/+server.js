@@ -16,7 +16,9 @@ export async function POST({ request, cookies }) {
         const deleteTokenQuery = "UPDATE users SET refresh_token = '' WHERE idx = ?";
         await sql_con.promise().query(deleteTokenQuery, [body.idx]);
         console.log(cookies);
-        cookies.delete('tk')
+        cookies.delete('access_token', { path: '/' })
+        cookies.delete('refresh_token', { path: '/' })
+
 
     } catch (error) {
 

@@ -3,7 +3,7 @@
     import axios from "axios";
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
-    import { user_info } from "$lib/store";
+    import { userInfo } from "$lib/stores/stores";
     import { back_api } from "$lib/const";
     import {
         formatTime,
@@ -14,8 +14,8 @@
     let { data } = $props();
     console.log(data);
 
-    let userInfo = $state({});
-    userInfo = data.userInfo;
+    let user_info = $state({});
+    user_info = data.userInfo;
 
     // 필수 정보 변수!
     let name = $state("");
@@ -52,13 +52,13 @@
             alert("오류입니다. 다시 시도해주세요");
             goto("/auth/login");
         }
-        // 빈 객체가 아닐경우 유저 정보가 있으므로 store user_info 에 정보 넣고 메인 페이지로 이동!
+        // 빈 객체가 아닐경우 유저 정보가 있으므로 store userInfo 에 정보 넣고 메인 페이지로 이동!
         if (data.loginStatus == true) {
-            $user_info = data;
+            $userInfo = data;
             location.href = "/";
         }
 
-        if (userInfo.phone) {
+        if (user_info.phone) {
             authBool = true;
         }
     });
@@ -127,12 +127,12 @@
     async function snsloginSubmit(e) {
         e.preventDefault();
 
-        if (!data.loginStatus && !userInfo.name && !name) {
+        if (!data.loginStatus && !user_info.name && !name) {
             alert("이름을 입력하세요.");
             return;
         }
 
-        if (!data.loginStatus && !userInfo.phone && !phone) {
+        if (!data.loginStatus && !user_info.phone && !phone) {
             alert("휴대폰 번호를 입력하세요.");
             return;
         }
@@ -142,14 +142,14 @@
             return;
         }
 
-        if (!data.loginStatus && !userInfo.nickname && !nickname) {
+        if (!data.loginStatus && !user_info.nickname && !nickname) {
             alert("닉네임을 입력하세요.");
             return;
         }
-        userInfo.name = name;
-        userInfo.phone = removeSpecialCharactersAndSpaces(phone);
-        userInfo.nickname = nickname;
-        console.log(userInfo);
+        user_info.name = name;
+        user_info.phone = removeSpecialCharactersAndSpaces(phone);
+        user_info.nickname = nickname;
+        console.log(user_info);
 
         // try {
         //     const res = await axios.post("/auth/kakao-callback", { userInfo });
@@ -233,7 +233,7 @@
         <div class="mt-12">
             <!-- svelte-ignore event_directive_deprecated -->
             <form on:submit={snsloginSubmit}>
-                {#if !userInfo.name && !data.loginStatus}
+                {#if !user_info.name && !data.loginStatus}
                     <label
                         class="input input-bordered flex items-center gap-2 text-sm mt-5"
                     >
@@ -250,7 +250,7 @@
                     </label>
                 {/if}
 
-                {#if !userInfo.nickname & !data.loginStatus}
+                {#if !user_info.nickname & !data.loginStatus}
                     <label
                         class="input input-bordered flex items-center gap-2 text-sm mt-5"
                     >
@@ -287,7 +287,7 @@
                     </div>
                 {/if}
 
-                {#if !userInfo.phone & !data.loginStatus}
+                {#if !user_info.phone & !data.loginStatus}
                     <div class="flex items-center mt-5 gap-2">
                         <label
                             class="input input-bordered flex items-center gap-2 text-sm w-full"

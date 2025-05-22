@@ -2,6 +2,7 @@
     import CustomModal from "$lib/components/CustomModal.svelte";
     import { goto } from "$app/navigation";
     import { back_api } from "$lib/const";
+    import { userInfo } from "$lib/stores/stores";
 
     import {
         formatTime,
@@ -11,20 +12,19 @@
         fetchRequest,
     } from "$lib/lib";
 
-    import { user_info } from "$lib/store.js";
     import QuestionItem from "$lib/components/QuestionItem.svelte";
-    // import axios from "axios";
 
     $effect(() => {
-        loginedChecked();
-    });
-
-    function loginedChecked() {
-        if ($user_info.idx) {
-            alert("이미 로그인 되어 있습니다.");
-            location.href = "/";
+        // 로그인 되어 있는지 체크~
+        if ($userInfo["idx"]) {
+            alertMessage = "이미 로그인 되어 있습니다.";
+            alertModal = true;
+            setTimeout(() => {
+                alertModal = false;
+                location.href = "/";
+            }, 800);
         }
-    }
+    });
 
     let id = $state("");
     let idErrBool = $state(false); // 아이디 창 벗어났을때 에러 창 뜨게 하는 변수
@@ -54,7 +54,10 @@
 
     let alertModal = $state(false);
     let alertMessage = $state("");
+    let successModal = $state(false); // 무언가 성공시 모달! (2초 후 로그인 페이지로 이동)
+    let successMessage = $state("");
 
+    // ID / 닉네임 / 휴대폰번호 input 창에서 벗어날시 기존 DB와 중복 체크 부분!
     async function duplicate_chk(e) {
         console.log("여기는??");
 
@@ -113,15 +116,19 @@
                     return false;
                 }
             } else {
-                alert("전화번호를 입력해주세요");
+                alertMessage = "전화번호를 입력해주세요";
+                alertModal = true;
                 return false;
             }
         }
     }
 
+    // 전화번호 인증 시작~~~~
     async function startAuth() {
         if (!phone) {
-            alert("전화번호를 입력해주세요");
+            alertMessage = "전화번호를 입력해주세요";
+            alertModal = true;
+
             return;
         }
         authShowBool = true;
@@ -164,26 +171,34 @@
                         clearInterval(interval);
                         interval = null;
                         timeLeft = 180;
-                        alert("시간이 만료 되었습니다. 다시 시도해주세요.");
+                        alertMessage =
+                            "시간이 만료 되었습니다. 다시 시도해주세요.";
+                        alertModal = true;
                     }
                 }, 1000);
             }
         } catch (error) {}
     }
 
+    // 인증 완료 또는 실패시
     function checkAuthStop() {
         if (authNumber == authNumChk) {
-            alert("인증 되었습니다.");
             clearInterval(interval);
+            successMessage = "인증 되었습니다.";
+            successModal = true;
+
             interval = null;
             authShowBool = false;
             authBool = true;
         } else {
-            alert("인증증번호가 일치하지 않습니다.");
+            alertMessage = "인증번호가 일치하지 않습니다.";
+            alertModal = true;
+
             return false;
         }
     }
 
+    // 비밀번호 와 비밀번호 확인 일치 여부!
     function chkPwdFunc() {
         pwdErrShowBool = false;
         pwdSuccessShowBool = false;
@@ -198,6 +213,7 @@
         }
     }
 
+    // 최종 회원가입!!
     async function joinSubmit(e) {
         e.preventDefault();
         if (!id) {
@@ -242,11 +258,13 @@
             return;
         }
         if (!password) {
-            alert("비밀번호를 입력하세요");
+            alertMessage = "비밀번호를 입력하세요";
+            alertModal = true;
             return;
         }
         if (password != passwordChk) {
-            alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+            alertMessage = "비밀번호와 비밀번호 확인이 일치하지 않습니다.";
+            alertModal = true;
             return;
         }
 
@@ -260,29 +278,19 @@
             password,
         });
         if (res.status) {
-            alert("회원가입 성공! 로그인 해주세요");
-            goto("/auth/login");
+            successMessage = "회원가입 성공! 로그인 해주세요.";
+            successModal = true;
+            setTimeout(() => {
+                successModal = false;
+                goto("/auth/login");
+            }, 1800);
         } else {
-            alert("회원가입 실패 다시 시도해주세요");
+            alertMessage = "회원가입 실패 다시 시도해주세요";
+            alertModal = true;
         }
-        // try {
-        //     const res = await axios.post("/auth/join", {
-        //         id,
-        //         name,
-        //         nickname,
-        //         phone,
-        //         password,
-        //     });
-        //     if (res.status === 200) {
-        //         alert("회원가입 성공! 로그인 해주세요");
-        //         goto("/auth/login");
-        //     }
-        // } catch (error) {
-        //     console.error(error);
-        //     alert("회원가입 실패 다시 시도해주세요");
-        // }
     }
 
+    // 전화번호 업로드시 숫자만 남기기
     function formatPhoneNumber(event) {
         let value = event.target.value.replace(/\D/g, ""); // 숫자만 남기기 (한글, 영어, 특수문자 제거)
 
@@ -295,6 +303,15 @@
         phone = value;
     }
 </script>
+
+<CustomModal bind:visible={successModal} closeBtn={false}>
+    <div class="text-center">
+        <div class=" text-green-700 text-3xl mb-2">
+            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+        </div>
+        <div>{successMessage}</div>
+    </div>
+</CustomModal>
 
 <CustomModal bind:visible={alertModal} closeBtn={false}>
     <div class="text-center">

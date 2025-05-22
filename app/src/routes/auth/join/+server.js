@@ -12,10 +12,6 @@ export async function POST({ request, cookies }) {
     const saltRounds = 10; // 솔트 라운드 수 (높을수록 보안은 좋지만 속도가 느려짐)
     body.password = await bcrypt.hash(body.password, saltRounds);
     const queryStr = getQueryStr(body, 'insert');
-    console.log(queryStr);
-
-    
-
 
     try {
         const testQuery = `INSERT INTO users (${queryStr.str}) VALUES (${queryStr.question})`;
