@@ -1,4 +1,5 @@
 <script>
+    import CustomModal from "$lib/components/CustomModal.svelte";
     import { goto } from "$app/navigation";
     import { back_api } from "$lib/const";
 
@@ -51,6 +52,9 @@
     let pwdErrShowBool = $state(false); // 비밀번호가 일치하지 않을시 에러 창 뜨게!
     let pwdSuccessShowBool = $state(false); // 비밀번호가 일치하면 정상 창 뜨게!
 
+    let alertModal = $state(false);
+    let alertMessage = $state("");
+
     async function duplicate_chk(e) {
         console.log("여기는??");
 
@@ -77,25 +81,6 @@
                     idSuccessBool = false;
                 }
                 console.log(res);
-
-                // try {
-                //     const res = await axios.post(`/auth/duplicate_chk`, {
-                //         type,
-                //         value: id,
-                //     });
-                //     if (res.status == 200) {
-                //         if (res.data.status == false) {
-                //             idErrBool = true;
-                //             idSuccessBool = false;
-                //         } else {
-                //             idErrBool = false;
-                //             idSuccessBool = true;
-                //         }
-                //     } else {
-                //         alert("에러발생! 다시 시도해주세요!");
-                //         id = "";
-                //     }
-                // } catch (error) {}
             }
         } else if (type == "nickname") {
             if (nickname) {
@@ -111,58 +96,22 @@
                     nicknameSuccessBool = false;
                 }
                 console.log(res);
-                // try {
-                //     const res = await axios.post(`/auth/duplicate_chk`, {
-                //         type,
-                //         value: nickname,
-                //     });
-                //     if (res.status == 200) {
-                //         if (res.data.status == false) {
-                //             nicknameErrBool = true;
-                //             nicknameSuccessBool = false;
-                //         } else {
-                //             nicknameErrBool = false;
-                //             nicknameSuccessBool = true;
-                //         }
-                //     } else {
-                //         alert("에러발생! 다시 시도해주세요!");
-                //         nickname = "";
-                //     }
-                // } catch (error) {}
             }
         } else {
             if (phone) {
                 const res = await fetchRequest("POST", `/auth/duplicate_chk`, {
                     type,
-                    value: phone,
+                    value: removeSpecialCharactersAndSpaces(phone),
                 });
                 if (res.status) {
                     clearInterval(interval);
                     return true;
                 } else {
-                    alert("중복된 번호가 있습니다. 전화번호를 확인해주세요");
+                    alertMessage = "전화번호가 중복됩니다. 다시 입력해주세요";
+                    alertModal = true;
+                    phone = "";
                     return false;
                 }
-                console.log(res);
-                // try {
-                //     const res = await axios.post(`/auth/duplicate_chk`, {
-                //         type,
-                //         value: phone,
-                //     });
-                //     if (res.status == 200) {
-                //         if (res.data.status == false) {
-                //             alert(
-                //                 "중복된 번호가 있습니다. 전화번호를 확인해주세요",
-                //             );
-                //             return false;
-                //         } else {
-                //             return true;
-                //         }
-                //     } else {
-                //         alert("에러발생! 다시 시도해주세요!");
-                //         nickname = "";
-                //     }
-                // } catch (error) {}
             } else {
                 alert("전화번호를 입력해주세요");
                 return false;
@@ -206,6 +155,7 @@
 
             if (!interval) {
                 interval = setInterval(() => {
+                    console.log("반복 실행 중...");
                     if (timeLeft > 0) {
                         timeLeft -= 1;
                     } else {
@@ -251,36 +201,44 @@
     async function joinSubmit(e) {
         e.preventDefault();
         if (!id) {
-            alert("아이디를 입력하세요");
+            alertMessage = "아이디를 입력하세요";
+            alertModal = true;
             return;
         }
         if (idStatusErrBool == true) {
-            alert("아이디 형식을 확인 해주세요");
+            alertMessage = "아이디 형식을 확인 해주세요";
+            alertModal = true;
             return;
         }
         if (idErrBool == true) {
-            alert("중복된 아이디입니다.");
+            alertMessage = "중복된 아이디입니다.";
+            alertModal = true;
             return;
         }
         if (!name) {
-            alert("이름을 입력하세요");
+            alertMessage = "이름을 입력하세요";
+            alertModal = true;
             return;
         }
 
         if (nicknameErrBool == true) {
-            alert("중복된 닉네임 입니다.");
+            alertMessage = "중복된 닉네임 입니다.";
+            alertModal = true;
             return;
         }
         if (!nickname) {
-            alert("닉네임을 입력하세요");
+            alertMessage = "닉네임을 입력하세요";
+            alertModal = true;
             return;
         }
         if (!phone) {
-            alert("전화번호를 입력하세요");
+            alertMessage = "전화번호를 입력하세요";
+            alertModal = true;
             return;
         }
         if (!authBool) {
-            alert("휴대폰 인증을 완료해주세요");
+            alertMessage = "휴대폰 인증을 완료해주세요";
+            alertModal = true;
             return;
         }
         if (!password) {
@@ -337,6 +295,15 @@
         phone = value;
     }
 </script>
+
+<CustomModal bind:visible={alertModal} closeBtn={false}>
+    <div class="text-center">
+        <div class=" text-red-500 text-3xl mb-2">
+            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+        </div>
+        <div>{alertMessage}</div>
+    </div>
+</CustomModal>
 
 <div class="bg-green-50 relative min-h-screen">
     <div
