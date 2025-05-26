@@ -49,31 +49,39 @@
             <span class="loading loading-dots loading-xl"></span>
         </div>
     {:else}
-        <div class="mt-5">
-            <h1>Welcome to SvelteKit</h1>
-            <p>
-                Visit <a href="https://svelte.dev/docs/kit"
-                    >svelte.dev/docs/kit</a
-                > to read the documentation
-            </p>
+        <div class="mt-5 px-3">
+            <div class="flex gap-5 pb-3 border-b border-b-gray-300">
+                <div class=" w-36 h-32 rounded-lg overflow-hidden">
+                    <img src="/sample_thumbnail-1.jpg" alt="" />
+                </div>
+                <div class="flex flex-col justify-around">
+                    <div>
+                        <span
+                            class=" bg-green-600 text-xs px-2 py-1 text-white rounded-md"
+                        >
+                            아파트
+                        </span>
+                    </div>
+                    <div>
+                        <span>지젤 라이프 그라피 서초</span>
+                    </div>
+                    <div class="text-sm text-amber-800">
+                        분양가 상한제 적용 / 최고 위치 및 입지
+                    </div>
 
-            <div class="bg-red-500">sdafjhasdf</div>
-            sdkjfjsldfjlsjfd
-
-            <a href="/registjob">테스트 페이지</a>
-
-            <PdButton
-                classVal="px-10 py-1 rounded-full text-white"
-                on:click={() => {
-                    console.log("alsdjfialsjdflijadsf");
-                }}
-            >
-                구인등록
-            </PdButton>
-
-            <button class="px-10 py-1 rounded-full text-white bg-gray-700">
-                가나다라
-            </button>
+                    <div class="text-xs">
+                        <span class="bg-amber-600 px-2 py-1 text-white">
+                            팀장
+                        </span>
+                        <span class="bg-amber-600 px-2 py-1 text-white">
+                            프로모션 20
+                        </span>
+                        <span class="bg-amber-600 px-2 py-1 text-white">
+                            일비/숙소비
+                        </span>
+                    </div>
+                </div>
+            </div>
         </div>
     {/if}
 </div>

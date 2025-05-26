@@ -4,19 +4,19 @@
     import { goto } from "$app/navigation";
 
     import { page } from "$app/stores";
-    import { userInfo } from "$lib/stores/stores";
+    import { user_info } from "$lib/stores/stores";
     import { fetchRequest } from "$lib/lib";
     let { children } = $props();
 
     let successModal = $state(false);
     let successMessage = $state("");
 
-    console.log($userInfo);
+    console.log($user_info);
 
     function movePage(e) {
         console.log(this.getAttribute("linkdata"));
 
-        if (this.getAttribute("linkdata") == "/my" && !$userInfo.idx) {
+        if (this.getAttribute("linkdata") == "/my" && !$user_info.idx) {
             // alert("로그인 후 이용 가능합니다.");
             // return;
         }
@@ -27,7 +27,7 @@
 
     async function logout() {
         const res = await fetchRequest("POST", "/auth/logout", {
-            idx: $userInfo.idx,
+            idx: $user_info.idx,
         });
         if (res.status) {
             successMessage = "로그아웃 되었습니다.";
@@ -35,7 +35,7 @@
             setTimeout(() => {
                 successModal = false;
             }, 800);
-            $userInfo = {};
+            $user_info = {};
         }
 
         console.log(res);
@@ -58,7 +58,7 @@
         <div>
             <img src="/logo.png" alt="" class=" max-w-[110px] cursor-pointer" />
         </div>
-        {#if $userInfo.idx}
+        {#if $user_info.idx}
             <button
                 class="btn btn-outline btn-success btn-xs"
                 on:click={logout}

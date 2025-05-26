@@ -1,6 +1,6 @@
 <script>
     import { goto } from "$app/navigation";
-    import { userInfo } from "$lib/stores/stores";
+    import { user_info } from "$lib/stores/stores";
     import CustomModal from "$lib/components/CustomModal.svelte";
 
     import { fetchRequest } from "$lib/lib";
@@ -13,12 +13,13 @@
     let successMessage = $state("");
     let alertModal = $state(false);
     let alertMessage = $state("");
+    let modalLoading = $state(false);
 
-    console.log($userInfo);
+    console.log($user_info);
 
     $effect(() => {
         // 로그인 되어 있는지 체크~
-        if ($userInfo["idx"]) {
+        if ($user_info["idx"]) {
             alertMessage = "이미 로그인 되어 있습니다.";
             alertModal = true;
             setTimeout(() => {
@@ -41,9 +42,10 @@
         if (res.status) {
             successMessage = "로그인 완료! 잠시후 메인으로 이동합니다.";
             successModal = true;
-
+            modalLoading = true;
             setTimeout(() => {
                 successModal = false;
+                modalLoading = false;
                 location.href = "/";
             }, 1800);
         } else {
@@ -68,10 +70,12 @@
         <div class=" text-green-700 text-3xl mb-2">
             <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
         </div>
-        <div class="mb-2">{successMessage}</div>
-        <div>
-            <span class="loading loading-ring loading-xl"></span>
-        </div>
+        <div>{successMessage}</div>
+        {#if modalLoading}
+            <div class="mt-2">
+                <span class="loading loading-ring loading-xl"></span>
+            </div>
+        {/if}
     </div>
 </CustomModal>
 
@@ -81,6 +85,11 @@
             <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
         </div>
         <div>{alertMessage}</div>
+        {#if modalLoading}
+            <div class="mt-2">
+                <span class="loading loading-ring loading-xl"></span>
+            </div>
+        {/if}
     </div>
 </CustomModal>
 

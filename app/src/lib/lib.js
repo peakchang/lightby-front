@@ -42,8 +42,6 @@ export async function fetchRequest(method, url, data = {}, headers = {}) {
 
         if (!res.ok) {
             const errorData = await res.json();
-            console.log(errorData);
-            
             throw new Error(errorData.message || '서버 오류');
         }
 
@@ -55,7 +53,6 @@ export async function fetchRequest(method, url, data = {}, headers = {}) {
         console.error(`Fetch ${method.toUpperCase()} Error:`, err);
         returnObj.status = false;
         returnObj.message = err.message || '서버와의 통신에 실패했습니다.';
-        console.log(returnObj);
         
         return returnObj;
     }

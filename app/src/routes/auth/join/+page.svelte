@@ -2,7 +2,7 @@
     import CustomModal from "$lib/components/CustomModal.svelte";
     import { goto } from "$app/navigation";
     import { back_api } from "$lib/const";
-    import { userInfo } from "$lib/stores/stores";
+    import { user_info } from "$lib/stores/stores";
 
     import {
         formatTime,
@@ -16,11 +16,13 @@
 
     $effect(() => {
         // 로그인 되어 있는지 체크~
-        if ($userInfo["idx"]) {
+        if ($user_info["idx"]) {
             alertMessage = "이미 로그인 되어 있습니다.";
             alertModal = true;
+            modalLoading = true;
             setTimeout(() => {
                 alertModal = false;
+                modalLoading= false;
                 location.href = "/";
             }, 800);
         }
@@ -56,6 +58,7 @@
     let alertMessage = $state("");
     let successModal = $state(false); // 무언가 성공시 모달! (2초 후 로그인 페이지로 이동)
     let successMessage = $state("");
+    let modalLoading = $state(false)
 
     // ID / 닉네임 / 휴대폰번호 input 창에서 벗어날시 기존 DB와 중복 체크 부분!
     async function duplicate_chk(e) {
@@ -125,12 +128,18 @@
 
     // 전화번호 인증 시작~~~~
     async function startAuth() {
-        if (!phone) {
-            alertMessage = "전화번호를 입력해주세요";
-            alertModal = true;
 
+        if (phone.length < 12) {
+            alertMessage = "휴대폰 번호를 확인해주세요";
+            alertModal = true;
             return;
         }
+        // if (!phone) {
+        //     alertMessage = "전화번호를 입력해주세요";
+        //     alertModal = true;
+
+        //     return;
+        // }
         authShowBool = true;
         console.log(authShowBool);
 
@@ -248,7 +257,7 @@
             return;
         }
         if (!phone) {
-            alertMessage = "전화번호를 입력하세요";
+            alertMessage = "휴대폰 번호를 입력하세요.";
             alertModal = true;
             return;
         }
@@ -280,8 +289,10 @@
         if (res.status) {
             successMessage = "회원가입 성공! 로그인 해주세요.";
             successModal = true;
+            modalLoading = true;
             setTimeout(() => {
                 successModal = false;
+                modalLoading = false;
                 goto("/auth/login");
             }, 1800);
         } else {
@@ -310,6 +321,11 @@
             <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
         </div>
         <div>{successMessage}</div>
+        {#if modalLoading}
+            <div class="mt-2">
+                <span class="loading loading-ring loading-xl"></span>
+            </div>
+        {/if}
     </div>
 </CustomModal>
 
@@ -319,6 +335,11 @@
             <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
         </div>
         <div>{alertMessage}</div>
+        {#if modalLoading}
+            <div class="mt-2">
+                <span class="loading loading-ring loading-xl"></span>
+            </div>
+        {/if}
     </div>
 </CustomModal>
 

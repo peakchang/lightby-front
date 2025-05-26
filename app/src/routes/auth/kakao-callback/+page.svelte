@@ -1,30 +1,28 @@
 <script>
+    import CustomModal from "$lib/components/CustomModal.svelte";
     import { page } from "$app/stores";
-    import axios from "axios";
-    import { onMount } from "svelte";
     import { goto } from "$app/navigation";
-    import { userInfo } from "$lib/stores/stores";
+    import { user_info } from "$lib/stores/stores";
     import { back_api } from "$lib/const";
     import {
         formatTime,
         generateRandomNumber,
         removeSpecialCharactersAndSpaces,
+        fetchRequest,
     } from "$lib/lib";
 
     let { data } = $props();
     console.log(data);
 
-    let user_info = $state({});
-    user_info = data.userInfo;
+    let userInfo = $state({});
+    userInfo = data.userInfo;
 
     // 필수 정보 변수!
-    let name = $state("");
-
     let nickname = $state("");
+    let phone = $state("");
+
     let nicknameSuccessBool = $state(false); // 아이디 창 벗어났을때 성공 창 뜨게 하는 변수
     let nicknameErrBool = $state(false); // 아이디 창 벗어났을때 에러 창 뜨게 하는 변수
-
-    let phone = $state("");
 
     let authNumber = $state(""); // 발송되는 인증번호
     let authNumChk = $state(""); // 실제 입력되는 인증번호
@@ -32,6 +30,12 @@
     let authBool = $state(false); // 마무리 체크 단계 false 면 회원가입 안됨!
     let timeLeft = $state(180); // 인증번호 카운트 다운 떨어지는 숫자!
     let interval = $state(null); // 인증번호 카운트 다운 시 setInerval 셋팅 변수
+
+    let alertModal = $state(false);
+    let alertMessage = $state("");
+    let successModal = $state(false); // 무언가 성공시 모달! (2초 후 로그인 페이지로 이동)
+    let successMessage = $state("");
+    let modalLoading = $state(false);
 
     // 고객정보 대조 후 필수 정보 (전화번호 / 이름) 없으면 인증 받기 (SNS 아이디는 비밀번호 X)
     // 이렇게 해서 로그인 / 회원가입 같이 처리하기
@@ -46,26 +50,128 @@
     */
 
     $effect(() => {
-        console.log(data);
-
         if (data.loginStatus == undefined) {
-            alert("오류입니다. 다시 시도해주세요");
-            goto("/auth/login");
+            alertMessage = "오류입니다. 다시 시도해주세요";
+            alertModal = true;
+            modalLoading = true;
+            setTimeout(() => {
+                alertModal = false;
+                modalLoading = false;
+                goto("/auth/login");
+            }, 1500);
         }
         // 빈 객체가 아닐경우 유저 정보가 있으므로 store userInfo 에 정보 넣고 메인 페이지로 이동!
         if (data.loginStatus == true) {
-            $userInfo = data;
-            location.href = "/";
+            $user_info = data;
+            successMessage = "메인으로 이동중입니다.";
+            successModal = true;
+            modalLoading = true;
+            setTimeout(() => {
+                successModal = false;
+                modalLoading = false;
+                location.href = "/";
+            }, 1500);
         }
 
-        if (user_info.phone) {
+        if (userInfo.phone) {
             authBool = true;
         }
     });
 
+    async function duplicate_chk(e) {
+        const type = e.target.getAttribute("data-type");
+        if (type == "nickname") {
+            if (nickname) {
+                const res = await fetchRequest("POST", `/auth/duplicate_chk`, {
+                    type,
+                    value: nickname,
+                });
+                if (res.status) {
+                    nicknameErrBool = false;
+                    nicknameSuccessBool = true;
+                } else {
+                    nicknameErrBool = true;
+                    nicknameSuccessBool = false;
+                }
+                console.log(res);
+            }
+        } else {
+            if (phone) {
+                const res = await fetchRequest("POST", `/auth/duplicate_chk`, {
+                    type,
+                    value: removeSpecialCharactersAndSpaces(phone),
+                });
+                if (res.status) {
+                    clearInterval(interval);
+                    return true;
+                } else {
+                    alertMessage = "전화번호가 중복됩니다. 다시 입력해주세요";
+                    alertModal = true;
+                    phone = "";
+                    return false;
+                }
+            } else {
+                alertMessage = "전화번호를 입력해주세요";
+                alertModal = true;
+                return false;
+            }
+        }
+    }
+
+    async function snsloginSubmit(e) {
+        e.preventDefault();
+
+        if (!data.loginStatus && !userInfo.phone && !phone) {
+            alertMessage = "휴대폰 번호를 입력하세요.";
+            alertModal = true;
+            return;
+        }
+
+        if (!data.loginStatus && !userInfo.phone && !authBool) {
+            alertMessage = "휴대폰 인증을 완료해주세요";
+            alertModal = true;
+            return;
+        }
+
+        if (!data.loginStatus && !userInfo.nickname && !nickname) {
+            alertMessage = "닉네임을 입력하세요";
+            alertModal = true;
+            return;
+        }
+
+        if (phone) {
+            userInfo.phone = removeSpecialCharactersAndSpaces(phone);
+        }
+        if (nickname) {
+            userInfo.nickname = nickname;
+        }
+
+        console.log(userInfo);
+
+        const res = await fetchRequest("POST", "/auth/kakao-callback", {
+            userInfo,
+        });
+        if (res.status) {
+            successMessage = "로그인 성공! 메인으로 이동합니다.";
+            successModal = true;
+            modalLoading = true;
+            setTimeout(() => {
+                successModal = false;
+                modalLoading = false;
+                goto("/");
+            }, 1800);
+        } else {
+            alertMessage = "회원가입 실패 다시 시도해주세요";
+            alertModal = true;
+        }
+    }
+
     async function startAuth() {
-        if (!phone) {
-            alert("전화번호를 입력해주세요");
+        console.log(phone.length);
+
+        if (phone.length < 12) {
+            alertMessage = "휴대폰 번호를 확인해주세요";
+            alertModal = true;
             return;
         }
         authShowBool = true;
@@ -96,6 +202,7 @@
 
             if (!interval) {
                 interval = setInterval(() => {
+                    console.log("반복 실행 중...");
                     if (timeLeft > 0) {
                         timeLeft -= 1;
                     } else {
@@ -113,101 +220,18 @@
 
     function checkAuthStop() {
         if (authNumber == authNumChk) {
-            alert("인증 되었습니다.");
             clearInterval(interval);
+            successMessage = "인증 되었습니다.";
+            successModal = true;
+
             interval = null;
             authShowBool = false;
             authBool = true;
         } else {
-            alert("인증번호가 맞지 않습니다. 다시 시도해주세요");
-            return;
-        }
-    }
+            alertMessage = "인증번호가 일치하지 않습니다.";
+            alertModal = true;
 
-    async function snsloginSubmit(e) {
-        e.preventDefault();
-
-        if (!data.loginStatus && !user_info.name && !name) {
-            alert("이름을 입력하세요.");
-            return;
-        }
-
-        if (!data.loginStatus && !user_info.phone && !phone) {
-            alert("휴대폰 번호를 입력하세요.");
-            return;
-        }
-
-        if (!authBool) {
-            alert("휴대폰 인증을 완료해주세요");
-            return;
-        }
-
-        if (!data.loginStatus && !user_info.nickname && !nickname) {
-            alert("닉네임을 입력하세요.");
-            return;
-        }
-        user_info.name = name;
-        user_info.phone = removeSpecialCharactersAndSpaces(phone);
-        user_info.nickname = nickname;
-        console.log(user_info);
-
-        // try {
-        //     const res = await axios.post("/auth/kakao-callback", { userInfo });
-        //     if (res.status == 200) {
-        //         alert("로그인 성공!");
-        //         location.href = "/";
-        //     }
-        // } catch (error) {}
-    }
-
-    async function duplicate_chk(e) {
-        const type = e.target.getAttribute("data-type");
-        if (type == "nickname") {
-            if (nickname) {
-                // try {
-                //     const res = await axios.post(`/auth/duplicate_chk`, {
-                //         type,
-                //         value: nickname,
-                //     });
-                //     if (res.status == 200) {
-                //         if (res.data.status == false) {
-                //             nicknameErrBool = true;
-                //             nicknameSuccessBool = false;
-                //         } else {
-                //             nicknameErrBool = false;
-                //             nicknameSuccessBool = true;
-                //         }
-                //     } else {
-                //         alert("에러발생! 다시 시도해주세요!");
-                //         nickname = "";
-                //     }
-                // } catch (error) {}
-            }
-        } else {
-            if (phone) {
-                // try {
-                //     const res = await axios.post(`/auth/duplicate_chk`, {
-                //         type,
-                //         value: phone,
-                //     });
-                //     if (res.status == 200) {
-                //         if (res.data.status == false) {
-                //             alert(
-                //                 "중복된 번호가 있습니다. 전화번호를 확인해주세요",
-                //             );
-                //             return false;
-                //         } else {
-                //             return true;
-                //         }
-                //     } else {
-                //         alert("에러발생! 다시 시도해주세요!");
-                //         nickname = "";
-                //     }
-                // } catch (error) {}
-            } else {
-                alert("전화번호를 입력해주세요");
-                return false;
-            }
+            return false;
         }
     }
 
@@ -224,6 +248,34 @@
     }
 </script>
 
+<CustomModal bind:visible={successModal} closeBtn={false}>
+    <div class="text-center">
+        <div class=" text-green-700 text-3xl mb-2">
+            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+        </div>
+        <div>{successMessage}</div>
+        {#if modalLoading}
+            <div class="mt-2">
+                <span class="loading loading-ring loading-xl"></span>
+            </div>
+        {/if}
+    </div>
+</CustomModal>
+
+<CustomModal bind:visible={alertModal} closeBtn={false}>
+    <div class="text-center">
+        <div class=" text-red-500 text-3xl mb-2">
+            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+        </div>
+        <div>{alertMessage}</div>
+        {#if modalLoading}
+            <div class="mt-2">
+                <span class="loading loading-ring loading-xl"></span>
+            </div>
+        {/if}
+    </div>
+</CustomModal>
+
 <div class="bg-green-50 relative min-h-screen pretendard">
     <div class="max-w-[530px] mx-auto pt-12 pb-10 bg-white p-14">
         <div class="text-center bg-white">
@@ -233,27 +285,8 @@
         <div class="mt-12">
             <!-- svelte-ignore event_directive_deprecated -->
             <form on:submit={snsloginSubmit}>
-                {#if !user_info.name && !data.loginStatus}
-                    <label
-                        class="input input-bordered flex items-center gap-2 text-sm mt-5"
-                    >
-                        <span class="min-w-4 flex justify-center">
-                            <i class="fa fa-user opacity-70" aria-hidden="true"
-                            ></i>
-                        </span>
-                        <input
-                            type="text"
-                            class="grow"
-                            placeholder="이름을 입력하세요"
-                            bind:value={name}
-                        />
-                    </label>
-                {/if}
-
-                {#if !user_info.nickname & !data.loginStatus}
-                    <label
-                        class="input input-bordered flex items-center gap-2 text-sm mt-5"
-                    >
+                {#if !userInfo.nickname & !data.loginStatus}
+                    <label class="input input-info mt-5 w-full">
                         <span class="min-w-4 flex justify-center">
                             <i
                                 class="fa fa-user-circle opacity-70"
@@ -287,11 +320,9 @@
                     </div>
                 {/if}
 
-                {#if !user_info.phone & !data.loginStatus}
+                {#if !userInfo.phone & !data.loginStatus}
                     <div class="flex items-center mt-5 gap-2">
-                        <label
-                            class="input input-bordered flex items-center gap-2 text-sm w-full"
-                        >
+                        <label class="input input-info w-full">
                             <span class="min-w-4 flex justify-center">
                                 <i
                                     class="fa fa-mobile text-lg opacity-70"
@@ -331,9 +362,7 @@
 
                 {#if authShowBool}
                     <div class="flex items-center mt-1.5 gap-2">
-                        <label
-                            class="input input-bordered flex items-center gap-2 text-sm w-full"
-                        >
+                        <label class="input input-info w-full">
                             <span
                                 class="min-w-4 flex justify-center text-red-400"
                             >

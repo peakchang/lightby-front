@@ -4,7 +4,7 @@
     import SortableImg from "$lib/components/SortableImg.svelte";
     import KakaoMap from "$lib/components/kakaoMap.svelte";
     
-    import { userInfo } from "$lib/stores/stores"
+    import { user_info } from "$lib/stores/stores"
     import { browser } from "$app/environment";
     import { back_api } from "$lib/const";
 

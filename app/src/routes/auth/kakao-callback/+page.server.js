@@ -64,6 +64,8 @@ export async function load({ params, url, cookies }) {
         // 유저 정보 얻기 완료!
         const kakaoUserInfo = userResponse.data;
 
+        console.log('kakaoUserInfo 여기~~~~~~~~~~~~');
+
         console.log(kakaoUserInfo);
 
 
@@ -71,53 +73,70 @@ export async function load({ params, url, cookies }) {
         const getUserInfoQuery = "SELECT * FROM users WHERE sns_id = ?";
         const [getUserInfo] = await sql_con.promise().query(getUserInfoQuery, [kakaoUserInfo.id]);
 
-
         if (getUserInfo.length > 0) {
-            // 기존 가입 유저면 액세스 토큰 / 리프레쉬 토큰 설정 하고 메인으로!
 
-            const payload = {
-                userId: userInfo.idx
+            try {
+                // 기존 가입 유저면 액세스 토큰 / 리프레쉬 토큰 설정 하고 메인으로!
+
+                const userInfo = getUserInfo[0];
+                const payload = {
+                    userId: userInfo.idx
+                }
+
+                const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+                const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET, { expiresIn: '14d' });
+
+                
+
+                data.loginStatus = true;
+
+                const options = {
+                    expiresIn: '7d',
+                }
+
+                const tokenUpdateQuery = `UPDATE users SET refresh_token = ? WHERE idx = ?`;
+                await sql_con.promise().query(tokenUpdateQuery, [refreshToken, userInfo.idx]);
+
+                cookies.set('access_token', accessToken, {
+                    httpOnly: true,
+                    secure: true,
+                    path: '/',
+                    maxAge: 60 * 15
+                });
+
+                cookies.set('refresh_token', refreshToken, {
+                    httpOnly: true,
+                    secure: true,
+                    path: '/',
+                    maxAge: 60 * 60 * 24 * 14
+                });
+            } catch (error) {
+                console.error(error.message);
+                console.log('카카오 로그인 에러!!!');
             }
 
-            const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
-            const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET, { expiresIn: '14d' });
-
-            const getUserInfo = getUserInfo[0];
-
-            data.loginStatus = true;
-
-            const options = {
-                expiresIn: '7d',
-            }
-
-            const tokenUpdateQuery = `UPDATE users SET refresh_token = ? WHERE idx = ?`;
-            await sql_con.promise().query(tokenUpdateQuery, [refreshToken, getUserInfo.idx]);
-
-            cookies.set('access_token', accessToken, {
-                httpOnly: true,
-                secure: true,
-                path: '/',
-                maxAge: 60 * 15
-            });
-
-            cookies.set('refresh_token', refreshToken, {
-                httpOnly: true,
-                secure: true,
-                path: '/',
-                maxAge: 60 * 60 * 24 * 14
-            });
         } else {
             // 기존 유저 아니면 아래 데이터들 체크! 모두 충족하면 넘어가기~
+            // 어쨌든 닉네임 때문에 다시 하긴 해야할거 같은데?
             data.loginStatus = false;
             data.userInfo.sns_id = kakaoUserInfo.id;
-            data.userInfo.profile_image = kakaoUserInfo.properties.profile_image
-            data.userInfo.profile_thumbnail = kakaoUserInfo.properties.thumbnail_image
-            data.userInfo.name = kakaoUserInfo.properties.name
-            // data.userInfo.name = '야무무'
-            data.userInfo.phone = kakaoUserInfo.properties.phone
-            // data.userInfo.phone =  '01021902197'
+            data.userInfo.profile_image = kakaoUserInfo.kakao_account.profile.profile_image_url
+            data.userInfo.profile_thumbnail = kakaoUserInfo.kakao_account.profile.thumbnail_image_url
+            data.userInfo.name = kakaoUserInfo.kakao_account.profile.nickname
+            data.userInfo.nickname = kakaoUserInfo.kakao_account.profile.nickname
+            data.userInfo.phone = kakaoUserInfo.properties.phone // 휴대폰 부분은 넘어온게 없으니까 추후 확인
 
-            // 정보들 다 있으면 여기서 insert 시키고 loginStatus true로 만들어서 보내기!!!
+            // name / nickname / phone 다 있으면 insert 시키고 없으면 바로 loginStatus = false 하고 리턴 시키기!
+            // 다 있어도 닉네임 / 휴대폰 번호 중복이 있을수 있으니까 에러나면 (unique) loginStatus = false 하고 리턴 시키기!
+
+
+
+            console.log('userInfo 확인!!!!');
+            console.log(data.userInfo);
+
+
+            console.log('여기가 신규 가입!!');
+
         }
 
     } catch (error) {
