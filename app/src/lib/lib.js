@@ -29,13 +29,16 @@ export async function fetchRequest(method, url, data = {}, headers = {}) {
         const options = {
             method: method.toUpperCase(),
             headers: {
-                'Content-Type': 'application/json',
                 ...headers,
             },
         };
 
+        if (!(data instanceof FormData)) {
+            options.headers['Content-Type'] = 'application/json';
+        }
+
         if (!isGet) {
-            options.body = JSON.stringify(data);
+            options.body = data instanceof FormData ? data : JSON.stringify(data);
         }
 
         const res = await fetch(url, options);
@@ -53,7 +56,7 @@ export async function fetchRequest(method, url, data = {}, headers = {}) {
         console.error(`Fetch ${method.toUpperCase()} Error:`, err);
         returnObj.status = false;
         returnObj.message = err.message || '서버와의 통신에 실패했습니다.';
-        
+
         return returnObj;
     }
 }
