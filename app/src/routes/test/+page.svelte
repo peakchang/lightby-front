@@ -10,6 +10,7 @@
 
     let imgArr = $state([]);
     let maxImgCount = $state(10);
+    let imgPath = $state("");
 
     function openPage(name) {
         console.log("alsdjfliajsdf");
@@ -69,7 +70,7 @@
 
                 try {
                     const res = await axios.post(
-                        `${back_api}/img/upload/single`,
+                        `${back_api}/img/upload_single`,
                         imgForm,
                         {
                             headers: {
@@ -79,6 +80,7 @@
                     );
                     // 성공시 아래 코드 작업!!
                     console.log("성공!!!");
+                    imgPath = res.data.saveUrl;
                 } catch (err) {
                     // 실패시 아래 코드 작업! err.response.data.message 는 서버에서 넘어온 메세지!
                     const m = err.response.data.message;
@@ -86,19 +88,40 @@
                     return;
                 }
 
-                // console.log(res);
-
-                // if (res.status == 200) {
-                //     addVal(res.data.baseUrl);
-                //     setDetailImgCount = imgArr.length - 1;
-                //     updateImg(imgArr);
-                // }
+                // 콜백함수
             } catch (error) {
                 console.error("Error during image compression:", error);
                 alert("이미지 업로드 오류! 다시 시도해주세요!");
             }
         };
     };
+
+    async function deleteImgFile() {
+        console.log("이미지 삭제!!");
+
+        try {
+            const res = await axios.post(`${back_api}/img/delete`, {
+                delPath: imgPath,
+            });
+
+            console.log("성공!!");
+        } catch (err) {
+            const m = err.response.data.message;
+            alert(m ? m : "이미지 삭제 오류! 다시 시도해주세요!");
+            return;
+        }
+    }
 </script>
 
+<div>
+    {#if imgPath}
+        <img
+            src="https://img-bucket1-250525.storage.googleapis.com/{imgPath}"
+            alt=""
+        />
+    {/if}
+</div>
+
 <button on:click={onFileSelected}> 이미지 업로드! </button>
+
+<button on:click={deleteImgFile}>이미지 삭제</button>
