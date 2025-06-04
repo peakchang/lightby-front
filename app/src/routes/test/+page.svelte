@@ -113,6 +113,8 @@
     }
 </script>
 
+
+
 <div>
     {#if imgPath}
         <img
@@ -125,3 +127,6 @@
 <button on:click={onFileSelected}> 이미지 업로드! </button>
 
 <button on:click={deleteImgFile}>이미지 삭제</button>
+
+
+<a href="/test2">test2</a>

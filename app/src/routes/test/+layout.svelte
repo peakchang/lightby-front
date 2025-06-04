@@ -6,15 +6,20 @@
     let { children } = $props();
 
     const key = derived(page, ($page) => $page.url.pathname);
+
+    $effect(() => {
+        console.log("진입!!!!!");
+
+        return () => {
+            console.log("빠져나옴!!!");
+        };
+    });
 </script>
 
 <div class="max-w-[520px] mx-auto border h-screen">
     {#key $key}
-        <div transition:slide={{ y: 200 }}>
-            
-        </div>
+        <div transition:slide={{ y: 200 }}></div>
     {/key}
-
 
     {@render children()}
 

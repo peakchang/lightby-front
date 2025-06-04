@@ -1,12 +1,62 @@
 <script>
-    import { goto } from "$app/navigation";
+    import { goto, beforeNavigate } from "$app/navigation";
     import QuestionItem from "$lib/components/QuestionItem.svelte";
     import SortableImg from "$lib/components/SortableImg.svelte";
     import KakaoMap from "$lib/components/kakaoMap.svelte";
-    
-    import { user_info } from "$lib/stores/stores"
+
+    import { user_info } from "$lib/stores/stores";
     import { browser } from "$app/environment";
     import { back_api } from "$lib/const";
+    import { getCookieValue } from "$lib/lib";
+    import axios from "axios";
+
+    let allData = $state({});
+
+    let feeBases = $derived(["본부", "팀", "직원", "상담시"]);
+    let businessArr = $state([]);
+    let occupationArr = $state([]);
+
+    // if (!$user_info.idx) {
+    //     goto('/')
+    // }
+
+
+
+    $effect(() => {
+
+        // allData["user_id"] = $user_info.idx;
+        allData["user_id"] = '12'
+
+        const refreshFlag = getCookieValue("refresh_flag");
+
+        if (refreshFlag) {
+            console.log(refreshFlag);
+            console.log("쿠키가 있어!!!!");
+            document.cookie = "refresh_flag=; Max-Age=0; path=/";
+        }
+
+        // 새로고침시 이미지 삭제 등을 표현하기 위해서!!!!
+        const handler = (e) => {
+            // 삭제할 이미지 리스트 저장
+            document.cookie = `refresh_flag=asdlkjgasdjfgj349fj3490jf034jf; path=/`;
+        };
+        window.addEventListener("beforeunload", handler);
+
+        // beforeNavigate((nav) => {
+        //     // console.log(imgs);
+
+        //     console.log(nav);
+        //     console.log(nav.from.url);
+        //     console.log(nav.to.url);
+        //     // 빠져나가는거 멈추기
+        //     nav.cancel();
+        // });
+
+        // return () => {
+        //     window.removeEventListener("beforeunload", handler);
+        //     console.log("페이지 나감?!?!?!");
+        // };
+    });
 
     let regions = $derived([
         "서울",
@@ -48,39 +98,7 @@
         "알바",
     ]);
 
-    let feeBases = $derived(["본부", "팀", "직원", "상담시"]);
-
-    let imgs = $state("");
-    let subject = $state("");
-    let point = $state("");
-    let addr = $state("");
-    let res_addr = $state("");
-    let location = $state("");
-    let agency = $state("");
-    let name = $state("");
-    let phone = $state("");
-    let businessArr = $state([]);
-    let business = $state("");
-    let occupationArr = $state([]);
-    let occupation = $state("");
-    let career = $state("");
-    let number_people = $state("");
-    let fee_type = $state("");
-    let fee = $state("");
-    let daily_expense = $state("");
-    let sleep_expense = $state("");
-    let promotion = $state("");
-    let base_pay = $state("");
-
     // ---------------------------------------------------
-
-    $effect(() => {
-        // if (!$user_info.idx) {
-        //     alert("로그인 후 이용 가능합니다.");
-        //     goto("/");
-        //     return;
-        // }
-    });
 
     // 주소 입력 창 영역
     let postWrap = $state();
@@ -94,10 +112,14 @@
     function chkEssentialValue(objArr) {
         for (let i = 0; i < objArr.length; i++) {
             const e = objArr[i];
-            if (!e.var) {
+            if (!allData[e.var]) {
                 alert(`${e.label}(은)는 필수 입력입니다.`);
                 return false;
             }
+            // if (!e.var) {
+            //     alert(`${e.label}(은)는 필수 입력입니다.`);
+            //     return false;
+            // }
         }
         return true;
     }
@@ -105,56 +127,44 @@
     async function uploadRegist(e) {
         e.preventDefault();
 
-        console.log(business);
-
-        business = businessArr.join(",");
-        occupation = occupationArr.join(",");
+        allData["business"] = businessArr.join(",");
+        allData["occupation"] = occupationArr.join(",");
 
         const chkBool = chkEssentialValue([
-            // { var: imgs, label: "현장 이미지" },
-            { var: subject, label: "공고 제목(현장명)" },
-            { var: point, label: "현장 포인트" },
-            { var: addr, label: "근무지 주소" },
-            { var: location, label: "지역 선택" },
-            { var: agency, label: "분양대행사명" },
-            { var: name, label: "담당자 성함" },
-            { var: phone, label: "담당자 연락처" },
-            { var: business, label: "업종분류선택" },
-            { var: occupation, label: "직종분류선택" },
-            { var: career, label: "경력 입력" },
-            { var: number_people, label: "인원 입력" },
-            { var: fee_type, label: "수수료 타입" },
-            { var: fee, label: "수수료 입력" },
+            { var: "imgs", label: "현장 이미지" },
+            { var: "subject", label: "공고 제목(현장명)" },
+            { var: "point", label: "현장 한마디" },
+            { var: "addr", label: "근무지 주소" },
+            { var: "location", label: "지역 선택" },
+            { var: "agency", label: "분양대행사명" },
+            { var: "name", label: "담당자 성함" },
+            { var: "phone", label: "담당자 연락처" },
+            { var: "business", label: "업종분류선택" },
+            { var: "occupation", label: "직종분류선택" },
+            { var: "career", label: "경력 입력" },
+            { var: "number_people", label: "인원 입력" },
+            { var: "fee_type", label: "수수료 타입" },
+            { var: "fee", label: "수수료 입력" },
         ]);
 
         console.log(chkBool);
+        console.log(allData);
 
         if (!chkBool) {
             return;
         }
 
+        try {
+            const res = await axios.post(`${back_api}/regist/upload`, {
+                allData,
+            });
+        } catch (err) {
+            const m = err.response.data.message;
+        }
+
         // try {
-        //     const res = await axios.post(`${back_api}/site/upload_content`, {
-        //         user_id: $user_info.idx,
-        //         imgs,
-        //         subject,
-        //         point,
-        //         addr,
-        //         res_addr,
-        //         location,
-        //         agency,
-        //         name,
-        //         phone,
-        //         business,
-        //         occupation,
-        //         career,
-        //         number_people,
-        //         fee_type,
-        //         fee,
-        //         daily_expense,
-        //         sleep_expense,
-        //         promotion,
-        //         base_pay,
+        //     const res = await axios.post(`${back_api}/regist/upload`, {
+
         //     });
 
         //     console.log(res);
@@ -169,17 +179,17 @@
         //     console.error(err.message);
         // }
 
-        console.log();
+        // console.log();
     }
 
     function updateImg(e) {
+        const imgArr = e.imgArr;
         let imgStr = "";
-        for (let i = 0; i < e.length; i++) {
-            const con = e[i];
-            console.log(con.href);
+        for (let i = 0; i < imgArr.length; i++) {
+            const con = imgArr[i];
             imgStr += con.href + ",";
         }
-        imgs = imgStr.slice(0, -1);
+        allData["imgs"] = imgStr.slice(0, -1);
     }
 
     function foldDaumPostcode() {
@@ -202,10 +212,10 @@
                 //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
                 if (data.userSelectedType === "R") {
                     // 사용자가 도로명 주소를 선택했을 경우
-                    addr = data.roadAddress;
+                    allData["addr"] = data.roadAddress;
                 } else {
                     // 사용자가 지번 주소를 선택했을 경우(J)
-                    addr = data.jibunAddress;
+                    allData["addr"] = data.jibunAddress;
                 }
 
                 // 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
@@ -233,20 +243,24 @@
                     // document.getElementById("sample3_extraAddress").value = "";
                 }
 
-                getAddress = addr;
+                getAddress = allData["addr"];
                 console.log(regions);
                 let selRegionIdx = null;
                 for (let i = 0; i < regions.length; i++) {
                     const region = regions[i];
                     const regex = new RegExp(`^${region}`);
-                    if (addr.match(regex)) {
+                    if (allData["addr"].match(regex)) {
                         selRegionIdx = i; // 매치되면 선택된 지역으로 저장
-                        location = regions[selRegionIdx];
+                        allData["location"] = regions[selRegionIdx];
                         break; // 매치된 경우 더 이상 순회하지 않음
                     }
                 }
 
-                res_addr = `(${data.zonecode}) ${addr} ${extraAddr}`;
+                allData["res_addr"] =
+                    `(${data.zonecode}) ${allData["addr"]} ${extraAddr}`;
+
+                console.log(allData["res_addr"]);
+
                 // detailAddrArea.focus();
 
                 // iframe을 넣은 element를 안보이게 한다.
@@ -323,10 +337,9 @@
                     window.history.back();
                 }}
             >
-                <i class="fa fa-angle-left text-2xl mr-1" aria-hidden="true"></i>
+                <i class="fa fa-angle-left text-2xl mr-1" aria-hidden="true"
+                ></i>
                 <span class="text-sm">뒤로가기</span>
-                
-
             </div>
 
             <div class="w-12"></div>
@@ -356,34 +369,35 @@
                     <input
                         type="text"
                         placeholder="공고 제목(현장명을 입력하세요)(필수)"
-                        bind:value={subject}
+                        bind:value={allData["subject"]}
                         class="input input-bordered input-info input-sm w-full"
                     />
                 </div>
 
-                <div class="mt-3 font-semibold text-lg">현장 포인트*</div>
+                <div class="mt-3 font-semibold text-lg">현장 한마디*</div>
                 <div class="mt-1.5">
-                    <textarea
-                        class="textarea textarea-info w-full p-2"
-                        placeholder="현장 포인트를 입력해주세요(필수)"
-                        bind:value={point}
-                    ></textarea>
+                    <input
+                        type="text"
+                        class="input input-bordered input-info input-sm w-full"
+                        placeholder="현장 한마디를 입력해주세요(필수)"
+                        bind:value={allData["point"]}
+                    />
                 </div>
 
                 <div class="mt-3 font-semibold text-lg">근무지*</div>
 
                 <div class="mt-1.5 flex w-full items-center gap-1">
-                    {#if res_addr}
+                    {#if allData["res_addr"]}
                         <div
                             class="border w-full py-1.5 px-2 text-sm border-sky-400 rounded-md"
                         >
-                            {res_addr}
+                            {allData["res_addr"]}
                         </div>
                     {:else}
                         <div
                             class="border w-full py-1.5 px-2 text-sm border-sky-400 rounded-md text-gray-400"
                         >
-                            주소 입력을 클릭해 주소를 입력해주세요
+                            우측 주소 입력을 클릭해 주소를 입력해주세요
                         </div>
                     {/if}
 
@@ -429,7 +443,7 @@
                                     type="radio"
                                     hidden
                                     value={region}
-                                    bind:group={location}
+                                    bind:group={allData["location"]}
                                 />
                                 <div>{region}</div>
                             </label>
@@ -444,18 +458,18 @@
                 <QuestionItem
                     sbj="분양대행사 *"
                     placeholder="필수입력"
-                    bind:iptVal={agency}
+                    bind:iptVal={allData["agency"]}
                 />
                 <QuestionItem
                     sbj="담당자 성함 *"
                     placeholder="필수입력"
-                    bind:iptVal={name}
+                    bind:iptVal={allData["name"]}
                 />
 
                 <QuestionItem
                     sbj="담당자 연락처 *"
                     placeholder="필수입력"
-                    bind:iptVal={phone}
+                    bind:iptVal={allData["phone"]}
                 />
 
                 <div class="mt-5">
@@ -501,13 +515,13 @@
                 <QuestionItem
                     sbj="경력 *"
                     placeholder="ex) 10년 / 초보"
-                    bind:iptVal={career}
+                    bind:iptVal={allData["career"]}
                 />
 
                 <QuestionItem
                     sbj="인원 *"
                     placeholder="ex) 2명 / 00명"
-                    bind:iptVal={number_people}
+                    bind:iptVal={allData["number_people"]}
                 />
             </div>
 
@@ -524,7 +538,7 @@
                                         type="radio"
                                         value={feeBase}
                                         hidden
-                                        bind:group={fee_type}
+                                        bind:group={allData["fee_type"]}
                                     />
                                     <div class="">{feeBase}</div>
                                 </label>
@@ -536,11 +550,11 @@
                         <div class="w-4/5 flex items-center gap-3">
                             <input
                                 type="text"
-                                bind:value={fee}
+                                bind:value={allData["fee"]}
                                 placeholder="숫자만 입력해주세요"
                                 class="input input-bordered input-info input-sm w-full"
                             />
-                            <div>원</div>
+                            <div class=" w-12">만 원</div>
                         </div>
                     </div>
 
@@ -555,25 +569,25 @@
                 <QuestionItem
                     sbj="일비"
                     placeholder="있을 경우만 입력 (ex, 월 100만원 / 일 3만원)"
-                    bind:iptVal={daily_expense}
+                    bind:iptVal={allData["daily_expense"]}
                 />
 
                 <QuestionItem
                     sbj="숙소비"
                     placeholder="있을 경우만 입력 (ex, 원룸 제공)"
-                    bind:iptVal={sleep_expense}
+                    bind:iptVal={allData["sleep_expense"]}
                 />
 
                 <QuestionItem
                     sbj="프로모션"
                     placeholder="있을 경우만 입력 (ex, 5채 판매시 추가 100만)"
-                    bind:iptVal={promotion}
+                    bind:iptVal={allData["promotion"]}
                 />
 
                 <QuestionItem
                     sbj="기본급여"
                     placeholder="있을 경우만 입력 (ex, 5채 판매시 추가 100만)"
-                    bind:iptVal={base_pay}
+                    bind:iptVal={allData["base_pay"]}
                 />
             </div>
 
@@ -584,11 +598,15 @@
                         class="textarea textarea-info w-full p-2"
                         placeholder="Bio"
                         rows="5"
+                        bind:value={allData["detail_content"]}
                     ></textarea>
                 </div>
 
                 <div class="mt-1.5">
-                    <button class="btn btn-success w-full text-white">
+                    <button
+                        class="btn btn-success w-full text-white"
+                        value="upload"
+                    >
                         등록하기
                     </button>
                 </div>

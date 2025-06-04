@@ -1,8 +1,10 @@
 <script>
     import Sortable from "sortablejs";
-    import imageCompression from "browser-image-compression";
-    // import axios from "axios";
-    import { back_api } from "$lib/const";
+
+    import axios from "axios";
+    import { back_api, back_api_origin } from "$lib/const";
+
+    import uploadImageAct from "$lib/lib";
 
     let {
         updateImg,
@@ -31,105 +33,34 @@
             setDetailImgCount = setDetailImgCount - 1;
         }
         const delTarget = imgArr[this.value];
-        console.log(delTarget);
+        const delPath = delTarget.href;
 
-        const delTargetArr = delTarget.href.split("/");
-
-        const delFolder = delTargetArr[delTargetArr.length - 2];
-        const delFile = delTargetArr[delTargetArr.length - 1];
-        console.log(delFolder);
-        console.log(delFile);
-
-        // try {
-        //     const res = await axios.post(`${back_api}/delete_sort_img`, {
-        //         delFolder,
-        //         delFile,
-        //     });
-        // } catch (error) {}
+        try {
+            const res = await axios.post(`${back_api}/img/delete`, {
+                delPath,
+            });
+        } catch (error) {
+            console.error(error.message);
+        }
 
         imgArr.splice(this.value, 1);
     }
 
-    const onFileSelected = (e) => {
-        if (imgArr.length >= maxImgCount) {
-            alert(`최대 ${maxImgCount}개 이미지만 업로드 가능합니다.`);
-            return false;
-        }
-
-        const input = document.createElement("input");
-        input.setAttribute("type", "file");
-        input.setAttribute("accept", ".png,.jpg,.jpeg");
-        input.click();
-
-        // input change
-        input.onchange = async (e) => {
-            const imageFile = e.target.files[0];
-            const options = {
-                maxSizeMB: 1, // 최대 파일 크기 (MB)
-                maxWidthOrHeight: 1024, // 최대 너비 또는 높이
-                useWebWorker: true, // 웹 워커 사용
-            };
+    function onFileSelected() {
+        uploadImageAct(`${back_api}/img/upload_single`, (err, imgData) => {
+            if (err) {
+                alert("이미지 업로드 실패! 다시 시도해주세요!");
+            }
 
             try {
-                const compressedFile = await imageCompression(
-                    imageFile,
-                    options,
-                );
-                console.log("Compressed file:", compressedFile);
-                console.log(compressedFile.name);
-
-                let imgForm = new FormData();
-
-                const timestamp = new Date().getTime();
-                const fileName = `${timestamp}${Math.random()
-                    .toString(36)
-                    .substring(2, 11)}.${compressedFile.name.split(".")[1]}`;
-
-                console.log(fileName);
-
-                imgForm.append("onimg", compressedFile, fileName);
-
-                // FormData의 key 값과 value값 찾기
-                // let keys = imgForm.keys();
-                // for (const pair of keys) {
-                //     console.log(`name : ${pair}`);
-                // }
-
-                // let values = imgForm.values();
-                // for (const pair of values) {
-                //     console.log(`value : ${pair}`);
-                // }
-
-                let res = {};
-                // try {
-                //     res = await axios.post(
-                //         `${back_api}/upload_sort_img`,
-                //         imgForm,
-                //         {
-                //             headers: {
-                //                 "Content-Type": "multipart/form-data",
-                //             },
-                //         },
-                //     );
-                // } catch (error) {
-                //     console.error("Error during image upload:", error.message);
-                //     alert("이미지 업로드 오류! 다시 시도해주세요!");
-                //     return;
-                // }
-
-                console.log(res);
-
-                if (res.status == 200) {
-                    addVal(res.data.baseUrl);
-                    setDetailImgCount = imgArr.length - 1;
-                    updateImg(imgArr);
-                }
-            } catch (error) {
-                console.error("Error during image compression:", error);
-                alert("이미지 업로드 오류! 다시 시도해주세요!");
+                addVal(imgData.saveUrl);
+                setDetailImgCount = imgArr.length - 1;
+                updateImg({ imgArr });
+            } catch (err) {
+                console.error(err.message);
             }
-        };
-    };
+        });
+    }
 
     // 아래는 sortable 관련 함수! 건드리지 말기!!
 
@@ -138,9 +69,6 @@
         handle: ".my-handle",
         ghostClass: "opacity-0",
         onEnd(evt) {
-            console.log("*******************************");
-            console.log(evt);
-
             imgArr = reorder(imgArr, evt);
             updateImg(imgArr);
         },
@@ -193,16 +121,16 @@
         <img src={imgArr[setDetailImgCount]["href"]} alt="" />
     </div>
 {/if} -->
-<ul class="flex flex-wrap" bind:this={sortable}>
+<ul class="flex flex-wrap m-1" bind:this={sortable}>
     {#each imgArr as img, idx (img)}
         <!-- svelte-ignore a11y_consider_explicit_label -->
         <!-- svelte-ignore event_directive_deprecated -->
         <li
-            class="m-2 flex w-24 h-24 items-center justify-center gap-1 border-2 my-handle rounded-lg overflow-hidden relative"
+            class="m-1 flex w-28 h-24 items-center justify-center gap-1 border border-gray-300 my-handle rounded-lg overflow-hidden relative"
             data-idx={idx}
         >
             <button
-                class=" absolute top-0 right-0"
+                class="absolute top-0 right-1 text-red-500 cursor-pointer"
                 type="button"
                 value={idx}
                 on:click={deleteImg}
@@ -210,7 +138,10 @@
                 <i class="fa fa-times-circle-o" aria-hidden="true"></i>
             </button>
 
-            <img src={img.href} alt="" />
+            <img
+                src={`https://storage.cloud.google.com/img-bucket1-250525/${img.href}`}
+                alt=""
+            />
         </li>
     {/each}
 </ul>

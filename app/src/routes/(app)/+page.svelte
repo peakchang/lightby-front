@@ -1,7 +1,14 @@
 <script>
     import PdButton from "$lib/components/PdButton.svelte";
+
+    let { data } = $props();
+
+    let siteList = $state(data.siteList);
+
+    console.log(siteList);
+
     let selectedSite = $state("전국");
-    let siteList = $derived([
+    let locationList = $derived([
         "전국",
         "서울/경기/인천",
         "충청/전라",
@@ -10,10 +17,34 @@
 
     let loading = $state(true);
 
+    // let siteList = $state([
+    //     {
+    //         one: "민간임대 3주 한방현장 OPEN",
+    //         subject: "정읍 월드메르디앙 더 브리온",
+    //         fee: "팀 700만원",
+    //         types: ["팀장", "아파트", "일비,숙소"],
+    //     },
+
+    //     {
+    //         one: "작년 완판된 장안 대방보다 저렴한 APT",
+    //         subject: "장안 우미린 프리미어",
+    //         fee: "직원 440만원",
+    //         types: ["직원", "아파텔", "일비"],
+    //     },
+    //     {
+    //         one: "일비 10만원 월300가능 계약금0원 다구좌가능",
+    //         subject: "반달섬 아르네브 큐브",
+    //         fee: "팀 1500",
+    //         types: ["직원", "오피스텔", "일비"],
+    //     },
+    // ]);
+
     $effect(() => {
         setTimeout(() => {
             loading = false;
         }, 0);
+
+        return () => {};
     });
 </script>
 
@@ -22,13 +53,13 @@
         <ul
             class="grid grid-cols-3 md:grid-cols-4 gap-x-5 md:gap-x-2 gap-y-1 px-4"
         >
-            {#each siteList as site}
+            {#each locationList as site}
                 <!-- svelte-ignore a11y_click_events_have_key_events -->
                 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-                <!-- svelte-ignore event_directive_deprecated -->
+                <!-- svelte-ignore event_directive_deprecated #62C15B -->
                 <li
                     class="text-center text-xs py-1.5 px-2 rounded-full border border-gray-500 text-gray-500 cursor-pointer"
-                    class:bg-[#62C15B]={selectedSite == site}
+                    class:bg-[#0669f8]={selectedSite == site}
                     class:text-white={selectedSite == site}
                     class:border-white={selectedSite == site}
                     data-site={site}
@@ -49,40 +80,57 @@
             <span class="loading loading-dots loading-xl"></span>
         </div>
     {:else}
-        <div class="mt-5 px-3">
-            <div class="flex gap-5 pb-3 border-b border-b-gray-300">
-                <div class=" w-36 h-32 rounded-lg overflow-hidden">
-                    <img src="/sample_thumbnail-1.jpg" alt="" />
+        {#each siteList as site}
+            <div class="mt-5 px-3 relative">
+                <div class="absolute bottom-0 right-0 p-3 max-w-1/3">
+                    <div class="w-full flex gap-1">
+                        <div class="w-1/3 max-w-[45px]">
+                            <img src="/icons/icon-change.png" alt="" />
+                        </div>
+                        <div class="w-1/3 max-w-[45px]">
+                            <img src="/icons/icon-new.png" alt="" />
+                        </div>
+                        <div class="w-1/3 max-w-[45px]">
+                            <img src="/icons/icon-one.png" alt="" />
+                        </div>
+                    </div>
                 </div>
-                <div class="flex flex-col justify-around">
-                    <div>
-                        <span
-                            class=" bg-green-600 text-xs px-2 py-1 text-white rounded-md"
-                        >
-                            아파트
-                        </span>
+                <div class="flex gap-5 pb-3 border-b border-b-gray-300">
+                    <div class=" w-36 h-32 rounded-lg overflow-hidden">
+                        {#if site.thumbnail}
+                            <img src={`https://storage.cloud.google.com/img-bucket1-250525/${site.thumbnail}`} alt="" />
+                        {/if}
                     </div>
-                    <div>
-                        <span>지젤 라이프 그라피 서초</span>
-                    </div>
-                    <div class="text-sm text-amber-800">
-                        분양가 상한제 적용 / 최고 위치 및 입지
-                    </div>
+                    <div class="flex flex-col justify-around">
+                        <div class="text-sm text-amber-800">
+                            {site.point}
+                        </div>
 
-                    <div class="text-xs">
-                        <span class="bg-amber-600 px-2 py-1 text-white">
-                            팀장
-                        </span>
-                        <span class="bg-amber-600 px-2 py-1 text-white">
-                            프로모션 20
-                        </span>
-                        <span class="bg-amber-600 px-2 py-1 text-white">
-                            일비/숙소비
-                        </span>
+                        <div>
+                            <span>{site.subject}</span>
+                        </div>
+
+                        <div class="mb-1">
+                            <span
+                                class=" bg-[#0a0078] text-sm px-2 py-1 text-white rounded-md font-bold"
+                            >
+                                {site.fee}
+                            </span>
+                        </div>
+
+                        <div class="text-xs">
+                            <!-- {#each temp.types as type}
+                                <span
+                                    class="bg-[#3a86ff] px-2 py-1 text-white rounded-sm mr-1"
+                                >
+                                    {type}
+                                </span>
+                            {/each} -->
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        {/each}
     {/if}
 </div>
 
