@@ -20,12 +20,9 @@
     //     goto('/')
     // }
 
-
-
     $effect(() => {
-
         // allData["user_id"] = $user_info.idx;
-        allData["user_id"] = '12'
+        allData["user_id"] = "12";
 
         const refreshFlag = getCookieValue("refresh_flag");
 
@@ -158,6 +155,8 @@
             const res = await axios.post(`${back_api}/regist/upload`, {
                 allData,
             });
+            alert("등록이 완료 되었습니다.");
+            goto(`/`);
         } catch (err) {
             const m = err.response.data.message;
         }

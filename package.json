@@ -1,0 +1,19 @@
+{
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "name": "lightby-front",
+  "version": "1.0.0",
+  "main": "server.js",
+  "type": "module",
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "scripts": {
+    "start": "cross-env NODE_ENV=product PORT=4001 pm2 start server.js -i 0 --name lightby-front",
+    "dev": "nodemon server"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
