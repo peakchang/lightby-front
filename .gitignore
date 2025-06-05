@@ -1,12 +1,6 @@
 node_modules
 
-# Output
-.output
-.vercel
-.netlify
-.wrangler
-/.svelte-kit
-/build
+
 
 # OS
 .DS_Store
@@ -18,8 +12,5 @@ Thumbs.db
 !.env.example
 !.env.test
 
-# Vite
-vite.config.js.timestamp-*
-vite.config.ts.timestamp-*
 
 gcs-lb.json
