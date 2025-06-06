@@ -83,13 +83,6 @@
         </ul>
     </div>
 
-    {public_img_bucket}
-
-    <img
-        src="https://storage.googleapis.com/img-bucket1-250525/imgs/imgs250605/thumb-1749095345545ovqj1cdk4.jpg"
-        alt=""
-    />
-
     {#if loading}
         <div class="mt-20 text-center">
             <div>로딩중</div>
