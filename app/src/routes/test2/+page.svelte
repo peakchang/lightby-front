@@ -13,7 +13,10 @@
 <div class="suit-font">
     <div>테스트1</div>
 
-    <div class=" text-black">테스트2</div>
+    <div class=" text-black">
+        <span>테스트2</span>
+        <span class="text-blue-600">테스트2-1</span>
+    </div>
 
     <div class="font-base">테스트3</div>
 </div>

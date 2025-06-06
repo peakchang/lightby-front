@@ -17,8 +17,6 @@
 	const animatedRoutes = ["registjob", "detail"];
 
 	const unsubscribe = page.subscribe(($page) => {
-
-
 		// useAnimation = animatedRoutes.includes($page.url.pathname);
 
 		useAnimation = animatedRoutes.some((item) =>
@@ -60,7 +58,7 @@
 </svelte:head>
 
 <div class="site-wrab">
-	<div class="max-w-[640px] mx-auto bg-white min-h-screen">
+	<div class="max-w-[640px] mx-auto bg-white min-h-screen text-black">
 		{#key key}
 			{#if useAnimation}
 				<div in:fly={{ y: 300, duration: 300 }}>
