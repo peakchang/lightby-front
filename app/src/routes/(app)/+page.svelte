@@ -104,9 +104,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex gap-5 items-center pb-3 border-b border-b-gray-300">
+                <div class="flex gap-3 md:gap-5 items-center pb-3 border-b border-b-gray-300">
                     <div
-                        class="w-32 h-24 md:w-36 md:h-28 rounded-lg overflow-hidden flex-shrink-0"
+                        class="w-32 h-[100px] md:w-36 md:h-28 rounded-lg overflow-hidden flex-shrink-0"
                     >
                         {#if site.thumbnail}
                             <img
