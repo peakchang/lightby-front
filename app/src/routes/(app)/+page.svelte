@@ -1,5 +1,6 @@
 <script>
     import { goto } from "$app/navigation";
+    import { back_api, public_img_bucket } from "$lib/const.js";
     import PdButton from "$lib/components/PdButton.svelte";
 
     let { data } = $props();
@@ -40,8 +41,8 @@
     //     },
     // ]);
 
-    function goToDetail(){
-        goto(`/detail/test`)
+    function goToDetail() {
+        goto(`/detail/test`);
     }
 
     $effect(() => {
@@ -82,6 +83,13 @@
         </ul>
     </div>
 
+    {public_img_bucket}
+
+    <img
+        src="https://storage.googleapis.com/img-bucket1-250525/imgs/imgs250605/thumb-1749095345545ovqj1cdk4.jpg"
+        alt=""
+    />
+
     {#if loading}
         <div class="mt-20 text-center">
             <div>로딩중</div>
@@ -107,7 +115,7 @@
                     <div class=" w-36 h-32 rounded-lg overflow-hidden">
                         {#if site.thumbnail}
                             <img
-                                src={`https://storage.cloud.google.com/img-bucket1-250525/${site.thumbnail}`}
+                                src={`${public_img_bucket}${site.thumbnail}`}
                                 alt=""
                             />
                         {/if}
