@@ -90,20 +90,20 @@
         </div>
     {:else}
         {#each siteList as site}
-            <div class="mt-5 px-3">
-                <!-- <div class="absolute bottom-0 right-0 p-3 max-w-1/3">
+            <div class="mt-5 px-3 relative">
+                <div class="absolute bottom-0 right-0 p-3 max-w-1/3">
                     <div class="w-full flex gap-1">
-                        <div class="w-1/3 max-w-[45px]">
+                        <div class="w-1/3 max-w-[30px] md:max-w-[45px]">
                             <img src="/icons/icon-change.png" alt="" />
                         </div>
-                        <div class="w-1/3 max-w-[45px]">
+                        <div class="w-1/3 max-w-[30px] md:max-w-[45px]">
                             <img src="/icons/icon-new.png" alt="" />
                         </div>
-                        <div class="w-1/3 max-w-[45px]">
+                        <div class="w-1/3 max-w-[30px] md:max-w-[45px]">
                             <img src="/icons/icon-one.png" alt="" />
                         </div>
                     </div>
-                </div> -->
+                </div>
                 <div class="flex gap-5 items-center pb-3 border-b border-b-gray-300">
                     <div
                         class="w-32 h-24 md:w-36 md:h-28 rounded-lg overflow-hidden flex-shrink-0"
@@ -136,7 +136,7 @@
                                     </span>
                                 </div>
 
-                                <div class=" text-[8px] md:text-xs flex flex-wrap">
+                                <div class=" text-[10px] md:text-xs flex flex-wrap">
                                     <span
                                         class="bg-[#3a86ff] px-1.5 py-1 text-white rounded-sm mr-1"
                                     >
