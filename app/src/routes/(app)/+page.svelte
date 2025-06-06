@@ -90,8 +90,8 @@
         </div>
     {:else}
         {#each siteList as site}
-            <div class="mt-5 px-3 relative">
-                <div class="absolute bottom-0 right-0 p-3 max-w-1/3">
+            <div class="mt-5 px-3">
+                <!-- <div class="absolute bottom-0 right-0 p-3 max-w-1/3">
                     <div class="w-full flex gap-1">
                         <div class="w-1/3 max-w-[45px]">
                             <img src="/icons/icon-change.png" alt="" />
@@ -103,9 +103,11 @@
                             <img src="/icons/icon-one.png" alt="" />
                         </div>
                     </div>
-                </div>
+                </div> -->
                 <div class="flex gap-5 pb-3 border-b border-b-gray-300">
-                    <div class=" w-36 h-32 rounded-lg overflow-hidden">
+                    <div
+                        class=" w-36 h-32 rounded-lg overflow-hidden flex-shrink-0"
+                    >
                         {#if site.thumbnail}
                             <img
                                 src={`${public_img_bucket}${site.thumbnail}`}
@@ -113,12 +115,12 @@
                             />
                         {/if}
                     </div>
-                    <div class="flex flex-col justify-around">
-                        <div class="text-sm text-amber-800">
+                    <div class="flex flex-col justify-around overflow-hidden">
+                        <div class="text-sm text-amber-800 truncate">
                             {site.point}
                         </div>
 
-                        <div>
+                        <div class="truncate">
                             <span>{site.subject}</span>
                         </div>
 
@@ -131,7 +133,7 @@
                             </span>
                         </div>
 
-                        <div class="text-xs">
+                        <div class="text-xs flex flex-wrap">
                             <span
                                 class="bg-[#3a86ff] px-2 py-1 text-white rounded-sm mr-1"
                             >
