@@ -112,6 +112,7 @@
                             <img
                                 src={`${public_img_bucket}${site.thumbnail}`}
                                 alt=""
+                                class="w-full h-full object-cover"
                             />
                         {/if}
                     </div>
