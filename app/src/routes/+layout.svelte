@@ -14,18 +14,21 @@
 	// 현재 경로에 따라 애니메이션 사용할지 결정
 	let useAnimation = $state(false);
 
-	const animatedRoutes = ["/testpage", "/registjob"];
+	const animatedRoutes = ["registjob", "detail"];
 
 	const unsubscribe = page.subscribe(($page) => {
-		useAnimation = animatedRoutes.includes($page.url.pathname);
+
+
+		// useAnimation = animatedRoutes.includes($page.url.pathname);
+
+		useAnimation = animatedRoutes.some((item) =>
+			$page.url.pathname.includes(item),
+		);
 	});
 
 	onDestroy(() => {
 		unsubscribe();
 	});
-
-
-	
 </script>
 
 <svelte:head>

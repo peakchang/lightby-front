@@ -1,4 +1,5 @@
 <script>
+    import { goto } from "$app/navigation";
     import PdButton from "$lib/components/PdButton.svelte";
 
     let { data } = $props();
@@ -39,6 +40,10 @@
     //     },
     // ]);
 
+    function goToDetail(){
+        goto(`/detail/test`)
+    }
+
     $effect(() => {
         setTimeout(() => {
             loading = false;
@@ -48,7 +53,10 @@
     });
 </script>
 
-<div class="pt-16 suit-font">
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<!-- svelte-ignore event_directive_deprecated -->
+<div class="pt-16 pb-32 suit-font" on:click={goToDetail}>
     <div>
         <ul
             class="grid grid-cols-3 md:grid-cols-4 gap-x-5 md:gap-x-2 gap-y-1 px-4"
@@ -98,7 +106,10 @@
                 <div class="flex gap-5 pb-3 border-b border-b-gray-300">
                     <div class=" w-36 h-32 rounded-lg overflow-hidden">
                         {#if site.thumbnail}
-                            <img src={`https://storage.cloud.google.com/img-bucket1-250525/${site.thumbnail}`} alt="" />
+                            <img
+                                src={`https://storage.cloud.google.com/img-bucket1-250525/${site.thumbnail}`}
+                                alt=""
+                            />
                         {/if}
                     </div>
                     <div class="flex flex-col justify-around">
@@ -114,18 +125,23 @@
                             <span
                                 class=" bg-[#0a0078] text-sm px-2 py-1 text-white rounded-md font-bold"
                             >
+                                {site.fee_type}
                                 {site.fee}
                             </span>
                         </div>
 
                         <div class="text-xs">
-                            <!-- {#each temp.types as type}
-                                <span
-                                    class="bg-[#3a86ff] px-2 py-1 text-white rounded-sm mr-1"
-                                >
-                                    {type}
-                                </span>
-                            {/each} -->
+                            <span
+                                class="bg-[#3a86ff] px-2 py-1 text-white rounded-sm mr-1"
+                            >
+                                {site.business}
+                            </span>
+
+                            <span
+                                class="bg-[#3a86ff] px-2 py-1 text-white rounded-sm mr-1"
+                            >
+                                {site.occupation}
+                            </span>
                         </div>
                     </div>
                 </div>
