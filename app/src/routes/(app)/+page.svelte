@@ -104,9 +104,9 @@
                         </div>
                     </div>
                 </div> -->
-                <div class="flex gap-5 pb-3 border-b border-b-gray-300">
+                <div class="flex gap-5 items-center pb-3 border-b border-b-gray-300">
                     <div
-                        class=" w-36 h-32 rounded-lg overflow-hidden flex-shrink-0"
+                        class="w-32 h-24 md:w-36 md:h-28 rounded-lg overflow-hidden flex-shrink-0"
                     >
                         {#if site.thumbnail}
                             <img
@@ -117,35 +117,39 @@
                         {/if}
                     </div>
                     <div class="flex flex-col justify-around overflow-hidden">
-                        <div class="text-sm text-amber-800 truncate">
+                        <div class="text-xs md:text-sm text-amber-800 truncate">
                             {site.point}
                         </div>
 
-                        <div class="truncate">
+                        <div class="text-sm md:text-base truncate">
                             <span>{site.subject}</span>
                         </div>
 
-                        <div class="mb-1">
-                            <span
-                                class=" bg-[#0a0078] text-sm px-2 py-1 text-white rounded-md font-bold"
-                            >
-                                {site.fee_type}
-                                {site.fee}
-                            </span>
-                        </div>
+                        <div>
+                            <div>
+                                <div class="mb-1">
+                                    <span
+                                        class=" bg-[#0a0078] text-xs md:text-sm px-2 py-1 text-white rounded-md font-bold"
+                                    >
+                                        {site.fee_type}
+                                        {site.fee}
+                                    </span>
+                                </div>
 
-                        <div class="text-xs flex flex-wrap">
-                            <span
-                                class="bg-[#3a86ff] px-2 py-1 text-white rounded-sm mr-1"
-                            >
-                                {site.business}
-                            </span>
+                                <div class=" text-[8px] md:text-xs flex flex-wrap">
+                                    <span
+                                        class="bg-[#3a86ff] px-1.5 py-1 text-white rounded-sm mr-1"
+                                    >
+                                        {site.business}
+                                    </span>
 
-                            <span
-                                class="bg-[#3a86ff] px-2 py-1 text-white rounded-sm mr-1"
-                            >
-                                {site.occupation}
-                            </span>
+                                    <span
+                                        class="bg-[#3a86ff] px-2 py-1 text-white rounded-sm mr-1"
+                                    >
+                                        {site.occupation}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
