@@ -2,6 +2,10 @@
     import { goto } from "$app/navigation";
 
     let viewDetail = $state({});
+
+    function contactSms() {}
+
+    function contactCall() {}
 </script>
 
 <div class="relative">
