@@ -10,10 +10,7 @@
     export let visible = false;
 
     function closeModal(e) {
-        console.log("?????????");
-
         e.preventDefault();
-
         visible = false;
     }
 </script>

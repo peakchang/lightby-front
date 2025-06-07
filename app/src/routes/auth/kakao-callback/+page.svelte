@@ -10,6 +10,7 @@
         removeSpecialCharactersAndSpaces,
         fetchRequest,
     } from "$lib/lib";
+    import axios from "axios";
 
     let { data } = $props();
     console.log(data);
@@ -82,29 +83,28 @@
         const type = e.target.getAttribute("data-type");
         if (type == "nickname") {
             if (nickname) {
-                const res = await fetchRequest("POST", `/auth/duplicate_chk`, {
-                    type,
-                    value: nickname,
-                });
-                if (res.status) {
+                try {
+                    const res = await axios.post(`/auth/duplicate_chk`, {
+                        type,
+                        value: nickname,
+                    });
                     nicknameErrBool = false;
                     nicknameSuccessBool = true;
-                } else {
+                } catch (error) {
                     nicknameErrBool = true;
                     nicknameSuccessBool = false;
                 }
-                console.log(res);
             }
         } else {
             if (phone) {
-                const res = await fetchRequest("POST", `/auth/duplicate_chk`, {
-                    type,
-                    value: removeSpecialCharactersAndSpaces(phone),
-                });
-                if (res.status) {
+                try {
+                    const res = await axios.post(`/auth/duplicate_chk`, {
+                        type,
+                        value: removeSpecialCharactersAndSpaces(phone),
+                    });
                     clearInterval(interval);
                     return true;
-                } else {
+                } catch (error) {
                     alertMessage = "전화번호가 중복됩니다. 다시 입력해주세요";
                     alertModal = true;
                     phone = "";
@@ -148,10 +148,11 @@
 
         console.log(userInfo);
 
-        const res = await fetchRequest("POST", "/auth/kakao-callback", {
-            userInfo,
-        });
-        if (res.status) {
+        try {
+            const res = await axios.post("/auth/kakao-callback", {
+                userInfo,
+            });
+
             successMessage = "로그인 성공! 메인으로 이동합니다.";
             successModal = true;
             modalLoading = true;
@@ -160,7 +161,7 @@
                 modalLoading = false;
                 goto("/");
             }, 1800);
-        } else {
+        } catch (error) {
             alertMessage = "회원가입 실패 다시 시도해주세요";
             alertModal = true;
         }

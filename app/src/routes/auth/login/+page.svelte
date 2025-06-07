@@ -2,8 +2,7 @@
     import { goto } from "$app/navigation";
     import { user_info } from "$lib/stores/stores";
     import CustomModal from "$lib/components/CustomModal.svelte";
-
-    import { fetchRequest } from "$lib/lib";
+    import axios from "axios";
 
     let id = $state("");
     let password = $state("");
@@ -34,12 +33,12 @@
 
         let errorMessage = "";
 
-        const res = await fetchRequest("POST", `/auth/login`, {
-            id,
-            password,
-        });
+        try {
+            const res = await axios.post(`/auth/login`, {
+                id,
+                password,
+            });
 
-        if (res.status) {
             successMessage = "로그인 완료! 잠시후 메인으로 이동합니다.";
             successModal = true;
             modalLoading = true;
@@ -48,10 +47,12 @@
                 modalLoading = false;
                 location.href = "/";
             }, 1800);
-        } else {
-            console.log(res);
+        } catch (err) {
+            console.log(err.response.data.message);
+            const m = err.response.data.message;
+
             alertModal = true;
-            alertMessage = res.message + " 다시 시도해주세요.";
+            alertMessage = `${m ? m : ""} 다시 시도해주세요.`
         }
     }
 
@@ -79,7 +80,7 @@
     </div>
 </CustomModal>
 
-<CustomModal bind:visible={alertModal} closeBtn={false}>
+<CustomModal bind:visible={alertModal} closeBtn={true}>
     <div class="text-center">
         <div class=" text-red-500 text-3xl mb-2">
             <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
@@ -159,7 +160,7 @@
 
             <div class="mt-3 text-center">
                 <button
-                    class="text-xs text-blue-600"
+                    class="text-xs text-blue-600 cursor-pointer"
                     on:click={() => {
                         goto("/auth/join");
                     }}

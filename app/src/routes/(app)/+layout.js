@@ -11,7 +11,7 @@ export const load = async ({ params, url, data }) => {
     let siteList = [];
 
     try {
-        const res = await axios.post(`${back_api}/mainsite/load_site_list`, {})
+        const res = await axios.post(`${back_api}/sitelist/load_site_list`, {})
 
         console.log(res.data);
 
@@ -22,7 +22,7 @@ export const load = async ({ params, url, data }) => {
         }
 
         console.log(siteList);
-        
+
 
 
     } catch (error) {

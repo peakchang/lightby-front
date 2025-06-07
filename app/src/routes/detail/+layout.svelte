@@ -3,7 +3,6 @@
     let y = $state(0);
 
     $effect(() => {
-        console.log(y);
         if (y > 100) {
             headerShowBool = false;
         } else {

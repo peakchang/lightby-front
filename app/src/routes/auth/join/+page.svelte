@@ -9,10 +9,10 @@
         generateRandomNumber,
         isAlphanumeric,
         removeSpecialCharactersAndSpaces,
-        fetchRequest,
     } from "$lib/lib";
 
     import QuestionItem from "$lib/components/QuestionItem.svelte";
+    import axios from "axios";
 
     $effect(() => {
         // 로그인 되어 있는지 체크~
@@ -22,7 +22,7 @@
             modalLoading = true;
             setTimeout(() => {
                 alertModal = false;
-                modalLoading= false;
+                modalLoading = false;
                 location.href = "/";
             }, 800);
         }
@@ -58,7 +58,7 @@
     let alertMessage = $state("");
     let successModal = $state(false); // 무언가 성공시 모달! (2초 후 로그인 페이지로 이동)
     let successMessage = $state("");
-    let modalLoading = $state(false)
+    let modalLoading = $state(false);
 
     // ID / 닉네임 / 휴대폰번호 input 창에서 벗어날시 기존 DB와 중복 체크 부분!
     async function duplicate_chk(e) {
@@ -75,44 +75,45 @@
             console.log(idChk);
 
             if (id) {
-                const res = await fetchRequest("POST", `/auth/duplicate_chk`, {
-                    type,
-                    value: id,
-                });
-                if (res.status) {
+                try {
+                    const res = await axios.post(`/auth/duplicate_chk`, {
+                        type,
+                        value: id,
+                    });
+
+                    console.log(res);
+
                     idErrBool = false;
                     idSuccessBool = true;
-                } else {
+                } catch (error) {
                     idErrBool = true;
                     idSuccessBool = false;
                 }
-                console.log(res);
             }
         } else if (type == "nickname") {
             if (nickname) {
-                const res = await fetchRequest("POST", `/auth/duplicate_chk`, {
-                    type,
-                    value: nickname,
-                });
-                if (res.status) {
+                try {
+                    const res = await axios.post(`/auth/duplicate_chk`, {
+                        type,
+                        value: nickname,
+                    });
                     nicknameErrBool = false;
                     nicknameSuccessBool = true;
-                } else {
+                } catch (error) {
                     nicknameErrBool = true;
                     nicknameSuccessBool = false;
                 }
-                console.log(res);
             }
         } else {
             if (phone) {
-                const res = await fetchRequest("POST", `/auth/duplicate_chk`, {
-                    type,
-                    value: removeSpecialCharactersAndSpaces(phone),
-                });
-                if (res.status) {
+                try {
+                    const res = await axios.post(`/auth/duplicate_chk`, {
+                        type,
+                        value: removeSpecialCharactersAndSpaces(phone),
+                    });
                     clearInterval(interval);
                     return true;
-                } else {
+                } catch (error) {
                     alertMessage = "전화번호가 중복됩니다. 다시 입력해주세요";
                     alertModal = true;
                     phone = "";
@@ -128,7 +129,6 @@
 
     // 전화번호 인증 시작~~~~
     async function startAuth() {
-
         if (phone.length < 12) {
             alertMessage = "휴대폰 번호를 확인해주세요";
             alertModal = true;
@@ -279,14 +279,15 @@
 
         phone = removeSpecialCharactersAndSpaces(phone);
 
-        const res = await fetchRequest("POST", `/auth/join`, {
-            id,
-            name,
-            nickname,
-            phone,
-            password,
-        });
-        if (res.status) {
+        try {
+            const res = await axios.post(`/auth/join`, {
+                id,
+                name,
+                nickname,
+                phone,
+                password,
+            });
+
             successMessage = "회원가입 성공! 로그인 해주세요.";
             successModal = true;
             modalLoading = true;
@@ -295,7 +296,7 @@
                 modalLoading = false;
                 goto("/auth/login");
             }, 1800);
-        } else {
+        } catch (error) {
             alertMessage = "회원가입 실패 다시 시도해주세요";
             alertModal = true;
         }

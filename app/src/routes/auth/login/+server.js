@@ -14,10 +14,14 @@ export async function POST({ request, cookies }) {
     try {
         const getUserInfoQuery = "SELECT * FROM users WHERE id = ?";
         const [getUserInfo] = await sql_con.promise().query(getUserInfoQuery, [id]);
+        console.log(getUserInfo);
+        
         if (getUserInfo.length === 0) {
             return json({ message: '아이디가 존재하지 않습니다.' }, { status: 400 })
         }
         const isMatch = await bcrypt.compare(password, getUserInfo[0].password);
+        console.log(isMatch);
+        
         if (isMatch) {
             const payload = {
                 userId: getUserInfo[0].idx
@@ -44,6 +48,8 @@ export async function POST({ request, cookies }) {
             });
 
         } else {
+            console.log('그럼 여기를 들어와야지?');
+            
             return json({ message: '비밀번호가 일치하지 않습니다.' }, { status: 400 })
         }
     } catch (error) {

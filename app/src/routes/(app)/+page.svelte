@@ -1,4 +1,5 @@
 <script>
+    import CustomModal from "$lib/components/CustomModal.svelte";
     import { goto } from "$app/navigation";
     import { back_api, public_img_bucket } from "$lib/const.js";
     import PdButton from "$lib/components/PdButton.svelte";
@@ -6,8 +7,6 @@
     let { data } = $props();
 
     let siteList = $state(data.siteList);
-
-    console.log(siteList);
 
     let selectedSite = $state("전국");
     let locationList = $derived([
@@ -18,6 +17,11 @@
     ]);
 
     let loading = $state(true);
+
+    const businessReplaceDict = $derived({
+        도시형생활주택: "도생",
+        지식산업센터: "지산",
+    });
 
     // let siteList = $state([
     //     {
@@ -41,8 +45,8 @@
     //     },
     // ]);
 
-    function goToDetail() {
-        goto(`/detail/test`);
+    function goToDetail(idx) {
+        goto(`/detail/${idx}`);
     }
 
     $effect(() => {
@@ -52,20 +56,23 @@
 
         return () => {};
     });
+
+    function multiReplace(str, map) {
+        const regex = new RegExp(Object.keys(map).join("|"), "g");
+        return str.replace(regex, (match) => map[match]);
+    }
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <!-- svelte-ignore event_directive_deprecated -->
-<div class="pt-16 pb-32 suit-font" on:click={goToDetail}>
+<div class="pt-16 pb-32 suit-font">
     <div>
         <ul
             class="grid grid-cols-3 md:grid-cols-4 gap-x-5 md:gap-x-2 gap-y-1 px-4"
         >
             {#each locationList as site}
-                <!-- svelte-ignore a11y_click_events_have_key_events -->
                 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-                <!-- svelte-ignore event_directive_deprecated #62C15B -->
                 <li
                     class="text-center text-xs py-1.5 px-2 rounded-full border border-gray-500 text-gray-500 cursor-pointer"
                     class:bg-[#0669f8]={selectedSite == site}
@@ -73,8 +80,8 @@
                     class:border-white={selectedSite == site}
                     data-site={site}
                     on:click={(e) => {
-                        console.log(e.target.getAttribute("data-site"));
-                        selectedSite = e.target.getAttribute("data-site");
+                        selectedSite = e.target.dataset.site;
+                        console.log(selectedSite);
                     }}
                 >
                     {site}
@@ -90,71 +97,134 @@
         </div>
     {:else}
         {#each siteList as site}
-            <div class="mt-5 px-3 relative">
-                <div class="absolute bottom-0 right-0 p-3 max-w-1/3">
-                    <div class="w-full flex gap-1">
-                        <div class="w-1/3 max-w-[30px] md:max-w-[45px]">
-                            <img src="/icons/icon-change.png" alt="" />
-                        </div>
-                        <div class="w-1/3 max-w-[30px] md:max-w-[45px]">
-                            <img src="/icons/icon-new.png" alt="" />
-                        </div>
-                        <div class="w-1/3 max-w-[30px] md:max-w-[45px]">
-                            <img src="/icons/icon-one.png" alt="" />
+            <a
+                href="/detail/{site.idx}"
+                on:click|preventDefault={() => {
+                    goToDetail(site.idx);
+                }}
+            >
+                <div
+                    class="mt-5 mx-2 border border-gray-300 rounded-lg p-2 shadow-sm cursor-pointer relative"
+                >
+                    <div class="absolute bottom-0 right-0 p-3 max-w-1/3">
+                        <div class="w-full flex gap-1">
+                            <div class="w-1/3 max-w-[30px] md:max-w-[45px]">
+                                <img src="/icons/icon-change.png" alt="" />
+                            </div>
+                            <div class="w-1/3 max-w-[30px] md:max-w-[45px]">
+                                <img src="/icons/icon-new.png" alt="" />
+                            </div>
+                            <div class="w-1/3 max-w-[30px] md:max-w-[45px]">
+                                <img src="/icons/icon-one.png" alt="" />
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="flex gap-3 md:gap-5 items-center pb-3 border-b border-b-gray-300">
                     <div
-                        class="w-32 h-[100px] md:w-36 md:h-28 rounded-lg overflow-hidden flex-shrink-0"
+                        class="flex gap-3 md:gap-5 items-center border-b-gray-300"
                     >
-                        {#if site.thumbnail}
-                            <img
-                                src={`${public_img_bucket}${site.thumbnail}`}
-                                alt=""
-                                class="w-full h-full object-cover"
-                            />
-                        {/if}
-                    </div>
-                    <div class="flex flex-col justify-around overflow-hidden">
-                        <div class="text-xs md:text-sm text-amber-800 truncate">
-                            {site.point}
+                        <div
+                            class="w-32 h-[100px] md:w-36 md:h-28 rounded-lg overflow-hidden flex-shrink-0"
+                        >
+                            {#if site.thumbnail}
+                                <img
+                                    src={`${public_img_bucket}${site.thumbnail}`}
+                                    alt=""
+                                    class="w-full h-full object-cover"
+                                />
+                            {/if}
                         </div>
+                        <div
+                            class="flex flex-col justify-around overflow-hidden"
+                        >
+                            <div
+                                class="text-xs md:text-sm text-amber-800 truncate"
+                            >
+                                {site.point}
+                            </div>
 
-                        <div class="text-sm md:text-base truncate">
-                            <span>{site.subject}</span>
-                        </div>
+                            <div class="text-sm md:text-base truncate">
+                                <span>{site.subject}</span>
+                            </div>
 
-                        <div>
                             <div>
-                                <div class="mb-1">
-                                    <span
-                                        class=" bg-[#0a0078] text-xs md:text-sm px-2 py-1 text-white rounded-md font-bold"
-                                    >
-                                        {site.fee_type}
-                                        {site.fee}
-                                    </span>
-                                </div>
+                                <div>
+                                    <div class="mb-1">
+                                        <span
+                                            class=" bg-[#0a0078] text-xs md:text-sm px-2 py-0.5 text-white rounded-md font-bold"
+                                        >
+                                            {site.fee_type}
+                                            {site.fee}
+                                        </span>
+                                    </div>
 
-                                <div class=" text-[10px] md:text-xs flex flex-wrap">
-                                    <span
-                                        class="bg-[#3a86ff] px-1.5 py-1 text-white rounded-sm mr-1"
+                                    <div
+                                        class="text-[10px] md:text-xs flex flex-wrap"
                                     >
-                                        {site.business}
-                                    </span>
+                                        <span
+                                            class="bg-[#3a86ff] px-1.5 py-0.5 text-white rounded-md mr-1"
+                                        >
+                                            {multiReplace(
+                                                site.business,
+                                                businessReplaceDict,
+                                            )}
+                                        </span>
 
-                                    <span
-                                        class="bg-[#3a86ff] px-2 py-1 text-white rounded-sm mr-1"
-                                    >
-                                        {site.occupation}
-                                    </span>
+                                        <span
+                                            class="bg-[#3a86ff] px-2 py-0.5 text-white rounded-md mr-1"
+                                        >
+                                            {site.occupation}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         {/each}
+
+        <a
+            href="/detail/test"
+            on:click|preventDefault={() => {
+                // goToDetail(site.idx);
+            }}
+        >
+            <div
+                class="mt-5 mx-2 relative border border-gray-300 rounded-lg p-2 shadow-sm cursor-pointer"
+            >
+                <div class="flex justify-between items-center">
+                    <div class="pl-4 max-w-[55%]">
+                        <div class="text-xs md:text-sm text-amber-800 truncate">
+                            청라 푸르지오 스타셀라 49 마지막 10세대
+                        </div>
+                        <div class="text-sm md:text-base">
+                            청라 푸르지오 스타셀라 49
+                        </div>
+                    </div>
+
+                    <div class=" max-w-[45%]">
+                        <div class="mb-1 text-[10px]">
+                            <span
+                                class=" bg-[#0a0078] px-2 py-1 text-white rounded-md font-bold mr-1 inline-block"
+                            >
+                                팀 500
+                            </span>
+                            <span
+                                class="bg-[#3a86ff] px-1.5 py-1 text-white rounded-md mr-1 inline-block"
+                            >
+                                아파트,오피스텔
+                            </span>
+
+                            <span
+                                class="bg-[#3a86ff] px-2 py-1 text-white rounded-md mr-1 inline-block"
+                            >
+                                팀장,직원
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
     {/if}
 </div>
 

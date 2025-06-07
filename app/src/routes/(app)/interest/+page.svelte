@@ -1,20 +1,30 @@
 <script>
     import { goto } from "$app/navigation";
 
-    let tempArr = $state([
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 11, 12, 13, 14, 15, 16,
-    ]);
+    let tabArea = $derived({});
 
-    function goToDetail() {
-        goto(`/sitedetail/gogo`);
+    function changeTab(e) {
+        for (const el of tabArea.children) {
+            el.classList.remove("tab-active");
+        }
+        tabArea.children[e.target.dataset.num].classList.add("tab-active");
     }
+
 </script>
 
-<div class="z-50 suit-font" style="padding-top: 50px; padding-bottom:70px">
+<div class="pt-16 pb-32 suit-font">
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <!-- svelte-ignore event_directive_deprecated -->
+    <div class="tab-area cursor-pointer" bind:this={tabArea}>
+        <div class="tab-active" data-num="0" on:click={changeTab}>관심 지역</div>
+        <div data-num="1" on:click={changeTab}>찜한 목록</div>
+        <div data-num="2" on:click={changeTab}>내 주변 현장</div>
+    </div>
+</div>
+
+<!-- <div class="z-50 suit-font" style="padding-top: 50px; padding-bottom:70px">
     {#each tempArr as temp}
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <!-- svelte-ignore event_directive_deprecated -->
         <div
             class="flex gap-3 w-full px-3 py-2 cursor-pointer bg-white mb-1.5 rounded-md"
             on:click={goToDetail}
@@ -32,4 +42,18 @@
             </div>
         </div>
     {/each}
-</div>
+</div> -->
+
+<style>
+    .tab-area {
+        display: flex;
+        justify-content: center;
+        gap: 10%;
+        color: #939393;
+    }
+    .tab-active {
+        color: black;
+        border-bottom: 3px solid black;
+        padding-bottom: 5px;
+    }
+</style>

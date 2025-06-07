@@ -11,15 +11,19 @@
     let successModal = $state(false);
     let successMessage = $state("");
 
+    let loginAlertModalShow = $state(false);
+
     function movePage(e) {
         console.log(this.getAttribute("linkdata"));
 
-        if (this.getAttribute("linkdata") == "/my" && !$user_info.idx) {
-            // alert("로그인 후 이용 가능합니다.");
-            // return;
+        const link = this.getAttribute("linkdata");
+        if ((link === "/my" || link === "/interest") && !$user_info.idx) {
+            loginAlertModalShow = true;
+            return;
         }
-        if ($page.url.pathname != this.getAttribute("linkdata")) {
-            goto(this.getAttribute("linkdata"));
+
+        if ($page.url.pathname != link) {
+            goto(link);
         }
     }
 
@@ -39,6 +43,34 @@
         console.log(res);
     }
 </script>
+
+<CustomModal bind:visible={loginAlertModalShow} closeBtn={false}>
+    <div class="text-center">
+        <div class=" text-green-700 text-3xl mb-2">
+            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+        </div>
+        <div class="mb-2 text-lg">로그인이 필요합니다!</div>
+        <div class="flex justify-center gap-3">
+            <PdButton
+                classVal="w-1/3 py-2 rounded-lg text-white text-sm"
+                backgroundColor="#1266FF"
+                hoverColor="#0042ED"
+                on:click={() => {
+                    goto("/auth/login");
+                }}
+            >
+                로그인 바로가기
+            </PdButton>
+            <PdButton
+                classVal="w-1/3 py-2 rounded-lg text-white text-sm"
+                backgroundColor="#5D5D5D"
+                hoverColor="#393939"
+            >
+                닫기
+            </PdButton>
+        </div>
+    </div>
+</CustomModal>
 
 <CustomModal bind:visible={successModal} closeBtn={false}>
     <div class="text-center">
@@ -86,7 +118,17 @@
     >
         {#if $page.url.pathname == "/" || $page.url.pathname == "/interest"}
             <div class="absolute right-3 top-[-45px]">
-                <a href="/registjob">
+                <!-- svelte-ignore event_directive_deprecated -->
+                <a
+                    href="/registjob"
+                    on:click|preventDefault={() => {
+                        if (!$user_info.idx) {
+                            loginAlertModalShow = true;
+                            return;
+                        }
+                        goto("/registjob");
+                    }}
+                >
                     <PdButton
                         classVal="py-1.5 px-4 text-white font-light rounded-full"
                         backgroundColor="#5587ED"
