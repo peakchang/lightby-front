@@ -90,7 +90,7 @@
     </div>
 </div>
 
-<div class=" h-[400px]">
+<div class=" min-h-[300px]">
     <img src={`${public_img_bucket}${mainImage[0]}`} alt="" />
 </div>
 
