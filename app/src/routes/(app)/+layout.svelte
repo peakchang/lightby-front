@@ -121,7 +121,7 @@
 </CustomModal>
 
 <div
-    class="fixed top-0 left-1/2 max-w-[640px] w-full -translate-x-1/2 bg-white p-3 shadow-bottom"
+    class="fixed top-0 left-1/2 max-w-[640px] w-full -translate-x-1/2 bg-white p-3 shadow-bottom z-20"
 >
     <div class="flex justify-between">
         <div>
