@@ -3,6 +3,7 @@
     import QuestionItem from "$lib/components/QuestionItem.svelte";
     import SortableImg from "$lib/components/SortableImg.svelte";
     import KakaoMap from "$lib/components/kakaoMap.svelte";
+    import CustomModal from "$lib/components/CustomModal.svelte";
 
     import { user_info } from "$lib/stores/stores";
     import { browser } from "$app/environment";
@@ -15,6 +16,9 @@
     let feeBases = $derived(["본부", "팀", "직원", "상담시"]);
     let businessArr = $state([]);
     let occupationArr = $state([]);
+
+    // 등록 전 결제 및 물어보는거 모달
+    let submitPrevModal = $state(false);
 
     // if (!$user_info.idx) {
     //     goto('/')
@@ -295,6 +299,48 @@
     ></script>
 </svelte:head>
 
+<CustomModal bind:visible={submitPrevModal} closeBtn={false}>
+    <div class="text-center">
+        <div class=" text-green-700 text-3xl mb-2">
+            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+        </div>
+
+        <div class="mb-5">
+            구인글 최초 1회 프리미엄 무료등록 // 첫 작성하는 사람한테만
+        </div>
+
+        <div class="mb-5 border p-3">
+            - 바로 등록 (무료 등록) 일 2회 무료 등록이 가능합니다.
+        </div>
+        <div class="mb-5 border p-3">
+            <p>프리미엄 등록 특가 132,000원 -> 66,000원</p>
+            <p>시작페이지 / 지역페이지 모든 지면 상단 10일 랜덤 노출</p>
+            <p>등록된 내용은 마이페이지에서 수정 가능</p>
+        </div>
+
+        <div class="mb-5 border p-3">
+            <p>지역 탑 등록 특가 99,000원 -> 49,500원</p>
+            <p>지역페이지 상단 10일 랜덤 노출</p>
+            <p>등록된 내용은 마이페이지에서 수정 가능</p>
+        </div>
+
+        <div class="">
+            <div>아이콘 선택 (개당 2,200원)</div>
+            <div>아이콘들......</div>
+        </div>
+
+        <div class="text-right mb-4">
+            <p>결제 금액 : 55,000원</p>
+        </div>
+
+        <div class="text-right">
+            <button class="bg-gray-400 text-white px-3 py-1.5"
+                >결제 및 등록</button
+            >
+        </div>
+    </div>
+</CustomModal>
+
 <dialog id="my_modal_1" class="modal">
     <div class="modal-box">
         <h3 class="text-lg font-bold">주소를 입력하세요</h3>
@@ -351,6 +397,13 @@
         <div class="text-center font-semibold text-xl bg-white p-3">
             구인글 등록
         </div>
+
+        <button
+            class=""
+            on:click={() => {
+                submitPrevModal = true;
+            }}>버튼버튼</button
+        >
 
         <!-- svelte-ignore event_directive_deprecated -->
         <form on:submit={uploadRegist}>
@@ -585,7 +638,7 @@
 
                 <QuestionItem
                     sbj="기본급여"
-                    placeholder="있을 경우만 입력 (ex, 5채 판매시 추가 100만)"
+                    placeholder="있을 경우만 입력 (ex, 기본급 200만)"
                     bind:iptVal={allData["base_pay"]}
                 />
             </div>
@@ -595,7 +648,7 @@
                 <div class="mt-1.5">
                     <textarea
                         class="textarea textarea-info w-full p-2"
-                        placeholder="Bio"
+                        placeholder="현장에 대한 상세 내용을 입력해주세요"
                         rows="5"
                         bind:value={allData["detail_content"]}
                     ></textarea>

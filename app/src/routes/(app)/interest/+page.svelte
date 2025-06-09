@@ -16,11 +16,11 @@
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <!-- svelte-ignore event_directive_deprecated -->
-    <div class="tab-area cursor-pointer" bind:this={tabArea}>
+    <!-- <div class="tab-area cursor-pointer" bind:this={tabArea}>
         <div class="tab-active" data-num="0" on:click={changeTab}>관심 지역</div>
         <div data-num="1" on:click={changeTab}>찜한 목록</div>
         <div data-num="2" on:click={changeTab}>내 주변 현장</div>
-    </div>
+    </div> -->
 </div>
 
 <!-- <div class="z-50 suit-font" style="padding-top: 50px; padding-bottom:70px">

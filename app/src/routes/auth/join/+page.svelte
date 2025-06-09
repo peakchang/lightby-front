@@ -476,6 +476,22 @@
                     </button>
                 </div>
 
+                <label class="input input-info mt-5 w-full">
+                    <span class="min-w-4 flex justify-center">
+                        <i class="fa fa-user opacity-70" aria-hidden="true"></i>
+                    </span>
+                    <input
+                        type="text"
+                        class="grow"
+                        placeholder="사업자 번호를 입력하세요"
+                        bind:value={name}
+                    />
+                </label>
+                <div class="pl-1 text-xs mt-1 text-blue-500">
+                    <p>구인글 작성을 원하시면 입력해주세요.</p>
+                    <p>사업자가 없을경우 공란!</p>
+                </div>
+
                 {#if authShowBool}
                     <div class="flex items-center mt-1.5 gap-2">
                         <label class="input input-info w-full">
