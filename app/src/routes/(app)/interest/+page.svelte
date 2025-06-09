@@ -1,5 +1,7 @@
 <script>
+    import { user_info } from "$lib/stores/stores";
     import { goto } from "$app/navigation";
+
 
     let tabArea = $derived({});
 
@@ -9,18 +11,40 @@
         }
         tabArea.children[e.target.dataset.num].classList.add("tab-active");
     }
-
 </script>
 
 <div class="pt-16 pb-32 suit-font">
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <!-- svelte-ignore event_directive_deprecated -->
-    <!-- <div class="tab-area cursor-pointer" bind:this={tabArea}>
-        <div class="tab-active" data-num="0" on:click={changeTab}>관심 지역</div>
-        <div data-num="1" on:click={changeTab}>찜한 목록</div>
-        <div data-num="2" on:click={changeTab}>내 주변 현장</div>
-    </div> -->
+    {#if $user_info.idx}
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <!-- svelte-ignore event_directive_deprecated -->
+        <div class="tab-area cursor-pointer" bind:this={tabArea}>
+            <div class="tab-active" data-num="0" on:click={changeTab}>
+                관심 지역
+            </div>
+            <div data-num="1" on:click={changeTab}>찜한 목록</div>
+            <div data-num="2" on:click={changeTab}>내 주변 현장</div>
+        </div>
+    {:else}
+        <div class="pt-16 text-center">
+            <div class=" text-green-700 text-4xl">
+                <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+            </div>
+            <div class="text-xl font-bold mt-5">
+                로그인이 필요한 페이지 입니다.
+            </div>
+            <div class="text-sm mt-5">
+                <p>관심현장은 로그인 후,</p>
+                <p>마이페이지에서 지역 설정을 하시거나</p>
+                <p>상세페이지에서 찜한 목록이 표시됩니다.</p>
+            </div>
+            <div class="mt-5">
+                <button class="btn btn-info btn-lg w-1/3 text-white"
+                    >로그인하기</button
+                >
+            </div>
+        </div>
+    {/if}
 </div>
 
 <!-- <div class="z-50 suit-font" style="padding-top: 50px; padding-bottom:70px">

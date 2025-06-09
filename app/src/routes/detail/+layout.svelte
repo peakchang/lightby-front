@@ -112,7 +112,7 @@
 </div> -->
 
 <div class="bg-white relative min-h-screen">
-    <div class="max-w-[530px] mx-auto pretendard pt-6 pb-16">
+    <div class="max-w-[530px] mx-auto pretendard pb-16">
         {@render children()}
     </div>
 </div>

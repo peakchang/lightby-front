@@ -53,11 +53,7 @@
 		href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
 	/>
 
-	<script
-		type="text/javascript"
-		defer
-		src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=72689d54e68abd94260d9284c64d7545&libraries=services&autoload=false`}
-	></script>
+	
 </svelte:head>
 
 <div class="site-wrab">

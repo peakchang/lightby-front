@@ -16,14 +16,7 @@
     let latestModalShow = $state(false);
 
     function movePage(e) {
-        console.log(this.getAttribute("linkdata"));
-
-        const link = this.getAttribute("linkdata");
-        if ((link === "/my" || link === "/interest") && !$user_info.idx) {
-            loginAlertModalShow = true;
-            return;
-        }
-
+        const link = this.dataset.link;
         if ($page.url.pathname != link) {
             goto(link);
         }
@@ -45,6 +38,14 @@
         console.log(res);
     }
 </script>
+
+<svelte:head>
+    <script
+        type="text/javascript"
+        defer
+        src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=72689d54e68abd94260d9284c64d7545&libraries=services&autoload=false`}
+    ></script>
+</svelte:head>
 
 <CustomModal bind:visible={loginAlertModalShow} closeBtn={false}>
     <div class="text-center">
@@ -208,7 +209,7 @@
             style={$page.url.pathname == "/"
                 ? "color:#61a2ff"
                 : "color:#868686"}
-            linkdata="/"
+            data-link="/"
             on:click={movePage}
         >
             <svg
@@ -233,7 +234,7 @@
             style={$page.url.pathname == "/find"
                 ? "color:#61a2ff"
                 : "color:#868686"}
-            linkdata="/find"
+            data-link="/find"
             on:click={movePage}
         >
             <svg
@@ -258,7 +259,7 @@
             style={$page.url.pathname == "/interest"
                 ? "color:#61a2ff"
                 : "color:#868686"}
-            linkdata="/interest"
+            data-link="/interest"
             on:click={movePage}
         >
             <svg
@@ -283,7 +284,7 @@
             style={$page.url.pathname == "/my"
                 ? "color:#61a2ff"
                 : "color:#868686"}
-            linkdata="/my"
+            data-link="/my"
             on:click={movePage}
         >
             <svg

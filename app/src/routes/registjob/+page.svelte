@@ -369,7 +369,7 @@
 </dialog>
 
 <!-- 숨겨진 헤더!!!!!!!!!!!!!!!!!!!!!! -->
-<div class="fixed top-0 left-0 w-full z-50 suit-font">
+<div class="fixed top-0 left-0 w-full z-20 suit-font">
     <div class="max-w-[530px] mx-auto bg-white border-b">
         <div class=" py-1 flex justify-between items-center">
             <!-- svelte-ignore a11y_click_events_have_key_events -->
