@@ -1,5 +1,11 @@
 <script>
-    const { getAddress, phText = "여기여기", height = "400px" } = $props();
+    let {
+        getAddress,
+        phText = "여기여기",
+        height = "400px",
+        tudeAct,
+    } = $props();
+
     let kakao;
     let kakaomapArea = $state({});
 
@@ -31,7 +37,9 @@
                             result[0].x,
                         );
 
-                        console.log(coords);
+                        try {
+                            tudeAct({ coords });
+                        } catch (error) {}
 
                         // 결과값으로 받은 위치를 마커로 표시합니다
                         var marker = new kakao.maps.Marker({

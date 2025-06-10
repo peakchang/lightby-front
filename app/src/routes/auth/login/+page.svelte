@@ -42,11 +42,12 @@
             successMessage = "로그인 완료! 잠시후 메인으로 이동합니다.";
             successModal = true;
             modalLoading = true;
+            const random = Math.floor(Math.random() * (1200 - 800 + 1)) + 800;
             setTimeout(() => {
                 successModal = false;
                 modalLoading = false;
                 location.href = "/";
-            }, 1800);
+            }, random);
         } catch (err) {
             console.log(err.response.data.message);
             const m = err.response.data.message;
@@ -94,6 +95,7 @@
     </div>
 </CustomModal>
 
+<!-- svelte-ignore event_directive_deprecated -->
 <div class="bg-green-50 relative min-h-screen">
     <div
         class="max-w-[530px] mx-auto suit-font pt-12 pb-10 bg-white p-14 min-h-screen"
@@ -103,7 +105,6 @@
         </div>
 
         <div class="mt-12">
-            <!-- svelte-ignore event_directive_deprecated -->
             <form on:submit={loginSubmit}>
                 <label class="input input-info mt-5 w-full">
                     <span class="min-w-4 flex justify-center">
@@ -111,7 +112,6 @@
                         ></i>
                     </span>
 
-                    <!-- svelte-ignore event_directive_deprecated -->
                     <input
                         type="text"
                         class="grow"
@@ -149,6 +149,7 @@
             </form>
 
             <div class="mt-3">
+                
                 <button
                     class=" bg-[#ffe500] font-semibold w-full p-3 rounded-lg flex justify-center items-center gap-2"
                     on:click={kakao_login}

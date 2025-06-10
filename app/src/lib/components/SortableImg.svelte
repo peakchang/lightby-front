@@ -44,6 +44,8 @@
         }
 
         imgArr.splice(this.value, 1);
+        const type = "subtract";
+        updateImg({ imgArr, url: delPath, type });
     }
 
     function onFileSelected() {
@@ -55,7 +57,9 @@
             try {
                 addVal(imgData.saveUrl);
                 setDetailImgCount = imgArr.length - 1;
-                updateImg({ imgArr });
+
+                const type = "add";
+                updateImg({ imgArr, url: imgData.saveUrl, type });
             } catch (err) {
                 console.error(err.message);
             }
@@ -70,7 +74,7 @@
         ghostClass: "opacity-0",
         onEnd(evt) {
             imgArr = reorder(imgArr, evt);
-            updateImg(imgArr);
+            updateImg({ imgArr });
         },
     });
 

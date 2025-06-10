@@ -13,51 +13,103 @@
 
     let allData = $state({});
 
-    let feeBases = $derived(["본부", "팀", "직원", "상담시"]);
+    let feeBases = $derived(["본부", "팀", "직원", "상담시"]); //
     let businessArr = $state([]);
     let occupationArr = $state([]);
 
     // 등록 전 결제 및 물어보는거 모달
     let submitPrevModal = $state(false);
 
-    // if (!$user_info.idx) {
-    //     goto('/')
-    // }
+    // 글 작성중 뒤로가기 또는 새로고침시 필요한 변수 (이미지 삭제 관련)
+    let escapePageModal = $state(false);
+    let delImgList = $state([]);
+    let toPage = $state("");
+    let blockBack = $state(true);
 
-    $effect(() => {
-        // allData["user_id"] = $user_info.idx;
-        allData["user_id"] = "12";
+    if (!$user_info.idx) {
+        goto("/");
+    }
 
-        const refreshFlag = getCookieValue("refresh_flag");
+    $effect(async () => {
+        allData["user_id"] = $user_info.idx;
+
+        const refreshFlag = getCookieValue("del_img_list");
 
         if (refreshFlag) {
-            console.log(refreshFlag);
-            console.log("쿠키가 있어!!!!");
-            document.cookie = "refresh_flag=; Max-Age=0; path=/";
+            try {
+                const res = await axios.post(`${back_api}/img/delete_many`, {
+                    delImgList: refreshFlag.split(","),
+                });
+            } catch (err) {
+                console.error(err.meesage);
+            }
+            document.cookie = "del_img_list=; Max-Age=0; path=/";
         }
 
         // 새로고침시 이미지 삭제 등을 표현하기 위해서!!!!
         const handler = (e) => {
             // 삭제할 이미지 리스트 저장
-            document.cookie = `refresh_flag=asdlkjgasdjfgj349fj3490jf034jf; path=/`;
+            if (delImgList.length > 0) {
+                const delImgListStr = delImgList.join(",");
+                document.cookie = `del_img_list=${delImgListStr}; path=/`;
+            }
         };
         window.addEventListener("beforeunload", handler);
 
-        // beforeNavigate((nav) => {
-        //     // console.log(imgs);
+        beforeNavigate((nav) => {
+            const hasData = Object.keys(allData).some(
+                (key) => key !== "user_id",
+            );
+            if (blockBack && hasData) {
+                toPage = nav.to.url.pathname;
+                escapePageModal = true;
+                nav.cancel();
+            }
+        });
 
-        //     console.log(nav);
-        //     console.log(nav.from.url);
-        //     console.log(nav.to.url);
-        //     // 빠져나가는거 멈추기
-        //     nav.cancel();
-        // });
-
-        // return () => {
-        //     window.removeEventListener("beforeunload", handler);
-        //     console.log("페이지 나감?!?!?!");
-        // };
+        return () => {
+            window.removeEventListener("beforeunload", handler);
+            console.log("페이지 나감?!?!?!");
+        };
     });
+
+    async function goToBackAndArrangeImg() {
+        if (delImgList.length > 0) {
+            try {
+                const res = await axios.post(`${back_api}/img/delete_many`, {
+                    delImgList,
+                });
+            } catch (err) {
+                console.error(err.meesage);
+            }
+        }
+        blockBack = false;
+        goto(toPage);
+    }
+
+    function updateImg(e) {
+        // 새로고침 또는 뒤로가기 시에 삭제할 이미지 리스트 정하기
+        if (e["type"]) {
+            if (e.type == "add") {
+                delImgList.push(e.url);
+            } else {
+                const tempArr = delImgList.filter((item) => item !== e.url);
+                delImgList = tempArr;
+            }
+            console.log(delImgList);
+        }
+
+        // 정상적으로 업로드 될 이미지 리스트 셋
+        const imgArr = e.imgArr;
+        console.log(imgArr);
+
+        let imgStr = "";
+        for (let i = 0; i < imgArr.length; i++) {
+            const con = imgArr[i];
+            imgStr += con.href + ",";
+        }
+        allData["imgs"] = imgStr.slice(0, -1);
+    }
 
     let regions = $derived([
         "서울",
@@ -110,6 +162,11 @@
     // KakaoMap 컴포넌트에 전달할 변수
     let getAddress = $state();
 
+    function tudeAct(e) {
+        allData["latitude"] = e.coords.Ma;
+        allData["longtitude"] = e.coords.La;
+    }
+
     function chkEssentialValue(objArr) {
         for (let i = 0; i < objArr.length; i++) {
             const e = objArr[i];
@@ -148,9 +205,6 @@
             { var: "fee", label: "수수료 입력" },
         ]);
 
-        console.log(chkBool);
-        console.log(allData);
-
         if (!chkBool) {
             return;
         }
@@ -164,35 +218,6 @@
         } catch (err) {
             const m = err.response.data.message;
         }
-
-        // try {
-        //     const res = await axios.post(`${back_api}/regist/upload`, {
-
-        //     });
-
-        //     console.log(res);
-
-        //     if (res.status == 200) {
-        //         alert("등록이 완료 되었습니다.");
-        //         goto(`/`);
-        //     } else {
-        //         alert("에러가 발생했습니다. 다시 시도해주세요.");
-        //     }
-        // } catch (err) {
-        //     console.error(err.message);
-        // }
-
-        // console.log();
-    }
-
-    function updateImg(e) {
-        const imgArr = e.imgArr;
-        let imgStr = "";
-        for (let i = 0; i < imgArr.length; i++) {
-            const con = imgArr[i];
-            imgStr += con.href + ",";
-        }
-        allData["imgs"] = imgStr.slice(0, -1);
     }
 
     function foldDaumPostcode() {
@@ -201,6 +226,7 @@
         modalCloseBtn.click();
     }
 
+    // 다음 주소
     function addressInput() {
         new daum.Postcode({
             oncomplete: function (data) {
@@ -299,6 +325,29 @@
     ></script>
 </svelte:head>
 
+
+<!-- svelte-ignore event_directive_deprecated -->
+<CustomModal bind:visible={escapePageModal} closeBtn={false}>
+    <div class="text-center">
+        <div class=" text-red-500 text-3xl mb-5">
+            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+        </div>
+        <div class="mb-5">
+            페이지에서 벗어날시 등록중인 글은 삭제됩니다. 진행하시겠습니까?
+        </div>
+        <div class="flex justify-center items-center gap-3">
+            
+            <button
+                class="btn btn-active btn-info text-white w-1/3"
+                on:click={goToBackAndArrangeImg}
+            >
+                뒤로가기
+            </button>
+            <button class="btn btn-active w-1/3">취소</button>
+        </div>
+    </div>
+</CustomModal>
+
 <CustomModal bind:visible={submitPrevModal} closeBtn={false}>
     <div class="text-center">
         <div class=" text-green-700 text-3xl mb-2">
@@ -341,6 +390,7 @@
     </div>
 </CustomModal>
 
+<!-- svelte-ignore event_directive_deprecated -->
 <dialog id="my_modal_1" class="modal">
     <div class="modal-box">
         <h3 class="text-lg font-bold">주소를 입력하세요</h3>
@@ -350,7 +400,6 @@
         >
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-            <!-- svelte-ignore event_directive_deprecated -->
             <img
                 src="//t1.daumcdn.net/postcode/resource/images/close.png"
                 id="btnFoldWrap"
@@ -369,12 +418,12 @@
 </dialog>
 
 <!-- 숨겨진 헤더!!!!!!!!!!!!!!!!!!!!!! -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<!-- svelte-ignore event_directive_deprecated -->
 <div class="fixed top-0 left-0 w-full z-20 suit-font">
     <div class="max-w-[530px] mx-auto bg-white border-b">
         <div class=" py-1 flex justify-between items-center">
-            <!-- svelte-ignore a11y_click_events_have_key_events -->
-            <!-- svelte-ignore a11y_no_static_element_interactions -->
-            <!-- svelte-ignore event_directive_deprecated -->
             <div
                 class="cursor-pointer"
                 style="color: #3da83b;"
@@ -392,6 +441,7 @@
     </div>
 </div>
 
+<!-- svelte-ignore event_directive_deprecated -->
 <div class="bg-white relative min-h-screen">
     <div class="max-w-[530px] mx-auto pretendard pt-12 pb-24">
         <div class="text-center font-semibold text-xl bg-white p-3">
@@ -402,10 +452,11 @@
             class=""
             on:click={() => {
                 submitPrevModal = true;
-            }}>버튼버튼</button
+            }}
         >
+            버튼버튼
+        </button>
 
-        <!-- svelte-ignore event_directive_deprecated -->
         <form on:submit={uploadRegist}>
             <div class="mt-2 bg-white p-5">
                 <div class="font-semibold text-lg">이미지 등록 *</div>
@@ -476,7 +527,12 @@
                     <div
                         class="mt-2 h-72 border w-full text-sm border-sky-400 rounded-md overflow-hidden"
                     >
-                        <KakaoMap {getAddress} phText="근무지" height="300px" />
+                        <KakaoMap
+                            {getAddress}
+                            phText="근무지"
+                            height="300px"
+                            {tudeAct}
+                        />
                     </div>
                 {:else}
                     <div

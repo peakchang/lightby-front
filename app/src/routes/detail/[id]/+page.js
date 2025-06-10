@@ -1,21 +1,22 @@
 import { back_api } from "$lib/const";
-import { user_info } from "$lib/stores/stores.js";
+import { user_info } from "$lib/stores/stores";
 import axios from "axios";
 
-// 사이트 접속시 user_info store 값에 user 정보 넣기
 export const load = async ({ params, url, data }) => {
-    console.log(params);
     let detail = {}
+    let favorateBool = false;
     try {
-        const res = await axios.post(`${back_api}/detail`, { idx: params.id })
+
+        let userId = ""
+        user_info.subscribe((v) => {
+            userId = v.idx
+        })
+        const res = await axios.post(`${back_api}/detail`, { idx: params.id, userId })
         detail = res.data.detail
+        favorateBool = res.data.favorateBool
     } catch (error) {
 
     }
-
-    console.log(detail);
-    
-
-    return { detail }
+    return { detail, favorateBool }
 
 }

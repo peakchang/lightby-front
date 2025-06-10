@@ -121,29 +121,42 @@
 </CustomModal>
 
 <div
-    class="fixed top-0 left-1/2 max-w-[640px] w-full -translate-x-1/2 bg-white p-3 shadow-bottom z-20"
+    class="fixed top-0 left-1/2 max-w-[640px] w-full -translate-x-1/2 bg-white pt-3 px-3 shadow-bottom suit-font z-20"
 >
-    <div class="flex justify-between">
+    <div class="flex justify-between items-center">
         <div>
-            <img src="/logo.png" alt="" class=" max-w-[110px] cursor-pointer" />
+            <img src="/logo.png" alt="" class=" max-w-[100px] md:max-w-[120px] cursor-pointer" />
         </div>
-        {#if $user_info.idx}
-            <!-- svelte-ignore event_directive_deprecated -->
-            <button
-                class="btn btn-outline btn-success btn-xs"
-                on:click={logout}
-            >
-                <i class="fa fa-user-circle" aria-hidden="true"></i>
-                <span>로그아웃</span>
-            </button>
-        {:else}
-            <a href="/auth/login">
-                <button class="btn btn-outline btn-success btn-xs">
+
+        <div class="flex justify-center items-center gap-2">
+            {#if $user_info.idx}
+                <!-- svelte-ignore event_directive_deprecated -->
+                <button
+                    class="btn btn-outline btn-success btn-xs md:btn-sm"
+                    on:click={logout}
+                >
                     <i class="fa fa-user-circle" aria-hidden="true"></i>
-                    <span>로그인</span>
+                    <span>로그아웃</span>
                 </button>
-            </a>
-        {/if}
+            {:else}
+                <a href="/auth/login">
+                    <button class="btn btn-outline btn-success btn-xs md:btn-sm">
+                        <i class="fa fa-user-circle" aria-hidden="true"></i>
+                        <span>로그인</span>
+                    </button>
+                </a>
+            {/if}
+
+            <button class="btn btn-outline btn-info btn-xs md:btn-sm">
+                <i class="fa fa-search" aria-hidden="true"></i>
+                <span>검색</span>
+            </button>
+        </div>
+    </div>
+    <div class="text-xs text-right pt-2">
+        <span>TODAY : 1,157</span>
+        <span>/</span>
+        <span>신규현장 : 59</span>
     </div>
 </div>
 

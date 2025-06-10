@@ -52,8 +52,6 @@
 		rel="stylesheet"
 		href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
 	/>
-
-	
 </svelte:head>
 
 <div class="site-wrab">
@@ -73,6 +71,10 @@
 </div>
 
 <style>
+	:global(body) {
+		user-select: none;
+		-webkit-user-drag: none;
+	}
 	@font-face {
 		font-family: "OKDDUNG";
 		src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2206-02@1.0/OKDDUNG.woff2")
@@ -127,5 +129,9 @@
 
 	:global(.site-wrab) {
 		background-color: #f3f6f6;
+	}
+
+	:global(#toast) {
+		transition: opacity 0.5s ease-in-out;
 	}
 </style>

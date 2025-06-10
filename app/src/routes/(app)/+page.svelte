@@ -66,10 +66,10 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <!-- svelte-ignore event_directive_deprecated -->
-<div class="pt-16 pb-32 suit-font">
+<div class="pt-20 pb-32 suit-font px-3">
     <div>
         <ul
-            class="grid grid-cols-3 md:grid-cols-4 gap-x-5 md:gap-x-2 gap-y-1 px-4"
+            class="grid grid-cols-3 md:grid-cols-4 gap-x-5 md:gap-x-2 gap-y-1"
         >
             {#each locationList as site}
                 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
@@ -90,6 +90,10 @@
         </ul>
     </div>
 
+    <div class="my-3 border border-gray-300 rounded-lg p-2">
+        배너배너~~~~~
+    </div>
+
     {#if loading}
         <div class="mt-20 text-center">
             <div>로딩중</div>
@@ -104,7 +108,7 @@
                 }}
             >
                 <div
-                    class="mt-5 mx-2 border border-gray-300 rounded-lg p-2 shadow-sm cursor-pointer relative"
+                    class="border border-gray-300 rounded-lg p-2 shadow-sm cursor-pointer relative"
                 >
                     <div class="absolute bottom-0 right-0 p-3 max-w-1/3">
                         <div class="w-full flex gap-1">
