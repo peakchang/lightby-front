@@ -4,7 +4,7 @@
     import { goto } from "$app/navigation";
 
     import { page } from "$app/stores";
-    import { user_info } from "$lib/stores/stores";
+    import { user_info, main_location } from "$lib/stores/stores";
     import { fetchRequest } from "$lib/lib";
     let { children } = $props();
 
@@ -23,6 +23,10 @@
     }
 
     async function logout() {
+        // 지역 설정 되어 있으면 풀기
+        $main_location = "전국";
+        localStorage.removeItem("location");
+
         const res = await fetchRequest("POST", "/auth/logout", {
             idx: $user_info.idx,
         });
@@ -125,7 +129,11 @@
 >
     <div class="flex justify-between items-center">
         <div>
-            <img src="/logo.png" alt="" class=" max-w-[100px] md:max-w-[120px] cursor-pointer" />
+            <img
+                src="/logo.png"
+                alt=""
+                class=" max-w-[100px] md:max-w-[120px] cursor-pointer"
+            />
         </div>
 
         <div class="flex justify-center items-center gap-2">
@@ -140,14 +148,18 @@
                 </button>
             {:else}
                 <a href="/auth/login">
-                    <button class="btn btn-outline btn-success btn-xs md:btn-sm">
+                    <button
+                        class="btn btn-outline btn-success btn-xs md:btn-sm hover:text-white"
+                    >
                         <i class="fa fa-user-circle" aria-hidden="true"></i>
                         <span>로그인</span>
                     </button>
                 </a>
             {/if}
 
-            <button class="btn btn-outline btn-info btn-xs md:btn-sm">
+            <button
+                class="btn btn-outline btn-info btn-xs md:btn-sm hover:text-white"
+            >
                 <i class="fa fa-search" aria-hidden="true"></i>
                 <span>검색</span>
             </button>

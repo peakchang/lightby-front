@@ -26,6 +26,17 @@
     let toPage = $state("");
     let blockBack = $state(true);
 
+    const iconList = $derived([
+        { name: "조건변경", id: "change" },
+        { name: "할인", id: "discount" },
+        { name: "수수료UP", id: "feeup" },
+        { name: "설거지", id: "guzi" },
+        { name: "급구", id: "hurry" },
+        { name: "소수인원", id: "minority" },
+        { name: "신규", id: "new" },
+        { name: "한방", id: "once" },
+    ]);
+
     if (!$user_info.idx) {
         goto("/");
     }
@@ -325,7 +336,6 @@
     ></script>
 </svelte:head>
 
-
 <!-- svelte-ignore event_directive_deprecated -->
 <CustomModal bind:visible={escapePageModal} closeBtn={false}>
     <div class="text-center">
@@ -336,7 +346,6 @@
             페이지에서 벗어날시 등록중인 글은 삭제됩니다. 진행하시겠습니까?
         </div>
         <div class="flex justify-center items-center gap-3">
-            
             <button
                 class="btn btn-active btn-info text-white w-1/3"
                 on:click={goToBackAndArrangeImg}
@@ -349,6 +358,7 @@
 </CustomModal>
 
 <CustomModal bind:visible={submitPrevModal} closeBtn={false}>
+    <!-- svelte-ignore event_directive_deprecated -->
     <div class="text-center">
         <div class=" text-green-700 text-3xl mb-2">
             <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
@@ -374,8 +384,39 @@
         </div>
 
         <div class="">
-            <div>아이콘 선택 (개당 2,200원)</div>
-            <div>아이콘들......</div>
+            <div class="mb-4">아이콘 선택 (개당 2,200원)</div>
+            <div class="grid grid-cols-4 md:gap-x-2 gap-y-2">
+                {#each iconList as icon}
+                    <label>
+                        
+                        <input
+                            type="checkbox"
+                            class="hidden peer"
+                            value={icon.id}
+                            bind:group={allData["icons"]}
+                            on:change={(e) => {
+                                console.log(e.target.checked);
+                                if (
+                                    e.target.checked &&
+                                    allData["icons"].length > 2
+                                ) {
+                                    e.target.checked = false;
+                                    return;
+                                }
+                            }}
+                        />
+                        <div
+                            class="border-2 peer-checked:border-blue-500 border-gray-200 w-5/6 md:w-4/5 p-2 mx-auto rounded-lg"
+                        >
+                            <img
+                                src="/icons/icon-{icon.id}.png"
+                                alt=""
+                                class="w-full"
+                            />
+                        </div>
+                    </label>
+                {/each}
+            </div>
         </div>
 
         <div class="text-right mb-4">

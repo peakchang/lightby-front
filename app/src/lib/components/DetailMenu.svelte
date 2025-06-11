@@ -34,8 +34,6 @@
             }
 
             setTimeout(() => {
-                console.log("????");
-
                 toastShow = 0;
             }, 1200);
             console.log(favorateBool);

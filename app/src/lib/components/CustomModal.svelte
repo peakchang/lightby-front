@@ -26,12 +26,16 @@
             }
         }}
     >
-        <form on:submit={closeModal}>
+        <!-- style="width: {width}px; max-width:90%;" -->
+        <form
+            on:submit={closeModal}
+            class="mx-auto"
+            style="max-width: 90%; width: {width}px"
+        >
             <div
                 class="bg-white rounded-lg p-6 shadow-lg relative suit-font h-1/2"
                 class:pt-6={xBtn}
                 class:pb-14={closeBtn}
-                style="width: {width}px;"
                 transition:fly={{ y: 20, duration: 200 }}
                 on:click|stopPropagation
             >

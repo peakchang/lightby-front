@@ -3,12 +3,15 @@
     import { goto } from "$app/navigation";
     import { back_api, public_img_bucket } from "$lib/const.js";
     import PdButton from "$lib/components/PdButton.svelte";
+    import { main_location } from "$lib/stores/stores.js";
+    import { browser } from "$app/environment";
 
     let { data } = $props();
 
+    console.log($main_location);
+
     let siteList = $state(data.siteList);
 
-    let selectedSite = $state("전국");
     let locationList = $derived([
         "전국",
         "서울/경기/인천",
@@ -67,31 +70,29 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <!-- svelte-ignore event_directive_deprecated -->
 <div class="pt-20 pb-32 suit-font px-3">
-    <div>
-        <ul
-            class="grid grid-cols-3 md:grid-cols-4 gap-x-5 md:gap-x-2 gap-y-1"
-        >
-            {#each locationList as site}
+    <div class=" border border-gray-300 rounded-lg p-2">배너배너~~~~~</div>
+
+    <div class="my-3">
+        <ul class="grid grid-cols-3 md:grid-cols-4 gap-x-5 md:gap-x-2 gap-y-1">
+            {#each locationList as location}
                 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
                 <li
                     class="text-center text-xs py-1.5 px-2 rounded-full border border-gray-500 text-gray-500 cursor-pointer"
-                    class:bg-[#0669f8]={selectedSite == site}
-                    class:text-white={selectedSite == site}
-                    class:border-white={selectedSite == site}
-                    data-site={site}
+                    class:bg-[#0669f8]={$main_location == location}
+                    class:text-white={$main_location == location}
+                    class:border-white={$main_location == location}
+                    data-location={location}
                     on:click={(e) => {
-                        selectedSite = e.target.dataset.site;
-                        console.log(selectedSite);
+                        $main_location = e.target.dataset.location;
+                        $main_location = $main_location;
+                        localStorage.setItem("location", $main_location);
+                        console.log("어쩌구!");
                     }}
                 >
-                    {site}
+                    {location}
                 </li>
             {/each}
         </ul>
-    </div>
-
-    <div class="my-3 border border-gray-300 rounded-lg p-2">
-        배너배너~~~~~
     </div>
 
     {#if loading}
@@ -100,6 +101,18 @@
             <span class="loading loading-dots loading-xl"></span>
         </div>
     {:else}
+        <div
+            class="mb-3 ml-6 text-lg font-bold text-cyan-700 flex items-center"
+        >
+            <span class="mr-2">
+                <i class="fa fa-bell" aria-hidden="true"></i>
+            </span>
+            <span class="mr-4">프리미엄</span>
+            <div
+                class=" w-[50%] md:w-[40%] rounded-full"
+                style="height: 2px; background-color: #007595;"
+            ></div>
+        </div>
         {#each siteList as site}
             <a
                 href="/detail/{site.idx}"
@@ -108,7 +121,7 @@
                 }}
             >
                 <div
-                    class="border border-gray-300 rounded-lg p-2 shadow-sm cursor-pointer relative"
+                    class="border border-gray-300 rounded-lg p-2 mb-3 shadow-sm cursor-pointer relative"
                 >
                     <div class="absolute bottom-0 right-0 p-3 max-w-1/3">
                         <div class="w-full flex gap-1">
@@ -194,7 +207,7 @@
             }}
         >
             <div
-                class="mt-5 mx-2 relative border border-gray-300 rounded-lg p-2 shadow-sm cursor-pointer"
+                class="mt-5 relative border border-gray-300 rounded-lg p-2 shadow-sm cursor-pointer"
             >
                 <div class="flex justify-between items-center">
                     <div class="pl-4 max-w-[55%]">
