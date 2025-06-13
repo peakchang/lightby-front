@@ -38,6 +38,7 @@ export async function POST({ request, cookies }) {
                 secure: true,
                 path: '/',
                 maxAge: 60 * 15
+                // maxAge: 15
             });
 
             cookies.set('refresh_token', refreshToken, {

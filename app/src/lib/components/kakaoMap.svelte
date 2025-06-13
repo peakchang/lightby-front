@@ -76,5 +76,6 @@
 </svelte:head>
 
 {#if getAddress}
+    <!-- svelte-ignore element_invalid_self_closing_tag -->
     <div id="map-area" style="width:100%; height:{height}" />
 {/if}

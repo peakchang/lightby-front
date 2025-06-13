@@ -4,45 +4,72 @@
     import SortableImg from "$lib/components/SortableImg.svelte";
     import KakaoMap from "$lib/components/kakaoMap.svelte";
     import CustomModal from "$lib/components/CustomModal.svelte";
-
-    import { user_info } from "$lib/stores/stores";
+    import Toast from "$lib/components/Toast.svelte";
+    import { user_info, all_data } from "$lib/stores/stores";
     import { browser } from "$app/environment";
     import { back_api } from "$lib/const";
     import { getCookieValue } from "$lib/lib";
     import axios from "axios";
 
-    let allData = $state({});
-
-    let feeBases = $derived(["본부", "팀", "직원", "상담시"]); //
+    let feeBases = $derived(["본부", "팀", "직원", "상담시"]); // 수수료 기준 값
     let businessArr = $state([]);
     let occupationArr = $state([]);
 
     // 등록 전 결제 및 물어보는거 모달
     let submitPrevModal = $state(false);
 
+    // 모달 내 계산기 관련
+    let productInfo = $state({ name: "일반", price: 0 });
+    let iconNames = $state([]);
+    let icons = $state([]);
+    let iconSum = $state(0);
+
     // 글 작성중 뒤로가기 또는 새로고침시 필요한 변수 (이미지 삭제 관련)
     let escapePageModal = $state(false);
     let delImgList = $state([]);
     let toPage = $state("");
-    let blockBack = $state(true);
+    let blockBack = $state(true); // 뒤로가기시 nav 에 막혀서 안움직일시 임시 변수
 
-    const iconList = $derived([
-        { name: "조건변경", id: "change" },
-        { name: "할인", id: "discount" },
-        { name: "수수료UP", id: "feeup" },
-        { name: "설거지", id: "guzi" },
-        { name: "급구", id: "hurry" },
-        { name: "소수인원", id: "minority" },
-        { name: "신규", id: "new" },
-        { name: "한방", id: "once" },
-    ]);
+    // 토스트 관련 변수
+    let toastShow = $state(0);
+    let toastMessage = $state("토스트 메세지!!");
 
-    if (!$user_info.idx) {
-        goto("/");
-    }
+    // alert modal 변수!!
+    let alertModalShow = $state(false);
+    let alertModalMessage = $state("");
+
+    // 상태값 변경 임시변수
+    let prevItem = $state("");
+
+    // effct 함수 내에서 무한루프가 되는거 방지! (반복되는 코드 부분 상태값 변경으로 한번만 실행되게 함)
+    let loopPrevent = $state(true);
+
+    $all_data["user_id"] = $user_info.idx;
 
     $effect(async () => {
-        allData["user_id"] = $user_info.idx;
+        console.log("sdfsdfsf");
+
+        console.log($all_data);
+
+        if (!$all_data["user_id"] && loopPrevent) {
+            blockBack = false;
+            goto("/");
+            loopPrevent = false;
+        }
+
+        if (!$all_data["product"]) {
+            $all_data["product"] = "free";
+        }
+
+        /*
+        후처리 부분!!!
+        (svelte5 에서는 $가 없어진 대신 effect 안에서 전부 처리)
+        해당 기준 윗 부분은 페이지 접근시 선처리 부분, 기타 조건 변경시 후처리 부분!
+        */
+
+        if ($all_data["product"] != prevItem) {
+            prevItem = $all_data["product"];
+        }
 
         const refreshFlag = getCookieValue("del_img_list");
 
@@ -68,7 +95,7 @@
         window.addEventListener("beforeunload", handler);
 
         beforeNavigate((nav) => {
-            const hasData = Object.keys(allData).some(
+            const hasData = Object.keys($all_data).some(
                 (key) => key !== "user_id",
             );
             if (blockBack && hasData) {
@@ -83,6 +110,74 @@
             console.log("페이지 나감?!?!?!");
         };
     });
+
+    const iconList = $derived([
+        { name: "조건변경", id: "change" },
+        { name: "할인", id: "discount" },
+        { name: "수수료UP", id: "feeup" },
+        { name: "설거지", id: "guzi" },
+        { name: "급구", id: "hurry" },
+        { name: "소수인원", id: "minority" },
+        { name: "신규", id: "new" },
+        { name: "한방", id: "once" },
+    ]);
+
+    /*
+        아이콘 선택 변경시 함수
+        아이콘 선택시 무료 등록이면 전부 해제 & 선택 불가
+        프리미엄, 탑 선택시 2개 초과 선택 못하게 +
+    */
+    function iconsChange() {
+        console.log(this.checked);
+
+        if ($all_data["product"] == "free") {
+            icons = [];
+            this.checked = false;
+            toastShow = 1;
+            toastMessage = "아이콘 선택은 유료 상품에서만 가능합니다.";
+            return;
+        }
+        if (this.checked && icons.length > 2) {
+            this.checked = false;
+            toastShow = 1;
+            toastMessage = "아이콘 선택은 2개까지만 가능합니다.";
+            return;
+        }
+
+        const iconsTemp = icons;
+        iconNames = icons
+            .map((id) => iconList.find((icon) => icon.id === id)?.name)
+            .filter((name) => name !== undefined);
+        iconSum = icons.length * 2200;
+
+        $all_data["sum"] = productInfo.price + iconSum;
+    }
+
+    function itemRateChange() {
+        console.log();
+
+        if (this.value == "premium") {
+            productInfo.name = "프리미엄";
+            productInfo.price = 66000;
+
+            console.log($all_data["sum"]);
+        } else if (this.value == "top") {
+            productInfo.name = "지역 탑";
+            productInfo.price = 49500;
+        } else if (this.value == "free") {
+            productInfo.name = "일반";
+            productInfo.price = 0;
+            if (icons && icons.length > 0) {
+                icons = [];
+                iconNames = [];
+                toastShow = 1;
+                toastMessage = "아이콘 선택은 유료 상품에서만 가능합니다.";
+                iconSum = 0;
+            }
+        }
+
+        $all_data["sum"] = productInfo.price + iconSum;
+    }
 
     async function goToBackAndArrangeImg() {
         if (delImgList.length > 0) {
@@ -119,7 +214,7 @@
             const con = imgArr[i];
             imgStr += con.href + ",";
         }
-        allData["imgs"] = imgStr.slice(0, -1);
+        $all_data["imgs"] = imgStr.slice(0, -1);
     }
 
     let regions = $derived([
@@ -174,15 +269,16 @@
     let getAddress = $state();
 
     function tudeAct(e) {
-        allData["latitude"] = e.coords.Ma;
-        allData["longtitude"] = e.coords.La;
+        $all_data["latitude"] = e.coords.Ma;
+        $all_data["longtitude"] = e.coords.La;
     }
 
     function chkEssentialValue(objArr) {
         for (let i = 0; i < objArr.length; i++) {
             const e = objArr[i];
-            if (!allData[e.var]) {
-                alert(`${e.label}(은)는 필수 입력입니다.`);
+            if (!$all_data[e.var]) {
+                alertModalMessage = `${e.label}(은)는 필수 입력입니다.`;
+                alertModalShow = true;
                 return false;
             }
             // if (!e.var) {
@@ -193,11 +289,9 @@
         return true;
     }
 
-    async function uploadRegist(e) {
-        e.preventDefault();
-
-        allData["business"] = businessArr.join(",");
-        allData["occupation"] = occupationArr.join(",");
+    function uploadChkRegist(e) {
+        $all_data["business"] = businessArr.join(",");
+        $all_data["occupation"] = occupationArr.join(",");
 
         const chkBool = chkEssentialValue([
             { var: "imgs", label: "현장 이미지" },
@@ -219,10 +313,14 @@
         if (!chkBool) {
             return;
         }
+        submitPrevModal = true;
+    }
 
+    async function uploadRegist() {
+        $all_data["icons"] = icons.join(",");
         try {
             const res = await axios.post(`${back_api}/regist/upload`, {
-                allData,
+                allData: $all_data,
             });
             alert("등록이 완료 되었습니다.");
             goto(`/`);
@@ -252,10 +350,10 @@
                 //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
                 if (data.userSelectedType === "R") {
                     // 사용자가 도로명 주소를 선택했을 경우
-                    allData["addr"] = data.roadAddress;
+                    $all_data["addr"] = data.roadAddress;
                 } else {
                     // 사용자가 지번 주소를 선택했을 경우(J)
-                    allData["addr"] = data.jibunAddress;
+                    $all_data["addr"] = data.jibunAddress;
                 }
 
                 // 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
@@ -283,23 +381,23 @@
                     // document.getElementById("sample3_extraAddress").value = "";
                 }
 
-                getAddress = allData["addr"];
+                getAddress = $all_data["addr"];
                 console.log(regions);
                 let selRegionIdx = null;
                 for (let i = 0; i < regions.length; i++) {
                     const region = regions[i];
                     const regex = new RegExp(`^${region}`);
-                    if (allData["addr"].match(regex)) {
+                    if ($all_data["addr"].match(regex)) {
                         selRegionIdx = i; // 매치되면 선택된 지역으로 저장
-                        allData["location"] = regions[selRegionIdx];
+                        $all_data["location"] = regions[selRegionIdx];
                         break; // 매치된 경우 더 이상 순회하지 않음
                     }
                 }
 
-                allData["res_addr"] =
-                    `(${data.zonecode}) ${allData["addr"]} ${extraAddr}`;
+                $all_data["res_addr"] =
+                    `(${data.zonecode}) ${$all_data["addr"]} ${extraAddr}`;
 
-                console.log(allData["res_addr"]);
+                console.log($all_data["res_addr"]);
 
                 // detailAddrArea.focus();
 
@@ -322,6 +420,8 @@
         postWrap.style.display = "block";
         my_modal_1.showModal();
     }
+
+    let successPrevModal = $state(false);
 </script>
 
 <svelte:head>
@@ -335,6 +435,58 @@
         src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=72689d54e68abd94260d9284c64d7545&libraries=services&autoload=false`}
     ></script>
 </svelte:head>
+
+<!-- <div class=" mt-40">
+    <button
+        on:click={() => {
+            // successPrevModal = true;
+            submitPrevModal = true;
+        }}
+    >
+        버튼버튼
+    </button>
+</div> -->
+
+<!-- svelte-ignore event_directive_deprecated -->
+<CustomModal bind:visible={successPrevModal} closeBtn={false}>
+    <div class="text-center">
+        <div class=" text-red-500 text-3xl mb-5">
+            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+        </div>
+        <div class="mb-5">보자귱!!!!!</div>
+        <div class="flex justify-center items-center gap-3">
+            <button
+                class="btn btn-active w-1/3"
+                on:click={() => {
+                    alertModalShow = true;
+                }}>닫기</button
+            >
+        </div>
+    </div>
+</CustomModal>
+
+<Toast
+    {toastShow}
+    {toastMessage}
+    toastAct={() => {
+        toastShow = 0;
+    }}
+></Toast>
+
+<!-- svelte-ignore event_directive_deprecated -->
+<CustomModal bind:visible={alertModalShow} closeBtn={false}>
+    <div class="text-center">
+        <div class=" text-red-500 text-3xl mb-5">
+            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+        </div>
+        <div class="mb-5">
+            {alertModalMessage}
+        </div>
+        <div class="flex justify-center items-center gap-3">
+            <button class="btn btn-active w-1/3">닫기</button>
+        </div>
+    </div>
+</CustomModal>
 
 <!-- svelte-ignore event_directive_deprecated -->
 <CustomModal bind:visible={escapePageModal} closeBtn={false}>
@@ -364,23 +516,91 @@
             <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
         </div>
 
-        <div class="mb-5">
-            구인글 최초 1회 프리미엄 무료등록 // 첫 작성하는 사람한테만
-        </div>
+        <div>
+            <div class="mb-5">
+                <p class="md:text-lg">첫글 작성자 혜택!</p>
+                <p>구인글 최초 1회 프리미엄 무료등록</p>
+            </div>
 
-        <div class="mb-5 border p-3">
-            - 바로 등록 (무료 등록) 일 2회 무료 등록이 가능합니다.
-        </div>
-        <div class="mb-5 border p-3">
-            <p>프리미엄 등록 특가 132,000원 -> 66,000원</p>
-            <p>시작페이지 / 지역페이지 모든 지면 상단 10일 랜덤 노출</p>
-            <p>등록된 내용은 마이페이지에서 수정 가능</p>
-        </div>
+            <label>
+                <input
+                    type="radio"
+                    value="premium"
+                    class="hidden peer"
+                    bind:group={$all_data["product"]}
+                    on:change={itemRateChange}
+                />
 
-        <div class="mb-5 border p-3">
-            <p>지역 탑 등록 특가 99,000원 -> 49,500원</p>
-            <p>지역페이지 상단 10일 랜덤 노출</p>
-            <p>등록된 내용은 마이페이지에서 수정 가능</p>
+                <div
+                    class="mb-5 border-2 peer-checked:border-blue-500 border-gray-200 p-2 mx-auto rounded-lg"
+                >
+                    <p class="text-sm md:text-base mb-2">
+                        프리미엄 등록 특가
+                        <span class="line-through text-gray-500">
+                            132,000원
+                        </span>
+                        ->
+                        <span class="font-bold">66,000원</span>
+                    </p>
+                    <p class="text-xs md:text-sm">
+                        시작페이지 / 지역페이지 모든 지면
+                    </p>
+                    <p class="text-xs md:text-sm">상단 10일 랜덤 노출</p>
+                    <p class="text-xs md:text-sm">
+                        등록된 내용은 마이페이지에서 수정 가능
+                    </p>
+                </div>
+            </label>
+
+            <label>
+                <input
+                    type="radio"
+                    value="top"
+                    class="hidden peer"
+                    bind:group={$all_data["product"]}
+                    on:change={itemRateChange}
+                />
+
+                <div
+                    class="mb-5 border-2 peer-checked:border-blue-500 border-gray-200 p-2 mx-auto rounded-lg"
+                >
+                    <p class="text-sm md:text-base mb-2">
+                        지역 탑 등록 특가
+                        <span class="line-through text-gray-500">
+                            99,000원
+                        </span>
+                        ->
+                        <span class="font-bold">49,500원</span>
+                    </p>
+                    <p class="text-xs md:text-sm">
+                        지역페이지 상단 10일 랜덤 노출
+                    </p>
+                    <p class="text-xs md:text-sm">
+                        등록된 내용은 마이페이지에서 수정 가능
+                    </p>
+                </div>
+            </label>
+
+            <label>
+                <input
+                    type="radio"
+                    value="free"
+                    class="hidden peer"
+                    bind:group={$all_data["product"]}
+                    on:change={itemRateChange}
+                />
+
+                <div
+                    class="mb-5 border-2 peer-checked:border-blue-500 border-gray-200 p-2 mx-auto rounded-lg"
+                >
+                    <p class="text-sm md:text-base mb-2">
+                        - 바로 등록 (무료 등록)
+                    </p>
+                    <p class="text-xs md:text-sm">
+                        일 2회 무료 등록이 가능합니다.
+                    </p>
+                </div>
+            </label>
         </div>
 
         <div class="">
@@ -388,22 +608,12 @@
             <div class="grid grid-cols-4 md:gap-x-2 gap-y-2">
                 {#each iconList as icon}
                     <label>
-                        
                         <input
                             type="checkbox"
                             class="hidden peer"
                             value={icon.id}
-                            bind:group={allData["icons"]}
-                            on:change={(e) => {
-                                console.log(e.target.checked);
-                                if (
-                                    e.target.checked &&
-                                    allData["icons"].length > 2
-                                ) {
-                                    e.target.checked = false;
-                                    return;
-                                }
-                            }}
+                            bind:group={icons}
+                            on:change={iconsChange}
                         />
                         <div
                             class="border-2 peer-checked:border-blue-500 border-gray-200 w-5/6 md:w-4/5 p-2 mx-auto rounded-lg"
@@ -419,14 +629,43 @@
             </div>
         </div>
 
-        <div class="text-right mb-4">
-            <p>결제 금액 : 55,000원</p>
+        <div class="w-2/3 md:w-1/2 ml-auto my-4 text-lg font-semibold">
+            <div
+                class="flex justify-between items-center mb-2 border-b border-gray-100 text-sm"
+            >
+                <span class="text-gray-600">{productInfo.name}</span>
+                <span class="font-medium">
+                    {productInfo.price.toLocaleString()}원
+                </span>
+            </div>
+
+            {#each iconNames as iconName}
+                <div
+                    class="flex justify-between items-center mb-2 border-b border-gray-100 text-sm"
+                >
+                    <span class="text-gray-600">{iconName}</span>
+                    <span class="font-medium"> 2,200 원 </span>
+                </div>
+            {/each}
+
+            <hr class="border-gray-300" />
+            <div
+                class="flex justify-between items-center py-2 border-b border-gray-100"
+            >
+                <span class="text-gray-600">합계</span>
+                <span class="font-medium">
+                    {$all_data["sum"] ? $all_data["sum"].toLocaleString() : 0}원
+                </span>
+            </div>
         </div>
 
         <div class="text-right">
-            <button class="bg-gray-400 text-white px-3 py-1.5"
-                >결제 및 등록</button
+            <button
+                class="bg-gray-400 text-white px-3 py-1.5"
+                on:click={uploadRegist}
             >
+                결제 및 등록
+            </button>
         </div>
     </div>
 </CustomModal>
@@ -489,72 +728,68 @@
             구인글 등록
         </div>
 
-        <button
-            class=""
-            on:click={() => {
-                submitPrevModal = true;
-            }}
-        >
-            버튼버튼
-        </button>
+        <div class="mt-2 bg-white p-5">
+            <div class="font-semibold text-lg">이미지 등록 *</div>
+            <div class="text-xs">
+                이미지는 최대 10장, 슬라이드 형태로 표시됩니다.
+            </div>
+            <div class="my-3">
+                <SortableImg
+                    {updateImg}
+                    imgModifyList={$all_data["imgs"]
+                        ? $all_data["imgs"].split(",")
+                        : ""}
+                    maxImgCount={10}
+                ></SortableImg>
+            </div>
 
-        <form on:submit={uploadRegist}>
-            <div class="mt-2 bg-white p-5">
-                <div class="font-semibold text-lg">이미지 등록 *</div>
-                <div class="text-xs">
-                    이미지는 최대 10장, 슬라이드 형태로 표시됩니다.
-                </div>
-                <div class="my-3">
-                    <SortableImg {updateImg} maxImgCount={10}></SortableImg>
-                </div>
+            <div class="font-semibold text-lg">공고제목 (현장명)*</div>
+            <div class="mt-1.5">
+                <input
+                    type="text"
+                    placeholder="공고 제목(현장명을 입력하세요)(필수)"
+                    bind:value={$all_data["subject"]}
+                    class="input input-bordered input-info input-sm w-full"
+                />
+            </div>
 
-                <div class="font-semibold text-lg">공고제목 (현장명)*</div>
-                <div class="mt-1.5">
-                    <input
-                        type="text"
-                        placeholder="공고 제목(현장명을 입력하세요)(필수)"
-                        bind:value={allData["subject"]}
-                        class="input input-bordered input-info input-sm w-full"
-                    />
-                </div>
+            <div class="mt-3 font-semibold text-lg">현장 한마디*</div>
+            <div class="mt-1.5">
+                <input
+                    type="text"
+                    class="input input-bordered input-info input-sm w-full"
+                    placeholder="현장 한마디를 입력해주세요(필수)"
+                    bind:value={$all_data["point"]}
+                />
+            </div>
 
-                <div class="mt-3 font-semibold text-lg">현장 한마디*</div>
-                <div class="mt-1.5">
-                    <input
-                        type="text"
-                        class="input input-bordered input-info input-sm w-full"
-                        placeholder="현장 한마디를 입력해주세요(필수)"
-                        bind:value={allData["point"]}
-                    />
-                </div>
+            <div class="mt-3 font-semibold text-lg">근무지*</div>
 
-                <div class="mt-3 font-semibold text-lg">근무지*</div>
-
-                <div class="mt-1.5 flex w-full items-center gap-1">
-                    {#if allData["res_addr"]}
-                        <div
-                            class="border w-full py-1.5 px-2 text-sm border-sky-400 rounded-md"
-                        >
-                            {allData["res_addr"]}
-                        </div>
-                    {:else}
-                        <div
-                            class="border w-full py-1.5 px-2 text-sm border-sky-400 rounded-md text-gray-400"
-                        >
-                            우측 주소 입력을 클릭해 주소를 입력해주세요
-                        </div>
-                    {/if}
-
-                    <button
-                        class="btn btn-outline btn-info btn-sm"
-                        type="button"
-                        on:click={addressInput}
+            <div class="mt-1.5 flex w-full items-center gap-1">
+                {#if $all_data["res_addr"]}
+                    <div
+                        class="border w-full py-1.5 px-2 text-sm border-sky-400 rounded-md"
                     >
-                        <span>주소 입력</span>
-                    </button>
-                </div>
+                        {$all_data["res_addr"]}
+                    </div>
+                {:else}
+                    <div
+                        class="border w-full py-1.5 px-2 text-sm border-sky-400 rounded-md text-gray-400"
+                    >
+                        우측 주소 입력을 클릭해 주소를 입력해주세요
+                    </div>
+                {/if}
 
-                <!-- <div class="my-2">
+                <button
+                    class="btn btn-outline btn-info btn-sm"
+                    type="button"
+                    on:click={addressInput}
+                >
+                    <span>주소 입력</span>
+                </button>
+            </div>
+
+            <!-- <div class="my-2">
                     <input
                         type="text"
                         bind:value={detailAddr}
@@ -564,203 +799,201 @@
                     />
                 </div> -->
 
-                {#if getAddress}
-                    <div
-                        class="mt-2 h-72 border w-full text-sm border-sky-400 rounded-md overflow-hidden"
-                    >
-                        <KakaoMap
-                            {getAddress}
-                            phText="근무지"
-                            height="300px"
-                            {tudeAct}
-                        />
-                    </div>
-                {:else}
-                    <div
-                        class="mt-2 h-24 border border-sky-400 rounded-md flex justify-center items-center bg-gray-200"
-                    >
-                        <div class="">주소를 입력하면 지도가 표시됩니다.</div>
-                    </div>
-                {/if}
+            {#if getAddress}
+                <div
+                    class="mt-2 h-72 border w-full text-sm border-sky-400 rounded-md overflow-hidden"
+                >
+                    <KakaoMap
+                        {getAddress}
+                        phText="근무지"
+                        height="300px"
+                        {tudeAct}
+                    />
+                </div>
+            {:else}
+                <div
+                    class="mt-2 h-24 border border-sky-400 rounded-md flex justify-center items-center bg-gray-200"
+                >
+                    <div class="">주소를 입력하면 지도가 표시됩니다.</div>
+                </div>
+            {/if}
 
-                <div class="mt-5">
-                    <div class="mt-3 font-semibold text-lg">지역선택*</div>
-                    <div class="mt-3 grid grid-cols-2 gap-1">
-                        {#each regions as region, idx}
-                            <label class="button-checkbox">
+            <div class="mt-5">
+                <div class="mt-3 font-semibold text-lg">지역선택*</div>
+                <div class="mt-3 grid grid-cols-2 gap-1">
+                    {#each regions as region, idx}
+                        <label class="button-checkbox">
+                            <input
+                                type="radio"
+                                hidden
+                                value={region}
+                                bind:group={$all_data["location"]}
+                            />
+                            <div>{region}</div>
+                        </label>
+                    {/each}
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-2 bg-white p-5">
+            <div class="font-semibold text-lg">기본정보</div>
+
+            <QuestionItem
+                sbj="분양대행사 *"
+                placeholder="필수입력"
+                bind:iptVal={$all_data["agency"]}
+            />
+            <QuestionItem
+                sbj="담당자 성함 *"
+                placeholder="필수입력"
+                bind:iptVal={$all_data["name"]}
+            />
+
+            <QuestionItem
+                sbj="담당자 연락처 *"
+                placeholder="필수입력"
+                bind:iptVal={$all_data["phone"]}
+            />
+
+            <div class="mt-5">
+                <div class="pl-3 text-left text-sm">
+                    <span>업종분류 *</span>
+                    <span class="text-xs">(여러개 선택 가능)</span>
+                </div>
+                <div class="mt-3 grid grid-cols-2 gap-1">
+                    {#each businessCategorys as businessCategory, idx}
+                        <label class="button-checkbox">
+                            <input
+                                type="checkbox"
+                                value={businessCategory}
+                                bind:group={businessArr}
+                                hidden
+                            />
+                            <div>{businessCategory}</div>
+                        </label>
+                    {/each}
+                </div>
+            </div>
+
+            <div class="mt-5">
+                <div class="pl-3 text-left text-sm">
+                    <span>직종분류 *</span>
+                    <span class="text-xs">(여러개 선택 가능)</span>
+                </div>
+                <div class="mt-3 grid grid-cols-2 gap-1">
+                    {#each jobCategorys as jobCategory, idx}
+                        <label class="button-checkbox">
+                            <input
+                                type="checkbox"
+                                value={jobCategory}
+                                bind:group={occupationArr}
+                                hidden
+                            />
+                            <div>{jobCategory}</div>
+                        </label>
+                    {/each}
+                </div>
+            </div>
+
+            <QuestionItem
+                sbj="경력 *"
+                placeholder="ex) 10년 / 초보"
+                bind:iptVal={$all_data["career"]}
+            />
+
+            <QuestionItem
+                sbj="인원 *"
+                placeholder="ex) 2명 / 00명"
+                bind:iptVal={$all_data["number_people"]}
+            />
+        </div>
+
+        <div class="mt-2 bg-white p-5">
+            <div class="font-semibold text-lg">급여 및 영업지원</div>
+
+            <div class="mt-2">
+                <div class="flex w-full items-center">
+                    <div class="w-1/5 text-center text-sm">수수료 *</div>
+                    <div class="w-4/5 flex gap-1">
+                        {#each feeBases as feeBase}
+                            <label class="button-checkbox w-full">
                                 <input
                                     type="radio"
+                                    value={feeBase}
                                     hidden
-                                    value={region}
-                                    bind:group={allData["location"]}
+                                    bind:group={$all_data["fee_type"]}
                                 />
-                                <div>{region}</div>
-                            </label>
-                        {/each}
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-2 bg-white p-5">
-                <div class="font-semibold text-lg">기본정보</div>
-
-                <QuestionItem
-                    sbj="분양대행사 *"
-                    placeholder="필수입력"
-                    bind:iptVal={allData["agency"]}
-                />
-                <QuestionItem
-                    sbj="담당자 성함 *"
-                    placeholder="필수입력"
-                    bind:iptVal={allData["name"]}
-                />
-
-                <QuestionItem
-                    sbj="담당자 연락처 *"
-                    placeholder="필수입력"
-                    bind:iptVal={allData["phone"]}
-                />
-
-                <div class="mt-5">
-                    <div class="pl-3 text-left text-sm">
-                        <span>업종분류 *</span>
-                        <span class="text-xs">(여러개 선택 가능)</span>
-                    </div>
-                    <div class="mt-3 grid grid-cols-2 gap-1">
-                        {#each businessCategorys as businessCategory, idx}
-                            <label class="button-checkbox">
-                                <input
-                                    type="checkbox"
-                                    value={businessCategory}
-                                    bind:group={businessArr}
-                                    hidden
-                                />
-                                <div>{businessCategory}</div>
+                                <div class="">{feeBase}</div>
                             </label>
                         {/each}
                     </div>
                 </div>
 
-                <div class="mt-5">
-                    <div class="pl-3 text-left text-sm">
-                        <span>직종분류 *</span>
-                        <span class="text-xs">(여러개 선택 가능)</span>
-                    </div>
-                    <div class="mt-3 grid grid-cols-2 gap-1">
-                        {#each jobCategorys as jobCategory, idx}
-                            <label class="button-checkbox">
-                                <input
-                                    type="checkbox"
-                                    value={jobCategory}
-                                    bind:group={occupationArr}
-                                    hidden
-                                />
-                                <div>{jobCategory}</div>
-                            </label>
-                        {/each}
+                <div class="flex justify-end items-center gap-3 mt-2">
+                    <div class="w-4/5 flex items-center gap-3">
+                        <input
+                            type="text"
+                            bind:value={$all_data["fee"]}
+                            placeholder="숫자만 입력해주세요"
+                            class="input input-bordered input-info input-sm w-full"
+                        />
+                        <div class=" w-12">만 원</div>
                     </div>
                 </div>
 
-                <QuestionItem
-                    sbj="경력 *"
-                    placeholder="ex) 10년 / 초보"
-                    bind:iptVal={allData["career"]}
-                />
-
-                <QuestionItem
-                    sbj="인원 *"
-                    placeholder="ex) 2명 / 00명"
-                    bind:iptVal={allData["number_people"]}
-                />
-            </div>
-
-            <div class="mt-2 bg-white p-5">
-                <div class="font-semibold text-lg">급여 및 영업지원</div>
-
-                <div class="mt-2">
-                    <div class="flex w-full items-center">
-                        <div class="w-1/5 text-center text-sm">수수료 *</div>
-                        <div class="w-4/5 flex gap-1">
-                            {#each feeBases as feeBase}
-                                <label class="button-checkbox w-full">
-                                    <input
-                                        type="radio"
-                                        value={feeBase}
-                                        hidden
-                                        bind:group={allData["fee_type"]}
-                                    />
-                                    <div class="">{feeBase}</div>
-                                </label>
-                            {/each}
-                        </div>
-                    </div>
-
-                    <div class="flex justify-end items-center gap-3 mt-2">
-                        <div class="w-4/5 flex items-center gap-3">
-                            <input
-                                type="text"
-                                bind:value={allData["fee"]}
-                                placeholder="숫자만 입력해주세요"
-                                class="input input-bordered input-info input-sm w-full"
-                            />
-                            <div class=" w-12">만 원</div>
-                        </div>
-                    </div>
-
-                    <div class="text-xs text-right mt-1 text-green-700">
-                        <p>
-                            수수료는 구인글 메인에 노출됩니다. 정확하게
-                            입력해주시면
-                        </p>
-                        <p>더 많은 사람들이 회원님의 공고를 확인하게 됩니다.</p>
-                    </div>
-                </div>
-                <QuestionItem
-                    sbj="일비"
-                    placeholder="있을 경우만 입력 (ex, 월 100만원 / 일 3만원)"
-                    bind:iptVal={allData["daily_expense"]}
-                />
-
-                <QuestionItem
-                    sbj="숙소비"
-                    placeholder="있을 경우만 입력 (ex, 원룸 제공)"
-                    bind:iptVal={allData["sleep_expense"]}
-                />
-
-                <QuestionItem
-                    sbj="프로모션"
-                    placeholder="있을 경우만 입력 (ex, 5채 판매시 추가 100만)"
-                    bind:iptVal={allData["promotion"]}
-                />
-
-                <QuestionItem
-                    sbj="기본급여"
-                    placeholder="있을 경우만 입력 (ex, 기본급 200만)"
-                    bind:iptVal={allData["base_pay"]}
-                />
-            </div>
-
-            <div class="mt-2 bg-white p-5">
-                <div class="font-semibold text-lg">상세내용</div>
-                <div class="mt-1.5">
-                    <textarea
-                        class="textarea textarea-info w-full p-2"
-                        placeholder="현장에 대한 상세 내용을 입력해주세요"
-                        rows="5"
-                        bind:value={allData["detail_content"]}
-                    ></textarea>
-                </div>
-
-                <div class="mt-1.5">
-                    <button
-                        class="btn btn-success w-full text-white"
-                        value="upload"
-                    >
-                        등록하기
-                    </button>
+                <div class="text-xs text-right mt-1 text-green-700">
+                    <p>
+                        수수료는 구인글 메인에 노출됩니다. 정확하게 입력해주시면
+                    </p>
+                    <p>더 많은 사람들이 회원님의 공고를 확인하게 됩니다.</p>
                 </div>
             </div>
-        </form>
+            <QuestionItem
+                sbj="일비"
+                placeholder="있을 경우만 입력 (ex, 월 100만원 / 일 3만원)"
+                bind:iptVal={$all_data["daily_expense"]}
+            />
+
+            <QuestionItem
+                sbj="숙소비"
+                placeholder="있을 경우만 입력 (ex, 원룸 제공)"
+                bind:iptVal={$all_data["sleep_expense"]}
+            />
+
+            <QuestionItem
+                sbj="프로모션"
+                placeholder="있을 경우만 입력 (ex, 5채 판매시 추가 100만)"
+                bind:iptVal={$all_data["promotion"]}
+            />
+
+            <QuestionItem
+                sbj="기본급여"
+                placeholder="있을 경우만 입력 (ex, 기본급 200만)"
+                bind:iptVal={$all_data["base_pay"]}
+            />
+        </div>
+
+        <div class="mt-2 bg-white p-5">
+            <div class="font-semibold text-lg">상세내용</div>
+            <div class="mt-1.5">
+                <textarea
+                    class="textarea textarea-info w-full p-2"
+                    placeholder="현장에 대한 상세 내용을 입력해주세요"
+                    rows="5"
+                    bind:value={$all_data["detail_content"]}
+                ></textarea>
+            </div>
+
+            <div class="mt-1.5">
+                <button
+                    class="btn btn-success w-full text-white"
+                    on:click={uploadChkRegist}
+                >
+                    등록하기
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 

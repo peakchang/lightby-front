@@ -16,6 +16,18 @@
     let sortable = $state(null);
     let setDetailImgCount = $state(0);
 
+    console.log(imgModifyList);
+
+    if (imgModifyList && imgModifyList.length > 0) {
+        const tempImgArr = [];
+        for (let i = 0; i < imgModifyList.length; i++) {
+            const con = imgModifyList[i];
+            const imgObj = { id: i + 1, href: con };
+            tempImgArr.push(imgObj);
+        }
+        imgArr = tempImgArr;
+    }
+
     function addVal(getHerf) {
         const newId =
             imgArr.length > 0
