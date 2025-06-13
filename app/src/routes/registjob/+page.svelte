@@ -323,7 +323,9 @@
                 allData: $all_data,
             });
             alert("등록이 완료 되었습니다.");
+            blockBack = false;
             goto(`/`);
+            $all_data = {};
         } catch (err) {
             const m = err.response.data.message;
         }
