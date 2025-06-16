@@ -115,18 +115,21 @@
                     <div
                         class="border border-gray-300 rounded-lg p-2 mb-3 shadow-sm cursor-pointer relative"
                     >
-                        <div class="absolute bottom-0 right-0 p-3 max-w-1/3">
-                            <div class="w-full flex gap-1">
-                                <div class="w-1/3 max-w-[30px] md:max-w-[45px]">
-                                    <img src="/icons/icon-change.png" alt="" />
+                        <div class="absolute bottom-0 right-0 p-3">
+                            {#if value.icons}
+                                <div class="w-full flex justify-end gap-1">
+                                    {#each value.icons.split(",") as icon}
+                                        <div
+                                            class="w-1/3 max-w-[45px] md:max-w-[55px]"
+                                        >
+                                            <img
+                                                src="/icons/icon-{icon}.png"
+                                                alt=""
+                                            />
+                                        </div>
+                                    {/each}
                                 </div>
-                                <div class="w-1/3 max-w-[30px] md:max-w-[45px]">
-                                    <img src="/icons/icon-new.png" alt="" />
-                                </div>
-                                <div class="w-1/3 max-w-[30px] md:max-w-[45px]">
-                                    <img src="/icons/icon-one.png" alt="" />
-                                </div>
-                            </div>
+                            {/if}
                         </div>
                         <div
                             class="flex gap-3 md:gap-5 items-center border-b-gray-300"
@@ -218,17 +221,20 @@
                         class="border border-gray-300 rounded-lg p-2 mb-3 shadow-sm cursor-pointer relative"
                     >
                         <div class="absolute bottom-0 right-0 p-3 max-w-1/3">
-                            <div class="w-full flex gap-1">
-                                <div class="w-1/3 max-w-[30px] md:max-w-[45px]">
-                                    <img src="/icons/icon-change.png" alt="" />
+                            {#if value.icons}
+                                <div class="w-full flex justify-end gap-1">
+                                    {#each value.icons.split(",") as icon}
+                                        <div
+                                            class="w-1/3 max-w-[45px] md:max-w-[55px]"
+                                        >
+                                            <img
+                                                src="/icons/icon-{icon}.png"
+                                                alt=""
+                                            />
+                                        </div>
+                                    {/each}
                                 </div>
-                                <div class="w-1/3 max-w-[30px] md:max-w-[45px]">
-                                    <img src="/icons/icon-new.png" alt="" />
-                                </div>
-                                <div class="w-1/3 max-w-[30px] md:max-w-[45px]">
-                                    <img src="/icons/icon-one.png" alt="" />
-                                </div>
-                            </div>
+                            {/if}
                         </div>
                         <div
                             class="flex gap-3 md:gap-5 items-center border-b-gray-300"
