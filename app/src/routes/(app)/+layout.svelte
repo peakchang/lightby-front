@@ -13,7 +13,7 @@
 
     let loginAlertModalShow = $state(false);
 
-    let latestModalShow = $state(false);
+
 
     function movePage(e) {
         const link = this.dataset.link;
@@ -88,41 +88,7 @@
     </div>
 </CustomModal>
 
-<CustomModal bind:visible={latestModalShow} closeBtn={false}>
-    <div class="text-center">최신 작성글 리스트</div>
 
-    <div>
-        <div class="mt-5 text-right">
-            <span class="text-sm"
-                >기존 글을 선택하시면 복사 및 수정이 가능합니다.</span
-            >
-        </div>
-        <div
-            class="border border-gray-300 rounded-md px-3 py-2 w-full mt-3 flex justify-between"
-        >
-            <div>첫번째 글 현장명</div>
-            <div>2025-06-08 13:54</div>
-        </div>
-        <div class="border border-gray-300 rounded-md px-3 py-2 w-full mt-3">
-            첫번째 글
-        </div>
-        <div class="border border-gray-300 rounded-md px-3 py-2 w-full mt-3">
-            첫번째 글
-        </div>
-    </div>
-
-    <div class="mt-5 text-center">
-        <button
-            class="px-2 py-1 bg-gray-400 text-white"
-            on:click={() => {
-                latestModalShow = false;
-                goto("/registjob");
-            }}
-        >
-            새로 작성
-        </button>
-    </div>
-</CustomModal>
 
 <div
     class="fixed top-0 left-1/2 max-w-[640px] w-full -translate-x-1/2 bg-white pt-3 px-3 shadow-bottom suit-font z-20"
@@ -190,11 +156,6 @@
                             loginAlertModalShow = true;
                             return;
                         }
-
-                        // 기존 있는 글 조회
-
-                        latestModalShow = true;
-                        return;
 
                         goto("/registjob");
                     }}

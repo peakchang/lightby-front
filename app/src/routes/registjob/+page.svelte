@@ -10,19 +10,27 @@
     import { back_api } from "$lib/const";
     import { getCookieValue } from "$lib/lib";
     import axios from "axios";
+    import {
+        feeBases,
+        iconList,
+        regions,
+        businessCategorys,
+        jobCategorys,
+    } from "./registjob";
 
-    let feeBases = $derived(["본부", "팀", "직원", "상담시"]); // 수수료 기준 값
-    let businessArr = $state([]);
-    let occupationArr = $state([]);
+    let businessArr = $state([]); // 업종분류 변수 담을 임시 배열
+    let occupationArr = $state([]); // 직종분류 변수 담을 임시 배열
 
     // 등록 전 결제 및 물어보는거 모달
-    let submitPrevModal = $state(false);
+    let submitPrevModal = $state(false); // 모달 변수
+    let paymentStatus = $state(false); // 업로드시에 결제 완료 여부 체크 변수!!
+    let popup = $state();
 
     // 모달 내 계산기 관련
-    let productInfo = $state({ name: "일반", price: 0 });
-    let iconNames = $state([]);
-    let icons = $state([]);
-    let iconSum = $state(0);
+    let productInfo = $state({ name: "일반", price: 0 }); // 상품 정보가 담김!
+    let iconNames = $state([]); // 아이콘 이름이 한글로 담김!
+    let icons = $state([]); // 아이콘 이름이 영어로 담김!
+    let iconSum = $state(0); // 아이콘 갯수에 따른 가격 합계
 
     // 글 작성중 뒤로가기 또는 새로고침시 필요한 변수 (이미지 삭제 관련)
     let escapePageModal = $state(false);
@@ -44,21 +52,93 @@
     // effct 함수 내에서 무한루프가 되는거 방지! (반복되는 코드 부분 상태값 변경으로 한번만 실행되게 함)
     let loopPrevent = $state(true);
 
-    $all_data["user_id"] = $user_info.idx;
+    // 사이트 진입 초반 값을 초기화 할때 쓰는 변수
+    let loading = true;
 
     $effect(async () => {
-        console.log("sdfsdfsf");
+        console.log("dd");
 
-        console.log($all_data);
+        // 사이트 진입시 loading 값 true로 필요한 변수들 초기화 한 뒤 false 로 변경!
+        if (loading) {
+            if (!$all_data["user_id"] && loopPrevent) {
+                // 유저 정보 없을경우 뒤로 돌아가기
+                blockBack = false;
+                window.history.back();
+                loopPrevent = false;
+                return;
+            }
 
-        if (!$all_data["user_id"] && loopPrevent) {
-            blockBack = false;
-            goto("/");
-            loopPrevent = false;
-        }
+            // 결제 완료시 success 페이지에서 요청이 오면 처리하는 부분!!
+            window.addEventListener("message", (e) => {
+                if (e.data.status) {
+                    console.log(e.data);
 
-        if (!$all_data["product"]) {
-            $all_data["product"] = "free";
+                    paymentStatus = true;
+                    $all_data["payment_key"] = e.data.paymentInfo.payment_key;
+                    popup = undefined;
+                    console.log($all_data);
+
+                    setTimeout(() => {
+                        uploadRegist();
+                    }, 4000);
+                }
+            });
+
+            // 삭제할 이미지 있으면 쿠키에서 값 가져와서 삭제하기!
+            const refreshFlag = getCookieValue("del_img_list");
+            if (refreshFlag) {
+                try {
+                    const res = await axios.post(
+                        `${back_api}/img/delete_many`,
+                        {
+                            delImgList: refreshFlag.split(","),
+                        },
+                    );
+                } catch (err) {
+                    console.error(err.meesage);
+                }
+                document.cookie = "del_img_list=; Max-Age=0; path=/";
+            }
+
+            if ($all_data["product"] != "free") {
+                if ($all_data["product"] == "premium") {
+                    productInfo.name = "프리미엄";
+                    productInfo.price = 66000;
+                } else if ($all_data["product"] == "top") {
+                    productInfo.name = "지역 탑";
+                    productInfo.price = 49500;
+                }
+            }
+
+            if ($all_data["icons"]) {
+                icons = $all_data["icons"].split(",");
+                iconNames = icons
+                    .map((id) => iconList.find((icon) => icon.id === id)?.name)
+                    .filter((name) => name !== undefined);
+                console.log(iconNames);
+            }
+
+            // 주소 있을경우 주소값 입력하기 (카카오 맵 적용)
+            if ($all_data["res_addr"]) {
+                getAddress = $all_data["res_addr"];
+            }
+
+            // 업종분류 값 있을경우 businessArr 에 값 넣기
+            if ($all_data["business"]) {
+                businessArr = $all_data["business"].split(",");
+            }
+
+            // 직종분류 값 있을경우 occupationArr 에 값 넣기
+            if ($all_data["occupation"]) {
+                occupationArr = $all_data["occupation"].split(",");
+            }
+
+            // 상품 값 없을경우 기본값 free
+            if (!$all_data["product"]) {
+                $all_data["product"] = "free";
+            }
+
+            loading = false;
         }
 
         /*
@@ -71,20 +151,7 @@
             prevItem = $all_data["product"];
         }
 
-        const refreshFlag = getCookieValue("del_img_list");
-
-        if (refreshFlag) {
-            try {
-                const res = await axios.post(`${back_api}/img/delete_many`, {
-                    delImgList: refreshFlag.split(","),
-                });
-            } catch (err) {
-                console.error(err.meesage);
-            }
-            document.cookie = "del_img_list=; Max-Age=0; path=/";
-        }
-
-        // 새로고침시 이미지 삭제 등을 표현하기 위해서!!!!
+        // 새로고침시 이미지 삭제를 하기 위해 delImgList 값이 변할때 삭제할 리스트 쿠키에 넣어주기!
         const handler = (e) => {
             // 삭제할 이미지 리스트 저장
             if (delImgList.length > 0) {
@@ -107,20 +174,10 @@
 
         return () => {
             window.removeEventListener("beforeunload", handler);
-            console.log("페이지 나감?!?!?!");
         };
     });
 
-    const iconList = $derived([
-        { name: "조건변경", id: "change" },
-        { name: "할인", id: "discount" },
-        { name: "수수료UP", id: "feeup" },
-        { name: "설거지", id: "guzi" },
-        { name: "급구", id: "hurry" },
-        { name: "소수인원", id: "minority" },
-        { name: "신규", id: "new" },
-        { name: "한방", id: "once" },
-    ]);
+    $all_data["user_id"] = $user_info.idx;
 
     /*
         아이콘 선택 변경시 함수
@@ -128,8 +185,6 @@
         프리미엄, 탑 선택시 2개 초과 선택 못하게 +
     */
     function iconsChange() {
-        console.log(this.checked);
-
         if ($all_data["product"] == "free") {
             icons = [];
             this.checked = false;
@@ -154,13 +209,9 @@
     }
 
     function itemRateChange() {
-        console.log();
-
         if (this.value == "premium") {
             productInfo.name = "프리미엄";
             productInfo.price = 66000;
-
-            console.log($all_data["sum"]);
         } else if (this.value == "top") {
             productInfo.name = "지역 탑";
             productInfo.price = 49500;
@@ -202,12 +253,10 @@
                 const tempArr = delImgList.filter((item) => item !== e.url);
                 delImgList = tempArr;
             }
-            console.log(delImgList);
         }
 
         // 정상적으로 업로드 될 이미지 리스트 셋
         const imgArr = e.imgArr;
-        console.log(imgArr);
 
         let imgStr = "";
         for (let i = 0; i < imgArr.length; i++) {
@@ -216,46 +265,6 @@
         }
         $all_data["imgs"] = imgStr.slice(0, -1);
     }
-
-    let regions = $derived([
-        "서울",
-        "경기북부",
-        "경기남부",
-        "인천",
-        "충청",
-        "전라",
-        "강원도",
-        "경상도",
-        "제주도",
-    ]);
-
-    let businessCategorys = $derived([
-        "아파트",
-        "오피스텔",
-        "도시형생활주택",
-        "호텔",
-        "레지던스",
-        "상가/쇼핑몰",
-        "오피스",
-        "지식산업센터",
-        "토지",
-        "빌라",
-        "타운하우스",
-        "펜션/풀빌라",
-        "전원주택",
-        "기타",
-    ]);
-
-    let jobCategorys = $derived([
-        "시행/대행 사무직",
-        "분양대행사",
-        "본부장",
-        "팀장",
-        "직원",
-        "데스크",
-        "TM상담사",
-        "알바",
-    ]);
 
     // ---------------------------------------------------
 
@@ -289,48 +298,6 @@
         return true;
     }
 
-    function uploadChkRegist(e) {
-        $all_data["business"] = businessArr.join(",");
-        $all_data["occupation"] = occupationArr.join(",");
-
-        const chkBool = chkEssentialValue([
-            { var: "imgs", label: "현장 이미지" },
-            { var: "subject", label: "공고 제목(현장명)" },
-            { var: "point", label: "현장 한마디" },
-            { var: "addr", label: "근무지 주소" },
-            { var: "location", label: "지역 선택" },
-            { var: "agency", label: "분양대행사명" },
-            { var: "name", label: "담당자 성함" },
-            { var: "phone", label: "담당자 연락처" },
-            { var: "business", label: "업종분류선택" },
-            { var: "occupation", label: "직종분류선택" },
-            { var: "career", label: "경력 입력" },
-            { var: "number_people", label: "인원 입력" },
-            { var: "fee_type", label: "수수료 타입" },
-            { var: "fee", label: "수수료 입력" },
-        ]);
-
-        if (!chkBool) {
-            return;
-        }
-        submitPrevModal = true;
-    }
-
-    async function uploadRegist() {
-        $all_data["icons"] = icons.join(",");
-        try {
-            const res = await axios.post(`${back_api}/regist/upload`, {
-                allData: $all_data,
-            });
-            alert("등록이 완료 되었습니다.");
-            blockBack = false;
-            goto(`/`);
-            $all_data = {};
-        } catch (err) {
-            const m = err.response.data.message;
-        }
-    }
-
     function foldDaumPostcode() {
         // iframe을 넣은 element를 안보이게 한다.
         postWrap.style.display = "none";
@@ -341,8 +308,6 @@
     function addressInput() {
         new daum.Postcode({
             oncomplete: function (data) {
-                console.log("이곳은 또 몇번째??");
-
                 // 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
 
                 // 각 주소의 노출 규칙에 따라 주소를 조합한다.
@@ -384,7 +349,6 @@
                 }
 
                 getAddress = $all_data["addr"];
-                console.log(regions);
                 let selRegionIdx = null;
                 for (let i = 0; i < regions.length; i++) {
                     const region = regions[i];
@@ -398,8 +362,6 @@
 
                 $all_data["res_addr"] =
                     `(${data.zonecode}) ${$all_data["addr"]} ${extraAddr}`;
-
-                console.log($all_data["res_addr"]);
 
                 // detailAddrArea.focus();
 
@@ -416,14 +378,85 @@
             height: "100%",
         }).embed(postWrap);
 
-        console.log("1번째인 이곳은 몇번째?");
-
         // iframe을 넣은 element를 보이게 한다.
         postWrap.style.display = "block";
         my_modal_1.showModal();
     }
 
     let successPrevModal = $state(false);
+    let successPrevModalMessage = $state("");
+
+    // 최종 업로드 부분!!!!!!!!!
+
+    function uploadChkRegist(e) {
+        console.log(popup);
+        if (popup) {
+            alertModalShow = true;
+            alertModalMessage = "현재 결제창이 열려 있습니다.";
+            return;
+        }
+
+        $all_data["business"] = businessArr.join(",");
+        $all_data["occupation"] = occupationArr.join(",");
+
+        const chkBool = chkEssentialValue([
+            { var: "imgs", label: "현장 이미지" },
+            { var: "subject", label: "공고 제목(현장명)" },
+            { var: "point", label: "현장 한마디" },
+            { var: "addr", label: "근무지 주소" },
+            { var: "location", label: "지역 선택" },
+            { var: "agency", label: "분양대행사명" },
+            { var: "name", label: "담당자 성함" },
+            { var: "phone", label: "담당자 연락처" },
+            { var: "business", label: "업종분류선택" },
+            { var: "occupation", label: "직종분류선택" },
+            { var: "career", label: "경력 입력" },
+            { var: "number_people", label: "인원 입력" },
+            { var: "fee_type", label: "수수료 타입" },
+            { var: "fee", label: "수수료 입력" },
+        ]);
+
+        if (!chkBool) {
+            return;
+        }
+        submitPrevModal = true;
+    }
+
+    async function uploadRegist() {
+        $all_data["icons"] = icons.join(",");
+
+        if ($all_data["product"] != "free" && paymentStatus == false) {
+            const payProductName = `${productInfo.name} + 아이콘${iconNames.length}`;
+            console.log(payProductName);
+            console.log($all_data["sum"]);
+            console.log($user_info.idx);
+
+            popup = window.open(
+                `/payments?user_id=${$user_info.idx}&order_name=${payProductName}&amount=${$all_data["sum"]}`,
+                "popup",
+                "width=550,height=670",
+            );
+
+            return;
+        }
+
+        try {
+            const res = await axios.post(`${back_api}/regist/upload`, {
+                allData: $all_data,
+            });
+            successPrevModal = true;
+            successPrevModalMessage = "업로드가 완료 되었습니다.";
+            setTimeout(() => {
+                console.log("이제 가야지?");
+                successPrevModal = false;
+                blockBack = false;
+                $all_data = {};
+                goto("/");
+            }, 2500);
+        } catch (err) {
+            const m = err.response.data.message;
+        }
+    }
 </script>
 
 <svelte:head>
@@ -438,31 +471,18 @@
     ></script>
 </svelte:head>
 
-<!-- <div class=" mt-40">
-    <button
-        on:click={() => {
-            // successPrevModal = true;
-            submitPrevModal = true;
-        }}
-    >
-        버튼버튼
-    </button>
-</div> -->
-
 <!-- svelte-ignore event_directive_deprecated -->
 <CustomModal bind:visible={successPrevModal} closeBtn={false}>
     <div class="text-center">
-        <div class=" text-red-500 text-3xl mb-5">
-            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+        <div class=" text-green-700 text-5xl mb-5">
+            <i class="fa fa-smile-o" aria-hidden="true"></i>
         </div>
-        <div class="mb-5">보자귱!!!!!</div>
-        <div class="flex justify-center items-center gap-3">
-            <button
-                class="btn btn-active w-1/3"
-                on:click={() => {
-                    alertModalShow = true;
-                }}>닫기</button
-            >
+        <div class="mb-2 text-xl">
+            {successPrevModalMessage}
+        </div>
+        <div class="mb-5 text-sm">잠시 후 이전 페이지로 돌아갑니다.</div>
+        <div>
+            <span class="loading loading-ring loading-xl"></span>
         </div>
     </div>
 </CustomModal>
@@ -705,7 +725,7 @@
 <!-- svelte-ignore event_directive_deprecated -->
 <div class="fixed top-0 left-0 w-full z-20 suit-font">
     <div class="max-w-[530px] mx-auto bg-white border-b">
-        <div class=" py-1 flex justify-between items-center">
+        <div class=" py-2 flex justify-between items-center">
             <div
                 class="cursor-pointer"
                 style="color: #3da83b;"
@@ -715,19 +735,38 @@
             >
                 <i class="fa fa-angle-left text-2xl mr-1" aria-hidden="true"
                 ></i>
-                <span class="text-sm">뒤로가기</span>
+                <span class="">뒤로가기</span>
             </div>
-
-            <div class="w-12"></div>
         </div>
     </div>
 </div>
 
 <!-- svelte-ignore event_directive_deprecated -->
 <div class="bg-white relative min-h-screen">
-    <div class="max-w-[530px] mx-auto pretendard pt-12 pb-24">
-        <div class="text-center font-semibold text-xl bg-white p-3">
-            구인글 등록
+    <div class="max-w-[530px] mx-auto pretendard pt-14 pb-24">
+        <button
+            on:click={() => {
+                successPrevModalMessage = "업로드가 완료 되었습니다.";
+                successPrevModal = true;
+            }}>dfdfdf</button
+        >
+        <div
+            class=" bg-white p-3 flex justify-between items-center border-b border-gray-300"
+        >
+            <div class="text-center font-semibold text-2xl">구인글 등록</div>
+
+            <div
+                class="border border-gray-300 px-3 py-1.5 rounded-lg flex justify-center items-center cursor-pointer"
+            >
+                <span class=" text-blue-700 text-lg mr-2">
+                    <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                </span>
+                <span
+                    class="text-xs bg-blue-400 text-white px-3 py-1.5 rounded-lg"
+                >
+                    이전 등록한 공고 불러오기
+                </span>
+            </div>
         </div>
 
         <div class="mt-2 bg-white p-5">
