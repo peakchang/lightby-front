@@ -241,6 +241,7 @@
             }
         }
         blockBack = false;
+        $all_data = {};
         goto(toPage);
     }
 

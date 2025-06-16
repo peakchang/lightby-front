@@ -13,8 +13,6 @@
 
     let loginAlertModalShow = $state(false);
 
-
-
     function movePage(e) {
         const link = this.dataset.link;
         if ($page.url.pathname != link) {
@@ -88,18 +86,18 @@
     </div>
 </CustomModal>
 
-
-
 <div
     class="fixed top-0 left-1/2 max-w-[640px] w-full -translate-x-1/2 bg-white pt-3 px-3 shadow-bottom suit-font z-20"
 >
     <div class="flex justify-between items-center">
         <div>
-            <img
-                src="/logo.png"
-                alt=""
-                class=" max-w-[100px] md:max-w-[120px] cursor-pointer"
-            />
+            <a href="/">
+                <img
+                    src="/logo.png"
+                    alt=""
+                    class=" max-w-[100px] md:max-w-[120px] cursor-pointer"
+                />
+            </a>
         </div>
 
         <div class="flex justify-center items-center gap-2">

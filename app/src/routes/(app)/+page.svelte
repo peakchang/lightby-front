@@ -204,7 +204,7 @@
                 <span class="mr-2">
                     <i class="fa fa-bell" aria-hidden="true"></i>
                 </span>
-                <span class="mr-4">지역 탑</span>
+                <span class="mr-4">지역 TOP</span>
                 <div
                     class=" w-[50%] md:w-[40%] rounded-full"
                     style="height: 2px; background-color: #007595;"
