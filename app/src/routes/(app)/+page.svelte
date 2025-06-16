@@ -1,6 +1,6 @@
 <script>
     import CustomModal from "$lib/components/CustomModal.svelte";
-    import { goto } from "$app/navigation";
+    import { goto, invalidateAll } from "$app/navigation";
     import { back_api, public_img_bucket } from "$lib/const.js";
     import PdButton from "$lib/components/PdButton.svelte";
     import { main_location } from "$lib/stores/stores.js";
@@ -8,8 +8,10 @@
 
     let { data } = $props();
 
-    console.log($main_location);
+    console.log(data);
 
+    let premiumList = $state(data.premiumList);
+    let topList = $state(data.topList);
     let siteList = $state(data.siteList);
 
     let locationList = $derived([
@@ -19,43 +21,29 @@
         "강원/경상/제주",
     ]);
 
-    let loading = $state(true);
+    let loading = $state(false);
+    if (data.premiumList.length == 0) {
+        loading = true;
+    }
 
     const businessReplaceDict = $derived({
         도시형생활주택: "도생",
         지식산업센터: "지산",
+        "상가/쇼핑몰": "상가",
     });
-
-    // let siteList = $state([
-    //     {
-    //         one: "민간임대 3주 한방현장 OPEN",
-    //         subject: "정읍 월드메르디앙 더 브리온",
-    //         fee: "팀 700만원",
-    //         types: ["팀장", "아파트", "일비,숙소"],
-    //     },
-
-    //     {
-    //         one: "작년 완판된 장안 대방보다 저렴한 APT",
-    //         subject: "장안 우미린 프리미어",
-    //         fee: "직원 440만원",
-    //         types: ["직원", "아파텔", "일비"],
-    //     },
-    //     {
-    //         one: "일비 10만원 월300가능 계약금0원 다구좌가능",
-    //         subject: "반달섬 아르네브 큐브",
-    //         fee: "팀 1500",
-    //         types: ["직원", "오피스텔", "일비"],
-    //     },
-    // ]);
 
     function goToDetail(idx) {
         goto(`/detail/${idx}`);
     }
 
     $effect(() => {
+        console.log("초기화!!!");
+
+        console.log(loading);
+
         setTimeout(() => {
             loading = false;
-        }, 0);
+        }, 1000);
 
         return () => {};
     });
@@ -87,6 +75,8 @@
                         $main_location = $main_location;
                         localStorage.setItem("location", $main_location);
                         console.log("어쩌구!");
+                        invalidateAll();
+                        loading = true;
                     }}
                 >
                     {location}
@@ -101,147 +91,278 @@
             <span class="loading loading-dots loading-xl"></span>
         </div>
     {:else}
-        <div
-            class="mb-3 ml-6 text-lg font-bold text-cyan-700 flex items-center"
-        >
-            <span class="mr-2">
-                <i class="fa fa-bell" aria-hidden="true"></i>
-            </span>
-            <span class="mr-4">프리미엄</span>
+        <div class="premium-area mb-10">
+            <!-- 프리미엄 영역 -->
             <div
-                class=" w-[50%] md:w-[40%] rounded-full"
-                style="height: 2px; background-color: #007595;"
-            ></div>
-        </div>
-        {#each siteList as site}
-            <a
-                href="/detail/{site.idx}"
-                on:click|preventDefault={() => {
-                    goToDetail(site.idx);
-                }}
+                class="mb-3 ml-6 text-lg font-bold text-cyan-700 flex items-center"
             >
+                <span class="mr-2">
+                    <i class="fa fa-bell" aria-hidden="true"></i>
+                </span>
+                <span class="mr-4">프리미엄</span>
                 <div
-                    class="border border-gray-300 rounded-lg p-2 mb-3 shadow-sm cursor-pointer relative"
+                    class=" w-[50%] md:w-[40%] rounded-full"
+                    style="height: 2px; background-color: #007595;"
+                ></div>
+            </div>
+            {#each premiumList as value}
+                <a
+                    href="/detail/{value.idx}"
+                    on:click|preventDefault={() => {
+                        goToDetail(value.idx);
+                    }}
                 >
-                    <div class="absolute bottom-0 right-0 p-3 max-w-1/3">
-                        <div class="w-full flex gap-1">
-                            <div class="w-1/3 max-w-[30px] md:max-w-[45px]">
-                                <img src="/icons/icon-change.png" alt="" />
-                            </div>
-                            <div class="w-1/3 max-w-[30px] md:max-w-[45px]">
-                                <img src="/icons/icon-new.png" alt="" />
-                            </div>
-                            <div class="w-1/3 max-w-[30px] md:max-w-[45px]">
-                                <img src="/icons/icon-one.png" alt="" />
-                            </div>
-                        </div>
-                    </div>
                     <div
-                        class="flex gap-3 md:gap-5 items-center border-b-gray-300"
+                        class="border border-gray-300 rounded-lg p-2 mb-3 shadow-sm cursor-pointer relative"
                     >
-                        <div
-                            class="w-32 h-[100px] md:w-36 md:h-28 rounded-lg overflow-hidden flex-shrink-0"
-                        >
-                            {#if site.thumbnail}
-                                <img
-                                    src={`${public_img_bucket}${site.thumbnail}`}
-                                    alt=""
-                                    class="w-full h-full object-cover"
-                                />
-                            {/if}
+                        <div class="absolute bottom-0 right-0 p-3 max-w-1/3">
+                            <div class="w-full flex gap-1">
+                                <div class="w-1/3 max-w-[30px] md:max-w-[45px]">
+                                    <img src="/icons/icon-change.png" alt="" />
+                                </div>
+                                <div class="w-1/3 max-w-[30px] md:max-w-[45px]">
+                                    <img src="/icons/icon-new.png" alt="" />
+                                </div>
+                                <div class="w-1/3 max-w-[30px] md:max-w-[45px]">
+                                    <img src="/icons/icon-one.png" alt="" />
+                                </div>
+                            </div>
                         </div>
                         <div
-                            class="flex flex-col justify-around overflow-hidden"
+                            class="flex gap-3 md:gap-5 items-center border-b-gray-300"
                         >
                             <div
-                                class="text-xs md:text-sm text-amber-800 truncate"
+                                class="w-32 h-[100px] md:w-36 md:h-28 rounded-lg overflow-hidden flex-shrink-0"
                             >
-                                {site.point}
+                                {#if value.thumbnail}
+                                    <img
+                                        src={`${public_img_bucket}${value.thumbnail}`}
+                                        alt=""
+                                        class="w-full h-full object-cover"
+                                    />
+                                {/if}
                             </div>
+                            <div
+                                class="flex flex-col justify-around overflow-hidden"
+                            >
+                                <div
+                                    class="text-xs md:text-sm text-amber-800 truncate"
+                                >
+                                    {value.point}
+                                </div>
 
-                            <div class="text-sm md:text-base truncate">
-                                <span>{site.subject}</span>
-                            </div>
+                                <div class="text-sm md:text-base truncate">
+                                    <span>{value.subject}</span>
+                                </div>
 
-                            <div>
                                 <div>
-                                    <div class="mb-1">
-                                        <span
-                                            class=" bg-[#0a0078] text-xs md:text-sm px-2 py-0.5 text-white rounded-md font-bold"
-                                        >
-                                            {site.fee_type}
-                                            {site.fee}
-                                        </span>
-                                    </div>
+                                    <div>
+                                        <div class="mb-1">
+                                            <span
+                                                class=" bg-[#0a0078] text-xs md:text-sm px-2 py-0.5 text-white rounded-md font-bold"
+                                            >
+                                                {value.fee_type}
+                                                {value.fee}
+                                            </span>
+                                        </div>
 
-                                    <div
-                                        class="text-[10px] md:text-xs flex flex-wrap"
-                                    >
-                                        <span
-                                            class="bg-[#3a86ff] px-1.5 py-0.5 text-white rounded-md mr-1"
+                                        <div
+                                            class="text-[10px] md:text-xs flex flex-wrap"
                                         >
-                                            {multiReplace(
-                                                site.business,
-                                                businessReplaceDict,
-                                            )}
-                                        </span>
+                                            <span
+                                                class="bg-[#3a86ff] px-1.5 py-0.5 text-white rounded-md mr-1"
+                                            >
+                                                {multiReplace(
+                                                    value.business,
+                                                    businessReplaceDict,
+                                                )}
+                                            </span>
 
-                                        <span
-                                            class="bg-[#3a86ff] px-2 py-0.5 text-white rounded-md mr-1"
-                                        >
-                                            {site.occupation}
-                                        </span>
+                                            <span
+                                                class="bg-[#3a86ff] px-2 py-0.5 text-white rounded-md mr-1"
+                                            >
+                                                {value.occupation}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </a>
-        {/each}
+                </a>
+            {/each}
+        </div>
 
-        <a
-            href="/detail/test"
-            on:click|preventDefault={() => {
-                // goToDetail(site.idx);
-            }}
-        >
+        <div class="top-area mb-10">
+            <!-- 지역탑 영역 -->
             <div
-                class="mt-5 relative border border-gray-300 rounded-lg p-2 shadow-sm cursor-pointer"
+                class="mb-3 ml-6 text-lg font-bold text-cyan-700 flex items-center"
             >
-                <div class="flex justify-between items-center">
-                    <div class="pl-4 max-w-[55%]">
-                        <div class="text-xs md:text-sm text-amber-800 truncate">
-                            청라 푸르지오 스타셀라 49 마지막 10세대
-                        </div>
-                        <div class="text-sm md:text-base">
-                            청라 푸르지오 스타셀라 49
-                        </div>
-                    </div>
-
-                    <div class=" max-w-[45%]">
-                        <div class="mb-1 text-[10px]">
-                            <span
-                                class=" bg-[#0a0078] px-2 py-1 text-white rounded-md font-bold mr-1 inline-block"
-                            >
-                                팀 500
-                            </span>
-                            <span
-                                class="bg-[#3a86ff] px-1.5 py-1 text-white rounded-md mr-1 inline-block"
-                            >
-                                아파트,오피스텔
-                            </span>
-
-                            <span
-                                class="bg-[#3a86ff] px-2 py-1 text-white rounded-md mr-1 inline-block"
-                            >
-                                팀장,직원
-                            </span>
-                        </div>
-                    </div>
-                </div>
+                <span class="mr-2">
+                    <i class="fa fa-bell" aria-hidden="true"></i>
+                </span>
+                <span class="mr-4">지역 탑</span>
+                <div
+                    class=" w-[50%] md:w-[40%] rounded-full"
+                    style="height: 2px; background-color: #007595;"
+                ></div>
             </div>
-        </a>
+            {#each topList as value}
+                <a
+                    href="/detail/{value.idx}"
+                    on:click|preventDefault={() => {
+                        goToDetail(value.idx);
+                    }}
+                >
+                    <div
+                        class="border border-gray-300 rounded-lg p-2 mb-3 shadow-sm cursor-pointer relative"
+                    >
+                        <div class="absolute bottom-0 right-0 p-3 max-w-1/3">
+                            <div class="w-full flex gap-1">
+                                <div class="w-1/3 max-w-[30px] md:max-w-[45px]">
+                                    <img src="/icons/icon-change.png" alt="" />
+                                </div>
+                                <div class="w-1/3 max-w-[30px] md:max-w-[45px]">
+                                    <img src="/icons/icon-new.png" alt="" />
+                                </div>
+                                <div class="w-1/3 max-w-[30px] md:max-w-[45px]">
+                                    <img src="/icons/icon-one.png" alt="" />
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="flex gap-3 md:gap-5 items-center border-b-gray-300"
+                        >
+                            <div
+                                class="w-32 h-[100px] md:w-36 md:h-28 rounded-lg overflow-hidden flex-shrink-0"
+                            >
+                                {#if value.thumbnail}
+                                    <img
+                                        src={`${public_img_bucket}${value.thumbnail}`}
+                                        alt=""
+                                        class="w-full h-full object-cover"
+                                    />
+                                {/if}
+                            </div>
+                            <div
+                                class="flex flex-col justify-around overflow-hidden"
+                            >
+                                <div
+                                    class="text-xs md:text-sm text-amber-800 truncate"
+                                >
+                                    {value.point}
+                                </div>
+
+                                <div class="text-sm md:text-base truncate">
+                                    <span>{value.subject}</span>
+                                </div>
+
+                                <div>
+                                    <div>
+                                        <div class="mb-1">
+                                            <span
+                                                class=" bg-[#0a0078] text-xs md:text-sm px-2 py-0.5 text-white rounded-md font-bold"
+                                            >
+                                                {value.fee_type}
+                                                {value.fee}
+                                            </span>
+                                        </div>
+
+                                        <div
+                                            class="text-[10px] md:text-xs flex flex-wrap"
+                                        >
+                                            <span
+                                                class="bg-[#3a86ff] px-1.5 py-0.5 text-white rounded-md mr-1"
+                                            >
+                                                {multiReplace(
+                                                    value.business,
+                                                    businessReplaceDict,
+                                                )}
+                                            </span>
+
+                                            <span
+                                                class="bg-[#3a86ff] px-2 py-0.5 text-white rounded-md mr-1"
+                                            >
+                                                {value.occupation}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            {/each}
+        </div>
+
+        <div>
+            <!-- 지역탑 영역 -->
+            <div
+                class="mb-3 ml-6 text-lg font-bold text-cyan-700 flex items-center"
+            >
+                <span class="mr-2">
+                    <i class="fa fa-bell" aria-hidden="true"></i>
+                </span>
+                <span class="mr-4">일반 공고</span>
+                <div
+                    class=" w-[50%] md:w-[40%] rounded-full"
+                    style="height: 2px; background-color: #007595;"
+                ></div>
+            </div>
+
+            {#each siteList as value}
+                <a
+                    href="/detail/test"
+                    on:click|preventDefault={() => {
+                        goToDetail(value.idx);
+                    }}
+                >
+                    <div
+                        class="mt-5 relative border border-gray-300 rounded-lg p-2 shadow-sm cursor-pointer"
+                    >
+                        <div class="flex justify-between items-center">
+                            <div class="pl-4 max-w-[55%]">
+                                <div
+                                    class="text-xs md:text-sm text-amber-800 truncate"
+                                >
+                                    {value.point}
+                                </div>
+                                <div class="text-sm md:text-base">
+                                    {value.subject}
+                                </div>
+                            </div>
+
+                            <div class=" max-w-[45%]">
+                                <div
+                                    class="mb-1 text-[10px] flex flex-wrap gap-1"
+                                >
+                                    <span
+                                        class=" bg-[#0a0078] px-2 py-1 text-white rounded-md font-bold inline-block"
+                                    >
+                                        {value.fee_type}
+                                        {value.fee}
+                                    </span>
+                                    <span
+                                        class="bg-[#3a86ff] px-1.5 py-1 text-white rounded-md inline-block"
+                                    >
+                                        {multiReplace(
+                                            value.business.split(",")[0],
+                                            businessReplaceDict,
+                                        )}
+                                    </span>
+
+                                    <span
+                                        class="bg-[#3a86ff] px-2 py-1 text-white rounded-md inline-block"
+                                    >
+                                        {value.occupation.split(",")[0]}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            {/each}
+        </div>
     {/if}
 </div>
 

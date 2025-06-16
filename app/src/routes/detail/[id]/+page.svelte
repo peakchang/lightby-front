@@ -1,11 +1,13 @@
 <script>
     import { goto } from "$app/navigation";
-    import { public_img_bucket } from "$lib/const";
+    import { public_img_bucket, img_bucket } from "$lib/const";
     import KakaoMap from "$lib/components/kakaoMap.svelte";
     import DetailMenu from "$lib/components/DetailMenu.svelte";
     import { user_info } from "$lib/stores/stores.js";
 
     let { data } = $props();
+
+    console.log(public_img_bucket);
 
     console.log(data);
     console.log(data.favorateBool);
@@ -20,7 +22,6 @@
     function contactCall() {}
 
     let imgSwiper = $state({});
-    
 
     $effect(() => {
         imgSwiper = new Swiper(".mySwiper", {
@@ -41,26 +42,27 @@
 
 <DetailMenu favorateBool={data.favorateBool} />
 
-
-{#if mainImage.length == 1}
-    <div class=" min-h-[300px] max-h-[500px]">
-        <img src={`${public_img_bucket}${mainImage[0]}`} alt="" />
-    </div>
-{:else}
-    <div class="swiper mySwiper">
-        <div class="swiper-wrapper">
-            {#each mainImage as img, idx}
-                <div class="swiper-slide">
-                    <img src={`${public_img_bucket}${img}`} alt="" />
-                </div>
-            {/each}
+<div class=" mb-8">
+    {#if mainImage.length == 1}
+        <div class=" min-h-[300px] max-h-[500px]">
+            <img src={`${public_img_bucket}${mainImage[0]}`} alt="" />
         </div>
-        <div class="swiper-button-next"></div>
-        <div class="swiper-button-prev"></div>
-    </div>
-{/if}
+    {:else}
+        <div class="swiper mySwiper">
+            <div class="swiper-wrapper">
+                {#each mainImage as img, idx}
+                    <div class="swiper-slide">
+                        <img src={`${public_img_bucket}${img}`} alt="" />
+                    </div>
+                {/each}
+            </div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+    {/if}
+</div>
 
-<div class="mt-3 p-3 bg-white rounded-lg">
+<div class="bg-white rounded-lg">
     <div class="font-bold text-xl text-center">{detailContent.subject}</div>
     <div class="mt-3">
         <div>
