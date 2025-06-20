@@ -1,14 +1,31 @@
 <script>
+    import CustomModal from "$lib/components/CustomModal.svelte";
     import { user_info } from "$lib/stores/stores";
     import { goto } from "$app/navigation";
+    import { navigating, page } from "$app/stores";
+
+    function setInterest() {}
+
+    let interestModalBool = $state(false);
 </script>
 
-<div class="z-50 suit-font" style="padding-top: 57px; padding-bottom:70px">
+<!-- 관심지역 설정 모달 -->
+<CustomModal bind:visible={interestModalBool} closeBtn={false}>
+    <div class="text-center">
+        <div class=" text-lg mb-2">관심지역 설정</div>
+        <div>asdljfailsjfdaslidfj</div>
+    </div>
+</CustomModal>
+
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<!-- svelte-ignore event_directive_deprecated -->
+<!-- svelte-ignore a11y_consider_explicit_label -->
+<div class="z-50 suit-font" style="padding-bottom:70px">
     {#if $user_info.idx}
-        <div class="bg-white p-5 rounded-lg">
+        <div class="bg-white p-5 rounded-lg pt-20">
             <div class="flex gap-7">
                 <div class="w-20 h-20 relative">
-                    <!-- svelte-ignore a11y_consider_explicit_label -->
                     <button
                         class="absolute bottom-[-10px] right-[-10px] w-7 h-7 border-2 rounded-full bg-white text-xs text-gray-500"
                     >
@@ -36,12 +53,10 @@
             <div
                 class="mt-10 bg-yellow-400 p-3 rounded-lg grid grid-cols-2 gap-3"
             >
-                <!-- svelte-ignore a11y_click_events_have_key_events -->
-                <!-- svelte-ignore a11y_no_static_element_interactions -->
                 <div
                     class="flex gap-2 items-center cursor-pointer"
                     on:click={() => {
-                        goto("/registjob");
+                        interestModalBool = true;
                     }}
                 >
                     <div
@@ -49,14 +64,13 @@
                     >
                         <i class="fa fa-building-o" aria-hidden="true"></i>
                     </div>
-                    <div class="text-sm font-semibold">구인글 등록</div>
+                    <div class="text-sm font-semibold">관심지역 설정</div>
                 </div>
-                <!-- svelte-ignore a11y_click_events_have_key_events -->
-                <!-- svelte-ignore a11y_no_static_element_interactions -->
+
                 <div
                     class="flex gap-2 items-center cursor-pointer"
                     on:click={() => {
-                        goto("/manage_job");
+                        goto("/manage_board");
                     }}
                 >
                     <div
@@ -64,14 +78,13 @@
                     >
                         0
                     </div>
-                    <div class="text-sm font-semibold">구인글 관리</div>
+                    <div class="text-sm font-semibold">내 글 관리</div>
                 </div>
-                <!-- svelte-ignore a11y_click_events_have_key_events -->
-                <!-- svelte-ignore a11y_no_static_element_interactions -->
+
                 <div
                     class="flex gap-2 items-center cursor-pointer"
                     on:click={() => {
-                        goto("/managemy");
+                        goto("/auth/manage");
                     }}
                 >
                     <div
@@ -81,8 +94,7 @@
                     </div>
                     <div class="text-sm font-semibold">회원정보 관리</div>
                 </div>
-                <!-- svelte-ignore a11y_click_events_have_key_events -->
-                <!-- svelte-ignore a11y_no_static_element_interactions -->
+
                 <div
                     class="flex gap-2 items-center cursor-pointer"
                     on:click={() => {
@@ -94,7 +106,10 @@
                     >
                         <i class="fa fa-file-text-o" aria-hidden="true"></i>
                     </div>
-                    <div class="text-sm font-semibold">인재정보 관리</div>
+                    <div class="text-sm font-semibold">
+                        내 인재 글 관리
+                        <span class="text-xs">(준비중)</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -112,7 +127,7 @@
             </div>
         </div>
     {:else}
-        <div class="pt-16 text-center">
+        <div class="pt-40 text-center">
             <div class=" text-green-700 text-4xl">
                 <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
             </div>
@@ -126,9 +141,16 @@
                 <p>내 정보 관리가 가능합니다.</p>
             </div>
             <div class="mt-5">
-                <button class="btn btn-info btn-lg w-1/3 text-white"
-                    >로그인하기</button
+                <a
+                    href="/auth/login"
+                    on:click|preventDefault={() => {
+                        goto(`/auth/login?path=${$page.url.pathname}`);
+                    }}
                 >
+                    <button class="btn btn-info btn-lg w-1/3 text-white">
+                        로그인하기
+                    </button>
+                </a>
             </div>
         </div>
     {/if}

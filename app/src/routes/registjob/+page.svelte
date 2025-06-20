@@ -1,5 +1,6 @@
 <script>
     import { goto, beforeNavigate } from "$app/navigation";
+    import PageHeader from "$lib/components/PageHeader.svelte";
     import QuestionItem from "$lib/components/QuestionItem.svelte";
     import SortableImg from "$lib/components/SortableImg.svelte";
     import KakaoMap from "$lib/components/kakaoMap.svelte";
@@ -7,16 +8,15 @@
     import Toast from "$lib/components/Toast.svelte";
     import { user_info, all_data } from "$lib/stores/stores";
     import { browser } from "$app/environment";
-    import { back_api } from "$lib/const";
-    import { getCookieValue } from "$lib/lib";
-    import axios from "axios";
     import {
-        feeBases,
-        iconList,
+        back_api,
         regions,
         businessCategorys,
         jobCategorys,
-    } from "./registjob";
+    } from "$lib/const";
+    import { getCookieValue } from "$lib/lib";
+    import axios from "axios";
+    import { feeBases, iconList } from "./registjob";
 
     let businessArr = $state([]); // 업종분류 변수 담을 임시 배열
     let occupationArr = $state([]); // 직종분류 변수 담을 임시 배열
@@ -162,9 +162,37 @@
         window.addEventListener("beforeunload", handler);
 
         beforeNavigate((nav) => {
-            const hasData = Object.keys($all_data).some(
-                (key) => key !== "user_id",
-            );
+            // const hasData = Object.keys($all_data).some(
+            //     (key) => key !== "user_id",
+            // );
+
+            const mustDatafields = [
+                "subject",
+                "point",
+                "res_addr",
+                "location",
+                "agency",
+                "name",
+                "phone",
+                "fee",
+            ];
+
+            console.log($all_data);
+
+            let hasData = false;
+
+            if (delImgList && delImgList.length > 0) {
+                hasData = true;
+            }
+
+            if ($all_data["subject"] || $all_data["point"]) {
+                hasData = true;
+            }
+
+            // if($all_data)
+
+            console.log(hasData);
+
             if (blockBack && hasData) {
                 toPage = nav.to.url.pathname;
                 escapePageModal = true;
@@ -724,23 +752,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <!-- svelte-ignore event_directive_deprecated -->
-<div class="fixed top-0 left-0 w-full z-20 suit-font">
-    <div class="max-w-[530px] mx-auto bg-white border-b">
-        <div class=" py-2 flex justify-between items-center">
-            <div
-                class="cursor-pointer"
-                style="color: #3da83b;"
-                on:click={() => {
-                    window.history.back();
-                }}
-            >
-                <i class="fa fa-angle-left text-2xl mr-1" aria-hidden="true"
-                ></i>
-                <span class="">뒤로가기</span>
-            </div>
-        </div>
-    </div>
-</div>
+<PageHeader></PageHeader>
 
 <!-- svelte-ignore event_directive_deprecated -->
 <div class="bg-white relative min-h-screen">

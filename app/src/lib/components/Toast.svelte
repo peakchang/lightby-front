@@ -10,7 +10,11 @@
 
     $effect(() => {
         setTimeout(() => {
-            toastArea.classList.add("hidden");
+            try {
+                toastArea.classList.add("hidden");
+            } catch (error) {
+                console.log("에러얌?");
+            }
         }, 3000);
         console.log(toastShow);
         if (toastShow == 1) {

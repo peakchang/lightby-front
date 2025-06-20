@@ -15,7 +15,14 @@
 	// 현재 경로에 따라 애니메이션 사용할지 결정
 	let useAnimation = $state(false);
 
-	const animatedRoutes = ["registjob", "detail"];
+	const animatedRoutes = [
+		"registjob",
+		"detail",
+		"manage_board",
+		"auth/manage",
+		"showfee/"
+
+	];
 
 	const unsubscribe = page.subscribe(($page) => {
 		// useAnimation = animatedRoutes.includes($page.url.pathname);
@@ -23,6 +30,9 @@
 		useAnimation = animatedRoutes.some((item) =>
 			$page.url.pathname.includes(item),
 		);
+
+		console.log(useAnimation);
+		
 	});
 </script>
 

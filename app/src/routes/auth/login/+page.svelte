@@ -2,6 +2,7 @@
     import { goto } from "$app/navigation";
     import { user_info } from "$lib/stores/stores";
     import CustomModal from "$lib/components/CustomModal.svelte";
+    import { page } from "$app/stores";
     import axios from "axios";
 
     let id = $state("");
@@ -31,6 +32,11 @@
     async function loginSubmit(e) {
         e.preventDefault();
 
+        console.log($page);
+        console.log($page.url.searchParams.get("path"));
+
+        const movePath = $page.url.searchParams.get("path");
+
         let errorMessage = "";
 
         try {
@@ -46,14 +52,18 @@
             setTimeout(() => {
                 successModal = false;
                 modalLoading = false;
-                location.href = "/";
+                if (movePath) {
+                    location.href = movePath;
+                } else {
+                    location.href = "/";
+                }
             }, random);
         } catch (err) {
             console.log(err.response.data.message);
             const m = err.response.data.message;
 
             alertModal = true;
-            alertMessage = `${m ? m : ""} 다시 시도해주세요.`
+            alertMessage = `${m ? m : ""} 다시 시도해주세요.`;
         }
     }
 
@@ -101,7 +111,9 @@
         class="max-w-[530px] mx-auto suit-font pt-12 pb-10 bg-white p-14 min-h-screen"
     >
         <div class="text-center bg-white">
-            <img src="/logo.png" alt="" class=" max-w-[150px] mx-auto" />
+            <a href="/">
+                <img src="/logo.png" alt="" class=" max-w-[150px] mx-auto" />
+            </a>
         </div>
 
         <div class="mt-12">
@@ -149,7 +161,6 @@
             </form>
 
             <div class="mt-3">
-                
                 <button
                     class=" bg-[#ffe500] font-semibold w-full p-3 rounded-lg flex justify-center items-center gap-2"
                     on:click={kakao_login}

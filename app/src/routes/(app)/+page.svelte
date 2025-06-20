@@ -6,13 +6,13 @@
     import { main_location } from "$lib/stores/stores.js";
     import { browser } from "$app/environment";
 
+    import { navigating } from "$app/stores";
+
     let { data } = $props();
 
-    console.log(data);
-
-    let premiumList = $state(data.premiumList);
-    let topList = $state(data.topList);
-    let siteList = $state(data.siteList);
+    let premiumList = $state([]);
+    let topList = $state([]);
+    let siteList = $state([]);
 
     let locationList = $derived([
         "전국",
@@ -22,7 +22,8 @@
     ]);
 
     let loading = $state(false);
-    if (data.premiumList.length == 0) {
+
+    if ($navigating == null) {
         loading = true;
     }
 
@@ -37,14 +38,13 @@
     }
 
     $effect(() => {
-        console.log("초기화!!!");
-
-        console.log(loading);
+        premiumList = data.premiumList;
+        topList = data.topList;
+        siteList = data.siteList;
 
         setTimeout(() => {
             loading = false;
-        }, 1000);
-
+        }, 500);
         return () => {};
     });
 
@@ -74,7 +74,6 @@
                         $main_location = e.target.dataset.location;
                         $main_location = $main_location;
                         localStorage.setItem("location", $main_location);
-                        console.log("어쩌구!");
                         invalidateAll();
                         loading = true;
                     }}
