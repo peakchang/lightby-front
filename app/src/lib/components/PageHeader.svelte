@@ -1,7 +1,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="fixed top-0 left-0 w-full z-20 suit-font">
-    <div class="max-w-[530px] mx-auto bg-white border-b">
+    <div class="max-w-[530px] mx-auto bg-white border-b border-gray-300">
         <div class="flex justify-between items-center">
             <div
                 class="cursor-pointer p-2"
