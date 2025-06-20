@@ -23,32 +23,32 @@
                 inventore beatae voluptatem quaerat expedita amet excepturi
                 soluta aliquid suscipit.
             </div>
-            <div class=" mt-3 flex items-center">
-                <span class="text-sm">테스트 모모</span>
+            <div class=" mt-3 flex justify-end flex-wrap items-center">
+                <span class="text-xs md:text-sm">테스트 모모</span>
                 <span class="mx-1.5">|</span>
-                <span class="flex items-center gap-1.5">
+                <span class="flex items-center gap-1 text-sm">
                     <i class="fa fa-heart-o" aria-hidden="true"></i>
                     <span
-                        class="border border-gray-400 px-2 py-0.5 rounded-full text-xs"
+                        class="border border-gray-400 px-1.5 py-0.5 rounded-full text-[10px] md:text-xs"
                     >
                         195
                     </span>
                 </span>
-                <span class="mx-1.5">|</span>
+                <span class="mx-1">|</span>
 
-                <span class="flex items-center gap-1.5">
+                <span class="flex items-center gap-1 text-sm">
                     <i class="fa fa-commenting text-gray-500" aria-hidden="true"
                     ></i>
                     <span
-                        class="border border-gray-400 px-2 py-0.5 rounded-full text-xs"
+                        class="border border-gray-400 px-2 py-0.5 rounded-full text-[10px] md:text-xs"
                     >
                         195
                     </span>
                 </span>
 
-                <span class="mx-1.5">|</span>
+                <span class="mx-1">|</span>
 
-                <span class="text-sm"> 25-06-17 12:42 </span>
+                <span class="text-xs md:text-sm"> 25-06-17 12:42 </span>
             </div>
         </div>
     {/each}
