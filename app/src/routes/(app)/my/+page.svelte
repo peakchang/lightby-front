@@ -107,8 +107,8 @@
                         <i class="fa fa-file-text-o" aria-hidden="true"></i>
                     </div>
                     <div class="text-sm font-semibold">
-                        내 인재 글 관리
-                        <span class="text-xs">(준비중)</span>
+                        <p>내 인재 글 관리</p>
+                        <p class="text-xs">(준비중)</p>
                     </div>
                 </div>
             </div>

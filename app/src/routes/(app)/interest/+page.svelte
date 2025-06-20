@@ -18,6 +18,9 @@
     function changeTab(e) {
         tabNum = e.target.dataset.num;
 
+        console.log(tabNum);
+        
+
         for (const el of tabArea.children) {
             el.classList.remove("tab-active");
         }
