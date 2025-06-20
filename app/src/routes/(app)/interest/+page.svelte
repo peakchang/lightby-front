@@ -19,7 +19,6 @@
         tabNum = e.target.dataset.num;
 
         console.log(tabNum);
-        
 
         for (const el of tabArea.children) {
             el.classList.remove("tab-active");
@@ -35,11 +34,33 @@
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <!-- svelte-ignore event_directive_deprecated -->
         <div class="tab-area cursor-pointer pt-20" bind:this={tabArea}>
-            <div class="tab-active" data-num="0" on:click={changeTab}>
+            <div
+                class:border-b-2={tabNum == 0}
+                class:text-black={tabNum == 0}
+                class:pb-1={tabNum == 0}
+                data-num="0"
+                on:click={changeTab}
+            >
                 관심 지역
             </div>
-            <div data-num="1" on:click={changeTab}>찜한 목록</div>
-            <div data-num="2" on:click={changeTab}>내 주변 현장</div>
+            <div
+                data-num="1"
+                class:border-b-2={tabNum == 1}
+                class:text-black={tabNum == 1}
+                class:pb-1={tabNum == 1}
+                on:click={changeTab}
+            >
+                찜한 목록
+            </div>
+            <div
+                data-num="2"
+                class:border-b-2={tabNum == 2}
+                class:text-black={tabNum == 2}
+                class:pb-1={tabNum == 2}
+                on:click={changeTab}
+            >
+                내 주변 현장
+            </div>
         </div>
 
         <!-- svelte-ignore event_directive_deprecated -->
