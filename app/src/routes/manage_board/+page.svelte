@@ -29,7 +29,7 @@
         <div data-num="0" class:tab-active={tabNum == 0} on:click={changeTab}>
             구인글 관리
         </div>
-        <div data-num="1" class:tab-active={tabNum == 0} on:click={changeTab}>
+        <div data-num="1" class:tab-active={tabNum == 1} on:click={changeTab}>
             게시판 관리
         </div>
     </div>
