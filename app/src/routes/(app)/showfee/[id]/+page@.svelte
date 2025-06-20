@@ -1,29 +1,12 @@
 <script>
+    import PageHeader from "$lib/components/PageHeader.svelte";
     let tempArr = [1, 2, 3, 4, 5, 6, 7];
 </script>
 
-<div class="fixed top-0 left-0 w-full z-20 suit-font">
-    <div class="max-w-[530px] mx-auto bg-white border-b">
-        <div class=" py-2 flex justify-between items-center">
-            <!-- svelte-ignore a11y_click_events_have_key_events -->
-            <!-- svelte-ignore a11y_no_static_element_interactions -->
-            <div
-                class="cursor-pointer"
-                style="color: #3da83b;"
-                on:click={() => {
-                    window.history.back();
-                }}
-            >
-                <i class="fa fa-angle-left text-2xl mr-1" aria-hidden="true"
-                ></i>
-                <span class="">뒤로가기</span>
-            </div>
-        </div>
-    </div>
-</div>
+<PageHeader></PageHeader>
 
 <!-- svelte-ignore event_directive_deprecated -->
-<div class="bg-white relative min-h-screen">
+<div class="bg-white relative min-h-screen px-3">
     <div class="max-w-[530px] mx-auto pretendard pt-14 pb-24">
         <div class="content-area border-b border-gray-300">
             <div class="text-lg font-semibold">이것은 글의 제목 입니다!!!</div>
