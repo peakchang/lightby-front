@@ -26,10 +26,12 @@
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <!-- svelte-ignore event_directive_deprecated -->
     <div class="tab-area cursor-pointer" bind:this={tabArea}>
-        <div class="tab-active" data-num="0" on:click={changeTab}>
+        <div data-num="0" class:tab-active={tabNum == 0} on:click={changeTab}>
             구인글 관리
         </div>
-        <div data-num="1" on:click={changeTab}>게시판 관리</div>
+        <div data-num="1" class:tab-active={tabNum == 0} on:click={changeTab}>
+            게시판 관리
+        </div>
     </div>
 </div>
 
