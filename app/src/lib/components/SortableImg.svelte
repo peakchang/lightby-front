@@ -1,22 +1,26 @@
 <script>
     import Sortable from "sortablejs";
-
     import axios from "axios";
-    import { back_api, back_api_origin } from "$lib/const";
-
+    import {
+        back_api,
+        back_api_origin,
+        public_img_bucket,
+        img_bucket,
+    } from "$lib/const";
     import uploadImageAct from "$lib/lib";
+    
+    import fileinput from "daisyui/components/fileinput";
 
     let {
         updateImg,
         imgModifyList = [],
         maxImgCount = 999999,
+        folder = "testfolder",
         detailShow = true,
     } = $props();
     let imgArr = $state([]);
     let sortable = $state(null);
     let setDetailImgCount = $state(0);
-
-    console.log(imgModifyList);
 
     if (imgModifyList && imgModifyList.length > 0) {
         const tempImgArr = [];
@@ -61,21 +65,28 @@
     }
 
     function onFileSelected() {
-        uploadImageAct(`${back_api}/img/upload_single`, (err, imgData) => {
-            if (err) {
-                alert("이미지 업로드 실패! 다시 시도해주세요!");
-            }
+        
+        uploadImageAct(
+            `${back_api}/img/upload_single`,
+            { folder },
+            (err, imgData) => {
+                
+                if (err) {
+                    alert("이미지 업로드 실패! 다시 시도해주세요!");
+                }
 
-            try {
-                addVal(imgData.saveUrl);
-                setDetailImgCount = imgArr.length - 1;
+                try {
+                    addVal(imgData.saveUrl);
+                    setDetailImgCount = imgArr.length - 1;
 
-                const type = "add";
-                updateImg({ imgArr, url: imgData.saveUrl, type });
-            } catch (err) {
-                console.error(err.message);
-            }
-        });
+                    const type = "add";
+                    updateImg({ imgArr, url: imgData.saveUrl, type });
+                } catch (err) {
+                    console.error(err.message);
+                } finally {
+                }
+            },
+        );
     }
 
     // 아래는 sortable 관련 함수! 건드리지 말기!!
@@ -154,10 +165,7 @@
                 <i class="fa fa-times-circle-o" aria-hidden="true"></i>
             </button>
 
-            <img
-                src={`https://storage.cloud.google.com/img-bucket1-250525/${img.href}`}
-                alt=""
-            />
+            <img src={`${public_img_bucket}${img.href}`} alt="" />
         </li>
     {/each}
 </ul>

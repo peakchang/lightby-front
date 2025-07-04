@@ -12,8 +12,7 @@ export const back_api = `${import.meta.env.VITE_SERVER_URL}`
 
 export const regions = [
     "서울",
-    "경기북부",
-    "경기남부",
+    "경기",
     "인천",
     "충청",
     "전라",

@@ -7,6 +7,12 @@
 
 	import { derived } from "svelte/store";
 
+	import { toastStore } from "$lib/stores/stores";
+	import Toast from "$lib/components/Toast.svelte";
+
+	import { loadingStore } from "$lib/stores/stores";
+	import Loading from "$lib/components/Loading.svelte";
+
 	let { children } = $props();
 
 	// 현재 경로 감지용 key 생성
@@ -20,8 +26,9 @@
 		"detail",
 		"manage_board",
 		"auth/manage",
-		"showfee/"
-
+		"showfee/",
+		"simplewrite",
+		"test/t1"
 	];
 
 	const unsubscribe = page.subscribe(($page) => {
@@ -32,9 +39,35 @@
 		);
 
 		console.log(useAnimation);
-		
 	});
 </script>
+
+<!-- <div class="mt-10">
+	<button
+		on:click={() => {
+			$loadingStore = true;
+			setTimeout(() => {
+				$loadingStore = false;
+			}, 1500);
+		}}>gogogo</button
+	>
+
+	<button
+		on:click={() => {
+			toastStore.set({
+				show: true,
+				message: "테스트토스트!",
+				color: "green",
+			});
+		}}
+	>
+		glglglglgl
+	</button>
+</div> -->
+
+<Loading />
+<Toast />
+<!-- svelte-ignore event_directive_deprecated -->
 
 <svelte:head>
 	<!-- Swiper JS -->

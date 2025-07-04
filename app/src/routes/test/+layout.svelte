@@ -9,7 +9,6 @@
 
     $effect(() => {
         console.log("진입!!!!!");
-
         return () => {
             console.log("빠져나옴!!!");
         };

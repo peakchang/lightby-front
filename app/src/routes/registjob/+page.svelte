@@ -6,7 +6,11 @@
     import KakaoMap from "$lib/components/kakaoMap.svelte";
     import CustomModal from "$lib/components/CustomModal.svelte";
     import Toast from "$lib/components/Toast.svelte";
-    import { user_info, all_data } from "$lib/stores/stores";
+    import {
+        user_info,
+        all_data,
+        paymentActRegistered,
+    } from "$lib/stores/stores";
     import { browser } from "$app/environment";
     import {
         back_api,
@@ -53,11 +57,99 @@
     let loopPrevent = $state(true);
 
     // 사이트 진입 초반 값을 초기화 할때 쓰는 변수
-    let loading = true;
+    let loading = $state(true);
+
+    // 페이지 내 함수 추가!!
+
+    console.log(`paymentActRegistered : ${$paymentActRegistered}`);
+
+    // if (!$paymentActRegistered) {
+    //     if (browser) {
+    //         window.addEventListener("paymentSuccess", paymentSuccessAct);
+    //         $paymentActRegistered = true;
+    //         console.log(`paymentSuccess 이벤트 등록됨`);
+    //     }
+    // }
+
+    // 상품 업로드 함수!!!
+    async function uploadRegist() {
+        console.log("등록 대기대기!!!");
+
+        $all_data["icons"] = icons.join(",");
+
+        if ($all_data["product"] != "free" && paymentStatus == false) {
+            const payProductName = `${productInfo.name} + 아이콘${iconNames.length}`;
+            popup = window.open(
+                `/payments?user_id=${$user_info.idx}&order_name=${payProductName}&amount=${$all_data["sum"]}`,
+                "popup",
+                "width=550,height=670",
+            );
+            return;
+        }
+
+        try {
+            const res = await axios.post(`${back_api}/regist/upload`, {
+                allData: $all_data,
+            });
+            blockBack = false;
+            successPrevModal = true;
+            successPrevModalMessage = "업로드가 완료 되었습니다.";
+            setTimeout(() => {
+                successPrevModal = false;
+                $all_data = {};
+                goto("/");
+            }, 2500);
+        } catch (err) {
+            const m = err.response.data.message;
+            console.error(`에러남!!!!`);
+        }
+    }
+
+    // 새로고침시 이미지 삭제를 하기 위해 delImgList 값이 변할때 삭제할 리스트 쿠키에 넣어주기!
+    function handler(e) {
+        // 삭제할 이미지 리스트 저장
+        if (delImgList.length > 0) {
+            const delImgListStr = delImgList.join(",");
+            document.cookie = `del_img_list=${delImgListStr}; path=/`;
+        }
+    }
+
+    // 결제 완료시 success 페이지에서 요청이 오면 처리하는 부분!!
+    async function paymentSuccessAct(e) {
+        if (e.data.status) {
+            console.log("진입 체크 하기!!");
+            setTimeout(() => {
+                console.log("최종 체크!!");
+            });
+            // $all_data["payment_key"] = e.data.paymentInfo.payment_key;
+            // try {
+            //     console.log('진입2');
+            //     const res = await axios.post(`${back_api}/regist/upload`, {
+            //         allData: $all_data,
+            //     });
+
+            //     console.log('요청 완료111');
+
+            //     blockBack = false;
+
+            //     successPrevModal = true;
+            //     successPrevModalMessage = "업로드가 완료 되었습니다.";
+            //     setTimeout(() => {
+            //         successPrevModal = false;
+            //         $all_data = {};
+            //         goto("/");
+            //     }, 4500);
+            // } catch (err) {
+            //     const m = err.response.data.message;
+            //     console.error(`에러남!!!!`);
+            // }
+        }
+    }
 
     $effect(async () => {
-        console.log("dd");
 
+        console.log('페이지 진입?!?!??!');
+        
         // 사이트 진입시 loading 값 true로 필요한 변수들 초기화 한 뒤 false 로 변경!
         if (loading) {
             if (!$all_data["user_id"] && loopPrevent) {
@@ -67,22 +159,6 @@
                 loopPrevent = false;
                 return;
             }
-
-            // 결제 완료시 success 페이지에서 요청이 오면 처리하는 부분!!
-            window.addEventListener("message", (e) => {
-                if (e.data.status) {
-                    console.log(e.data);
-
-                    paymentStatus = true;
-                    $all_data["payment_key"] = e.data.paymentInfo.payment_key;
-                    popup = undefined;
-                    console.log($all_data);
-
-                    setTimeout(() => {
-                        uploadRegist();
-                    }, 4000);
-                }
-            });
 
             // 삭제할 이미지 있으면 쿠키에서 값 가져와서 삭제하기!
             const refreshFlag = getCookieValue("del_img_list");
@@ -115,7 +191,6 @@
                 iconNames = icons
                     .map((id) => iconList.find((icon) => icon.id === id)?.name)
                     .filter((name) => name !== undefined);
-                console.log(iconNames);
             }
 
             // 주소 있을경우 주소값 입력하기 (카카오 맵 적용)
@@ -138,6 +213,8 @@
                 $all_data["product"] = "free";
             }
 
+            // window.addEventListener("beforeunload", handler);
+
             loading = false;
         }
 
@@ -151,59 +228,53 @@
             prevItem = $all_data["product"];
         }
 
-        // 새로고침시 이미지 삭제를 하기 위해 delImgList 값이 변할때 삭제할 리스트 쿠키에 넣어주기!
-        const handler = (e) => {
-            // 삭제할 이미지 리스트 저장
-            if (delImgList.length > 0) {
-                const delImgListStr = delImgList.join(",");
-                document.cookie = `del_img_list=${delImgListStr}; path=/`;
-            }
-        };
-        window.addEventListener("beforeunload", handler);
-
-        beforeNavigate((nav) => {
-            // const hasData = Object.keys($all_data).some(
-            //     (key) => key !== "user_id",
-            // );
-
-            const mustDatafields = [
-                "subject",
-                "point",
-                "res_addr",
-                "location",
-                "agency",
-                "name",
-                "phone",
-                "fee",
-            ];
-
-            console.log($all_data);
-
-            let hasData = false;
-
-            if (delImgList && delImgList.length > 0) {
-                hasData = true;
-            }
-
-            if ($all_data["subject"] || $all_data["point"]) {
-                hasData = true;
-            }
-
-            // if($all_data)
-
-            console.log(hasData);
-
-            if (blockBack && hasData) {
-                toPage = nav.to.url.pathname;
-                escapePageModal = true;
-                nav.cancel();
-            }
-        });
-
         return () => {
-            window.removeEventListener("beforeunload", handler);
+            console.log('regist page out!!!!!!!!!!!!!!!!!!!!!');
+            
+            // window.removeEventListener("beforeunload", handler);
+            // console.log("여기는 안들어와?!");
         };
     });
+
+    // beforeNavigate((nav) => {
+    //     const mustDatafields = [
+    //         "subject",
+    //         "point",
+    //         "res_addr",
+    //         "location",
+    //         "agency",
+    //         "name",
+    //         "phone",
+    //         "fee",
+    //     ];
+    //     let hasData = false;
+    //     if (delImgList && delImgList.length > 0) {
+    //         hasData = true;
+    //     }
+    //     if ($all_data["subject"] || $all_data["point"]) {
+    //         hasData = true;
+    //     }
+
+    //     console.log(blockBack);
+    //     console.log(hasData);
+
+    //     console.log("페이지에서 나가는건 여긴가?");
+
+    //     // if ($paymentActRegistered) {
+    //     //     if (browser) {
+    //     //         window.removeEventListener("paymentSuccess", paymentSuccessAct);
+    //     //         $paymentActRegistered = false;
+    //     //         console.log(`paymentActRegistered 이벤트 해제됨`);
+    //     //     }
+    //     // }
+
+    //     if (blockBack && hasData) {
+    //         console.log("여기는 왜 들어오지?!!");
+    //         toPage = nav.to.url.pathname;
+    //         escapePageModal = true;
+    //         nav.cancel();
+    //     }
+    // });
 
     $all_data["user_id"] = $user_info.idx;
 
@@ -236,6 +307,7 @@
         $all_data["sum"] = productInfo.price + iconSum;
     }
 
+    // 상품 변경시 처리 함수
     function itemRateChange() {
         if (this.value == "premium") {
             productInfo.name = "프리미엄";
@@ -258,6 +330,7 @@
         $all_data["sum"] = productInfo.price + iconSum;
     }
 
+    // 모달에서 뒤로가기 했을때 뜨는 창!!
     async function goToBackAndArrangeImg() {
         if (delImgList.length > 0) {
             try {
@@ -418,7 +491,6 @@
     // 최종 업로드 부분!!!!!!!!!
 
     function uploadChkRegist(e) {
-        console.log(popup);
         if (popup) {
             alertModalShow = true;
             alertModalMessage = "현재 결제창이 열려 있습니다.";
@@ -449,42 +521,6 @@
             return;
         }
         submitPrevModal = true;
-    }
-
-    async function uploadRegist() {
-        $all_data["icons"] = icons.join(",");
-
-        if ($all_data["product"] != "free" && paymentStatus == false) {
-            const payProductName = `${productInfo.name} + 아이콘${iconNames.length}`;
-            console.log(payProductName);
-            console.log($all_data["sum"]);
-            console.log($user_info.idx);
-
-            popup = window.open(
-                `/payments?user_id=${$user_info.idx}&order_name=${payProductName}&amount=${$all_data["sum"]}`,
-                "popup",
-                "width=550,height=670",
-            );
-
-            return;
-        }
-
-        try {
-            const res = await axios.post(`${back_api}/regist/upload`, {
-                allData: $all_data,
-            });
-            successPrevModal = true;
-            successPrevModalMessage = "업로드가 완료 되었습니다.";
-            setTimeout(() => {
-                console.log("이제 가야지?");
-                successPrevModal = false;
-                blockBack = false;
-                $all_data = {};
-                goto("/");
-            }, 2500);
-        } catch (err) {
-            const m = err.response.data.message;
-        }
     }
 </script>
 
@@ -790,6 +826,7 @@
             <div class="my-3">
                 <SortableImg
                     {updateImg}
+                    folder={"job-offer"}
                     imgModifyList={$all_data["imgs"]
                         ? $all_data["imgs"].split(",")
                         : ""}

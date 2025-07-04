@@ -1,44 +1,27 @@
 <script>
-    let {
-        toastShow = 0,
-        toastMessage = "토스트 메세지!!",
-        toastAct,
-    } = $props();
-    // 토스트
-
-    let toastArea = $state({});
+    import { toastStore } from "$lib/stores/stores";
 
     $effect(() => {
-        setTimeout(() => {
-            try {
-                toastArea.classList.add("hidden");
-            } catch (error) {
-                console.log("에러얌?");
-            }
-        }, 3000);
-        console.log(toastShow);
-        if (toastShow == 1) {
-            toastArea.classList.remove("hidden");
+        if ($toastStore.show == true) {
             setTimeout(() => {
-                toastShow = 0;
-                toastAct();
+                toastStore.set({ show: false, message: "" });
             }, 1800);
-
-            setTimeout(() => {
-                toastArea.classList.add("hidden");
-            }, 2200);
         }
     });
 </script>
 
-<div
-    id="toast"
-    class="toast toast-center toast-bottom z-[9999999] opacity-{toastShow} suit-font"
-    bind:this={toastArea}
->
-    <div class="alert bg-red-500 text-white mb-20">
-        <span>
-            {toastMessage}
-        </span>
+<!-- opacity-{toastShow} -->
+
+{#if $toastStore.show}
+    <div
+        id="toast"
+        class="toast toast-center toast-bottom z-[9999999] suit-font"
+    >
+        <div
+            class="alert text-white mb-20"
+            style="background-color: {$toastStore.color};"
+        >
+            <span> {$toastStore.message} </span>
+        </div>
     </div>
-</div>
+{/if}

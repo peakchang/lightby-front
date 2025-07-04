@@ -49,10 +49,12 @@
         </div>
     {:else}
         <div class="swiper mySwiper">
-            <div class="swiper-wrapper">
+            <div class="swiper-wrapper items-center">
                 {#each mainImage as img, idx}
                     <div class="swiper-slide">
-                        <img src={`${public_img_bucket}${img}`} alt="" />
+                        <div class=" img-area">
+                            <img src={`${public_img_bucket}${img}`} alt="" />
+                        </div>
                     </div>
                 {/each}
             </div>
@@ -86,7 +88,7 @@
             TIP : 번개분양을 보고 연락드렸다고 하시면 보다 상담이 쉬워집니다.
         </div>
         <!-- svelte-ignore event_directive_deprecated -->
-        <div class="mt-4 flex gap-2 justify-center">
+        <!-- <div class="mt-4 flex gap-2 justify-center">
             <button
                 class="btn btn-info btn-sm w-1/3 text-white"
                 on:click={contactCall}
@@ -101,7 +103,7 @@
                 <i class="fa fa-envelope-o" aria-hidden="true"></i>
                 문자하기
             </button>
-        </div>
+        </div> -->
     </div>
 </div>
 
@@ -195,7 +197,7 @@
     .swiper-slide {
         text-align: center;
         font-size: 18px;
-        background: #444;
+        background: white;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -204,7 +206,7 @@
     .swiper-slide img {
         display: block;
         width: 100%;
-        height: 100%;
+        /* height: 100%; */
         object-fit: cover;
     }
 </style>

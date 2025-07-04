@@ -173,14 +173,14 @@
             {:else if ["/showfee"].includes($page.url.pathname)}
                 <!-- svelte-ignore event_directive_deprecated -->
                 <a
-                    href="/registjob"
+                    href="/simplewrite"
                     on:click|preventDefault={() => {
                         if (!$user_info.idx) {
                             loginAlertModalShow = true;
                             return;
                         }
 
-                        goto("/registjob");
+                        goto("/simplewrite");
                     }}
                 >
                     <PdButton

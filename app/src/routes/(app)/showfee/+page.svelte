@@ -1,37 +1,42 @@
 <script>
     import { goto } from "$app/navigation";
+    import moment from "moment-timezone";
 
     let sampleArr = $state([1, 2, 3, 4, 5]);
+
+    let { data } = $props();
+    console.log(data);
+    let boardList = $state([]);
+    boardList = data.boardList;
+    console.log(boardList);
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <!-- svelte-ignore event_directive_deprecated -->
 <div class="pt-20 pb-32 suit-font px-3">
-    {#each sampleArr as sample}
+    {#each boardList as boardData}
         <div
             class="border-b py-5 px-3 border-gray-300 cursor-pointer"
             on:click={() => {
-                goto("/showfee/test");
+                goto(`/showfee/${boardData.idx}`);
             }}
         >
-            <div class="mt-1 font-semibold">이것은 글의 제목 입니다!!!</div>
+            <div class="mt-1 font-semibold">
+                {boardData.subject}
+            </div>
             <div class="mt-1 ellipsis">
-                Lorem ipsum, 숫자가 보이면 ** 처리 되게!!! dolor sit amet
-                consectetur adipisicing elit. Sint voluptas veniam explicabo
-                ullam error cumque numquam quae pariatur, aspernatur modi
-                inventore beatae voluptatem quaerat expedita amet excepturi
-                soluta aliquid suscipit.
+                {boardData.content}
             </div>
             <div class=" mt-3 flex justify-end flex-wrap items-center">
-                <span class="text-xs md:text-sm">테스트 모모</span>
+                <span class="text-xs md:text-sm">{boardData.nickname}</span>
                 <span class="mx-1.5">|</span>
                 <span class="flex items-center gap-1 text-sm">
                     <i class="fa fa-heart-o" aria-hidden="true"></i>
                     <span
                         class="border border-gray-400 px-1.5 py-0.5 rounded-full text-[10px] md:text-xs"
                     >
-                        195
+                        {boardData.good_count ? boardData.good_count : 0}
                     </span>
                 </span>
                 <span class="mx-1">|</span>
@@ -42,13 +47,15 @@
                     <span
                         class="border border-gray-400 px-2 py-0.5 rounded-full text-[10px] md:text-xs"
                     >
-                        195
+                        {boardData.reply_count}
                     </span>
                 </span>
 
                 <span class="mx-1">|</span>
 
-                <span class="text-xs md:text-sm"> 25-06-17 12:42 </span>
+                <span class="text-xs md:text-sm">
+                    {moment(boardData.created_at).format("YY/MM/DD HH:mm")}
+                </span>
             </div>
         </div>
     {/each}
