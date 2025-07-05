@@ -11,8 +11,9 @@
     import axios from "axios";
     import { page } from "$app/stores";
     import { getRandBet } from "$lib/lib.js";
+    import { onMount } from "svelte";
 
-    console.log($user_info);
+    console.log(`$user_info : ${$user_info.idx}`);
     console.log($page);
 
     let { data } = $props();
@@ -35,6 +36,15 @@
     let replyInpBorder = $state(false);
     let replyInpArea = $derived({});
     let replyContent = $state("");
+
+
+    onMount(() => {
+        console.log('onMounted!!!!');
+        console.log($user_info);
+        
+    })
+
+
 
     async function uploadReply() {
         console.log(replyContent);
@@ -140,7 +150,6 @@
 
             <div class="mt-10 pb-10">
                 {#each imgList as img}
-                    {`${img_bucket}${img}`}
                     <img src={`${public_img_bucket}${img}`} alt="" />
                 {/each}
 

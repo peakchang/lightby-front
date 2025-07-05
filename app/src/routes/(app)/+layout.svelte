@@ -151,14 +151,14 @@
             {#if ["/", "/interest", "/my"].includes($page.url.pathname)}
                 <!-- svelte-ignore event_directive_deprecated -->
                 <a
-                    href="/registjob"
+                    href="/joboffer"
                     on:click|preventDefault={() => {
                         if (!$user_info.idx) {
                             loginAlertModalShow = true;
                             return;
                         }
 
-                        goto("/registjob");
+                        goto("/joboffer");
                     }}
                 >
                     <PdButton

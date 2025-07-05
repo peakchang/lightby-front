@@ -6,11 +6,7 @@
     import KakaoMap from "$lib/components/kakaoMap.svelte";
     import CustomModal from "$lib/components/CustomModal.svelte";
     import Toast from "$lib/components/Toast.svelte";
-    import {
-        user_info,
-        all_data,
-        paymentActRegistered,
-    } from "$lib/stores/stores";
+    import { user_info, all_data } from "$lib/stores/stores";
     import { browser } from "$app/environment";
     import {
         back_api,
@@ -60,16 +56,15 @@
     let loading = $state(true);
 
     // 페이지 내 함수 추가!!
+    let paymentActRegistered = $state(false);
 
-    console.log(`paymentActRegistered : ${$paymentActRegistered}`);
-
-    // if (!$paymentActRegistered) {
-    //     if (browser) {
-    //         window.addEventListener("paymentSuccess", paymentSuccessAct);
-    //         $paymentActRegistered = true;
-    //         console.log(`paymentSuccess 이벤트 등록됨`);
-    //     }
-    // }
+    if (!paymentActRegistered) {
+        if (browser) {
+            window.addEventListener("paymentSuccess", paymentSuccessAct);
+            paymentActRegistered = true;
+            console.log(`paymentSuccess 이벤트 등록됨`);
+        }
+    }
 
     // 상품 업로드 함수!!!
     async function uploadRegist() {
@@ -147,9 +142,6 @@
     }
 
     $effect(async () => {
-
-        console.log('페이지 진입?!?!??!');
-        
         // 사이트 진입시 loading 값 true로 필요한 변수들 초기화 한 뒤 false 로 변경!
         if (loading) {
             if (!$all_data["user_id"] && loopPrevent) {
@@ -213,7 +205,7 @@
                 $all_data["product"] = "free";
             }
 
-            // window.addEventListener("beforeunload", handler);
+            window.addEventListener("beforeunload", handler);
 
             loading = false;
         }
@@ -229,52 +221,40 @@
         }
 
         return () => {
-            console.log('regist page out!!!!!!!!!!!!!!!!!!!!!');
-            
-            // window.removeEventListener("beforeunload", handler);
-            // console.log("여기는 안들어와?!");
+            window.removeEventListener("beforeunload", handler);
+            window.removeEventListener("paymentSuccess", paymentSuccessAct);
         };
     });
 
-    // beforeNavigate((nav) => {
-    //     const mustDatafields = [
-    //         "subject",
-    //         "point",
-    //         "res_addr",
-    //         "location",
-    //         "agency",
-    //         "name",
-    //         "phone",
-    //         "fee",
-    //     ];
-    //     let hasData = false;
-    //     if (delImgList && delImgList.length > 0) {
-    //         hasData = true;
-    //     }
-    //     if ($all_data["subject"] || $all_data["point"]) {
-    //         hasData = true;
-    //     }
+    beforeNavigate((nav) => {
+        const mustDatafields = [
+            "subject",
+            "point",
+            "res_addr",
+            "location",
+            "agency",
+            "name",
+            "phone",
+            "fee",
+        ];
+        let hasData = false;
+        if (delImgList && delImgList.length > 0) {
+            hasData = true;
+        }
+        if ($all_data["subject"] || $all_data["point"]) {
+            hasData = true;
+        }
 
-    //     console.log(blockBack);
-    //     console.log(hasData);
+        console.log(blockBack);
+        console.log(hasData);
 
-    //     console.log("페이지에서 나가는건 여긴가?");
-
-    //     // if ($paymentActRegistered) {
-    //     //     if (browser) {
-    //     //         window.removeEventListener("paymentSuccess", paymentSuccessAct);
-    //     //         $paymentActRegistered = false;
-    //     //         console.log(`paymentActRegistered 이벤트 해제됨`);
-    //     //     }
-    //     // }
-
-    //     if (blockBack && hasData) {
-    //         console.log("여기는 왜 들어오지?!!");
-    //         toPage = nav.to.url.pathname;
-    //         escapePageModal = true;
-    //         nav.cancel();
-    //     }
-    // });
+        if (blockBack && hasData) {
+            console.log("여기는 왜 들어오지?!!");
+            toPage = nav.to.url.pathname;
+            escapePageModal = true;
+            nav.cancel();
+        }
+    });
 
     $all_data["user_id"] = $user_info.idx;
 

@@ -4,12 +4,19 @@ import jwt from 'jsonwebtoken';
 
 export async function handle({ event, resolve }) {
 
+    if (event.url.pathname.startsWith('/.well-known/')) {
+        return new Response('', { status: 204 });
+    }
+
+
     const accessToken = event.cookies.get('access_token');
     const refreshToken = event.cookies.get('refresh_token');
     // 기본 초기화~
     let userInfo = {}
 
     try {
+        console.log(accessToken);
+
         if (accessToken) {
             const payload = jwt.verify(accessToken, ACCESS_TOKEN_SECRET)
             userInfo = { idx: payload.userId };
@@ -48,7 +55,8 @@ export async function handle({ event, resolve }) {
                 httpOnly: true,
                 secure: true,
                 path: '/',
-                maxAge: 60 * 15
+                // maxAge: 60 * 15
+                maxAge: 5
             });
 
             userInfo = { idx: user.idx };
@@ -57,10 +65,7 @@ export async function handle({ event, resolve }) {
             event.cookies.delete('access_token', { path: '/' });
             event.cookies.delete('refresh_token', { path: '/' });
         }
-
     }
-
-    event.locals.userInfo = userInfo;
     const res = await resolve(event); // 요청 처리
 
     return res;

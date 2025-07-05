@@ -13,7 +13,13 @@
 	import { loadingStore } from "$lib/stores/stores";
 	import Loading from "$lib/components/Loading.svelte";
 
-	let { children } = $props();
+	import { user_info } from "$lib/stores/stores";
+	import { onMount } from "svelte";
+
+	let { data, children } = $props();
+	onMount(() => {
+		$user_info = data.user
+	});
 
 	// 현재 경로 감지용 key 생성
 	const key = derived(page, ($page) => $page.url.pathname);
@@ -28,7 +34,8 @@
 		"auth/manage",
 		"showfee/",
 		"simplewrite",
-		"test/t1"
+		"test/t1",
+		"joboffer",
 	];
 
 	const unsubscribe = page.subscribe(($page) => {

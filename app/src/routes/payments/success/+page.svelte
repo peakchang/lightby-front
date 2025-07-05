@@ -33,7 +33,7 @@
                     countdown--;
                     console.log(countdown);
 
-                    if (countdown < 0) {
+                    if (countdown <= 0) {
                         clearInterval(countdownInterval);
                         window.close();
                     }
@@ -41,6 +41,7 @@
 
                 // orderId=order_12&paymentKey=taedp20250615162321MXTw8&amount=11000
             } else {
+                alert('에러에러에러!!!')
                 console.log("부모 페이지 없음 ㅠㅠ");
             }
         }

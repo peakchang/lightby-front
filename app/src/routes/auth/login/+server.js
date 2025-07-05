@@ -28,6 +28,7 @@ export async function POST({ request, cookies }) {
             }
 
             const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+
             const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET, { expiresIn: '14d' });
 
             const refreshTokenUpdateQuery = `UPDATE users SET refresh_token = ? WHERE idx = ?`;
@@ -37,8 +38,8 @@ export async function POST({ request, cookies }) {
                 httpOnly: true,
                 secure: true,
                 path: '/',
-                maxAge: 60 * 15
-                // maxAge: 15
+                // maxAge: 60 * 15
+                maxAge: 5
             });
 
             cookies.set('refresh_token', refreshToken, {

@@ -8,6 +8,8 @@
     import axios from "axios";
     import { back_api } from "$lib/const";
     import { toastStore } from "$lib/stores/stores";
+    import { onMount } from "svelte";
+    import Cookies from "js-cookie";
 
     if (!$user_info.idx) {
         goto("/");
@@ -30,35 +32,32 @@
     let blockBack = $state(true);
     let toPage = $state("");
 
-    $effect(async () => {
-        // 삭제할 이미지 있으면 쿠키에서 값 가져와서 삭제하기!
-        const refreshFlag = getCookieValue("del_img_list");
+    onMount(async () => {
+        // 새로고침, 최초 로딩시 삭제할 이미지 있으면 쿠키에서 값 가져와서 삭제하기! (글쓰는 페이지 적용!!)
+        const refreshFlag = Cookies.get("del_img_list");
         if (refreshFlag) {
             try {
                 const res = await axios.post(`${back_api}/img/delete_many`, {
                     delImgList: refreshFlag.split(","),
                 });
             } catch (err) {
-                console.error(err);
-
-                // console.error(err.meesage);
+                console.error(err.meesage);
             }
-            // document.cookie = "del_img_list=; Max-Age=0; path=/";
+            Cookies.remove("del_img_list");
         }
+    });
 
-        // 새로고침시 이미지 삭제를 하기 위해 delImgList 값이 변할때 삭제할 리스트 쿠키에 넣어주기!
-        const handler = (e) => {
-            // 삭제할 이미지 리스트 저장
-            if (delImgList.length > 0) {
-                const delImgListStr = delImgList.join(",");
-                document.cookie = `del_img_list=${delImgListStr}; path=/`;
-            }
-        };
-        window.addEventListener("beforeunload", handler);
-
-        return () => {
-            window.removeEventListener("beforeunload", handler);
-        };
+    $effect(async () => {
+        // delImgList 에 리스트 담기!! (글쓰는 페이지!)
+        if (delImgList.length > 0) {
+            const delImgListStr = delImgList.join(",");
+            Cookies.set("del_img_list", delImgListStr, {
+                path: "/",
+                expires: 7,
+            });
+        } else {
+            Cookies.remove("del_img_list", { path: "/" });
+        }
     });
 
     async function goToBackAndArrangeImg() {
@@ -218,7 +217,8 @@
                     />
                 </div>
                 <!-- imgModifyList={} -->
-                <SortableImg {updateImg} maxImgCount={10}></SortableImg>
+                <SortableImg {updateImg} maxImgCount={10} folder={"boardfee"}
+                ></SortableImg>
 
                 <div class="mt-5">
                     <textarea
