@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 
-export const user_info = writable({});
+export const user_info = writable({ idx: undefined });
 
 export const main_location = writable("");
 

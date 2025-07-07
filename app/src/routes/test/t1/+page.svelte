@@ -3,9 +3,11 @@
     import { browser } from "$app/environment";
     import { goto, beforeNavigate } from "$app/navigation";
 
+    import { user_info } from "$lib/stores/stores";
+    console.log($user_info);
     $effect(() => {
-        console.log('t1 페이지에 들어오는 거잖아?!');
-        
+        console.log("t1 페이지에 들어오는 거잖아?!");
+
         if (browser) {
             window.addEventListener("testfunc", testFunc);
         }
@@ -17,11 +19,8 @@
     });
 
     beforeNavigate(() => {
-        console.log('빠져나가기 전처리?!?!');
-        
-    })
-
-    
+        console.log("빠져나가기 전처리?!?!");
+    });
 
     function testFunc() {
         console.log("asldifjlasjdflajfFD");

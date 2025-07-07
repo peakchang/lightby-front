@@ -18,7 +18,9 @@
 
 	let { data, children } = $props();
 	onMount(() => {
-		$user_info = data.user
+		if (data.user) {
+			$user_info = data.user;
+		}
 	});
 
 	// 현재 경로 감지용 key 생성

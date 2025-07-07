@@ -3,6 +3,7 @@
     import { user_info } from "$lib/stores/stores";
     import CustomModal from "$lib/components/CustomModal.svelte";
     import { page } from "$app/stores";
+    import { onMount, tick } from "svelte";
     import axios from "axios";
 
     let id = $state("");
@@ -16,10 +17,16 @@
     let modalLoading = $state(false);
 
     console.log($user_info);
+    
 
-    $effect(() => {
-        // 로그인 되어 있는지 체크~
-        if ($user_info["idx"]) {
+    onMount(async () => {
+
+        
+
+        console.log($user_info);
+
+        
+        if ($user_info.idx) {
             alertMessage = "이미 로그인 되어 있습니다.";
             alertModal = true;
             setTimeout(() => {
@@ -28,6 +35,8 @@
             }, 800);
         }
     });
+
+    $effect(() => {});
 
     async function loginSubmit(e) {
         e.preventDefault();
@@ -77,6 +86,15 @@
     };
 </script>
 
+<button
+    on:click={() => {
+        console.log($page);
+        
+        console.log($user_info);
+    }}
+>
+    gogogo
+</button>
 <CustomModal bind:visible={successModal} closeBtn={false}>
     <div class="text-center">
         <div class=" text-green-700 text-3xl mb-2">

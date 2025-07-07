@@ -8,12 +8,8 @@
     import axios from "axios";
     import { back_api } from "$lib/const";
     import { toastStore } from "$lib/stores/stores";
-    import { onMount } from "svelte";
+    import { onMount, tick } from "svelte";
     import Cookies from "js-cookie";
-
-    if (!$user_info.idx) {
-        goto("/");
-    }
 
     let delImgList = $state([]);
     let imgs = $state("");
@@ -33,6 +29,14 @@
     let toPage = $state("");
 
     onMount(async () => {
+        await tick();
+
+        console.log($user_info);
+        
+        if (!$user_info.idx) {
+            goto("/");
+        }
+
         // 새로고침, 최초 로딩시 삭제할 이미지 있으면 쿠키에서 값 가져와서 삭제하기! (글쓰는 페이지 적용!!)
         const refreshFlag = Cookies.get("del_img_list");
         if (refreshFlag) {

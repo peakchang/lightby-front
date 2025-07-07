@@ -19,12 +19,11 @@
     } from "$lib/const";
     import axios from "axios";
     import { feeBases, iconList } from "./jopoffer";
-    import { onDestroy, onMount } from "svelte";
+    import { onDestroy, onMount, tick } from "svelte";
     import Cookies from "js-cookie";
 
     let { data } = $props();
     console.log(data);
-    
 
     let businessArr = $state([]); // 업종분류 변수 담을 임시 배열
     let occupationArr = $state([]); // 직종분류 변수 담을 임시 배열
@@ -66,21 +65,15 @@
 
     // 시작 셋팅
     onMount(async () => {
+        await tick();
         if (!$user_info.idx) {
             goto("/");
-        }
-        $all_data["user_id"] = $user_info.idx;
-
-        if (!$all_data["user_id"] && loopPrevent) {
-            // 유저 정보 없을경우 뒤로 돌아가기
-            blockBack = false;
-            window.history.back();
-            loopPrevent = false;
-            return;
         }
 
         // 삭제할 이미지 있으면 쿠키에서 값 가져와서 삭제하기! (글쓰는 페이지 적용!!)
         const refreshFlag = Cookies.get("del_img_list");
+        console.log(refreshFlag);
+
         if (refreshFlag) {
             try {
                 const res = await axios.post(`${back_api}/img/delete_many`, {
@@ -89,7 +82,19 @@
             } catch (err) {
                 console.error(err.meesage);
             }
-            Cookies.remove('del_img_list');
+            Cookies.remove("del_img_list");
+        }
+
+        console.log($user_info);
+
+        $all_data["user_id"] = $user_info.idx;
+
+        if (!$all_data["user_id"] && loopPrevent) {
+            // 유저 정보 없을경우 뒤로 돌아가기
+            blockBack = false;
+            window.history.back();
+            loopPrevent = false;
+            return;
         }
 
         if ($all_data["product"] != "free") {
@@ -454,9 +459,7 @@
                     if (extraAddr !== "") {
                         extraAddr = " (" + extraAddr + ")";
                     }
-
                 } else {
-
                 }
 
                 getAddress = $all_data["addr"];
