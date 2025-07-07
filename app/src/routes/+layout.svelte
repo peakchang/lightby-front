@@ -46,8 +46,6 @@
 		useAnimation = animatedRoutes.some((item) =>
 			$page.url.pathname.includes(item),
 		);
-
-		console.log(useAnimation);
 	});
 </script>
 

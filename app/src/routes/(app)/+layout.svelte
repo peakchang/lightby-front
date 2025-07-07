@@ -36,8 +36,6 @@
             }, 800);
             $user_info = {};
         }
-
-        console.log(res);
     }
 </script>
 

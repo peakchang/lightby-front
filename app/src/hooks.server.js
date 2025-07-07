@@ -13,14 +13,12 @@ export async function handle({ event, resolve }) {
     const refreshToken = event.cookies.get('refresh_token');
     // 기본 초기화~
     let userInfo = {}
-
+    console.log('액세스 토큰은 무엇?!?!');
+    console.log(accessToken);
     try {
-        console.log(accessToken);
-
         if (accessToken) {
             const payload = jwt.verify(accessToken, ACCESS_TOKEN_SECRET)
             userInfo = { idx: payload.userId };
-            console.log('액세스토큰 정상 처리~');
             // 액세스 토큰 정상이면 바로 리턴 처리~
             event.locals.userInfo = userInfo;
             const res = await resolve(event); // 요청 처리
@@ -28,7 +26,6 @@ export async function handle({ event, resolve }) {
 
         }
     } catch (error) {
-        console.log('액세스토큰 에러~');
     }
 
     // 액세스 토큰으로 처리 안되었다면 리프레쉬 토큰으로 액세스 토큰 재발급 하기~
@@ -36,10 +33,8 @@ export async function handle({ event, resolve }) {
 
         try {
             const refreshPayload = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
-            console.log(refreshPayload);
             const getUserInfoQuery = "SELECT * FROM users WHERE idx = ?";
             const [userInfoRow] = await sql_con.promise().query(getUserInfoQuery, [refreshPayload.userId]);
-            console.log(userInfoRow);
 
             // userInfoRow.length 가 0 이면 아이디가 없는것 / 토큰 불일치 하면 다시 로그인 하라고 리턴처리
             if (userInfoRow.length == 0 || userInfoRow[0].refresh_token != refreshToken) {

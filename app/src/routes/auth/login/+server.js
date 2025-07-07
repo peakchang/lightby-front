@@ -38,8 +38,8 @@ export async function POST({ request, cookies }) {
                 httpOnly: true,
                 secure: true,
                 path: '/',
-                maxAge: 60 * 15
-                // maxAge: 5
+                // maxAge: 60 * 15
+                maxAge: 5
             });
 
             cookies.set('refresh_token', refreshToken, {
