@@ -46,7 +46,7 @@
 </div>
 
 <!-- svelte-ignore event_directive_deprecated -->
-<div class="fixed bottom-0 left-0 w-full z-50 suit-font">
+<div class="fixed bottom-0 left-0 w-full z-20 suit-font">
     <div class="max-w-[530px] mx-auto pretendard">
         <div
             class="flex gap-2 justify-center bg-white pt-3 pb-3 border-t border-gray-200"

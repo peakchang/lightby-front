@@ -9,7 +9,7 @@
             bind:value={iptVal}
             type="text"
             {placeholder}
-            class="input input-bordered input-info input-sm w-full"
+            class="input input-bordered input-info w-full"
         />
     </div>
 </div>

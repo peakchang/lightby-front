@@ -13,9 +13,12 @@
 
     import QuestionItem from "$lib/components/QuestionItem.svelte";
     import axios from "axios";
+    import { onMount } from "svelte";
 
-    $effect(() => {
+    onMount(() => {
         // 로그인 되어 있는지 체크~
+        console.log($user_info["idx"]);
+        
         if ($user_info["idx"]) {
             alertMessage = "이미 로그인 되어 있습니다.";
             alertModal = true;
@@ -27,7 +30,6 @@
             }, 800);
         }
     });
-
     let id = $state("");
     let idErrBool = $state(false); // 아이디 창 벗어났을때 에러 창 뜨게 하는 변수
     let idSuccessBool = $state(false); // 아이디 창 벗어났을때 성공 창 뜨게 하는 변수
@@ -48,6 +50,8 @@
     let authBool = $state(false); // 마무리 체크 단계 false 면 회원가입 안됨!
     let timeLeft = $state(180); // 인증번호 카운트 다운 떨어지는 숫자!
     let interval = $state(null); // 인증번호 카운트 다운 시 setInerval 셋팅 변수
+
+    let businessNum = $state("")
 
     let password = $state("");
     let passwordChk = $state("");
@@ -134,12 +138,7 @@
             alertModal = true;
             return;
         }
-        // if (!phone) {
-        //     alertMessage = "전화번호를 입력해주세요";
-        //     alertModal = true;
 
-        //     return;
-        // }
         authShowBool = true;
         console.log(authShowBool);
 
@@ -476,21 +475,7 @@
                     </button>
                 </div>
 
-                <label class="input input-info mt-5 w-full">
-                    <span class="min-w-4 flex justify-center">
-                        <i class="fa fa-user opacity-70" aria-hidden="true"></i>
-                    </span>
-                    <input
-                        type="text"
-                        class="grow"
-                        placeholder="사업자 번호를 입력하세요"
-                        bind:value={name}
-                    />
-                </label>
-                <div class="pl-1 text-xs mt-1 text-blue-500">
-                    <p>구인글 작성을 원하시면 입력해주세요.</p>
-                    <p>사업자가 없을경우 공란!</p>
-                </div>
+                
 
                 {#if authShowBool}
                     <div class="flex items-center mt-1.5 gap-2">
@@ -518,6 +503,22 @@
                         </button>
                     </div>
                 {/if}
+
+                <label class="input input-info mt-5 w-full">
+                    <span class="min-w-4 flex justify-center">
+                        <i class="fa fa-user opacity-70" aria-hidden="true"></i>
+                    </span>
+                    <input
+                        type="text"
+                        class="grow"
+                        placeholder="사업자 번호를 입력하세요"
+                        bind:value={businessNum}
+                    />
+                </label>
+                <div class="pl-1 text-xs mt-1 text-blue-500">
+                    <p>구인글 작성을 원하시면 입력해주세요.</p>
+                    <p>사업자가 없을경우 공란!</p>
+                </div>
 
                 <label class="input input-info mt-5 w-full">
                     <svg

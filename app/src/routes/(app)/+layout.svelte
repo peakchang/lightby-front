@@ -1,10 +1,15 @@
 <script>
     import PdButton from "$lib/components/PdButton.svelte";
     import CustomModal from "$lib/components/CustomModal.svelte";
-    import { goto } from "$app/navigation";
+    import { goto, invalidateAll } from "$app/navigation";
 
     import { page } from "$app/stores";
-    import { user_info, main_location } from "$lib/stores/stores";
+    import {
+        user_info,
+        main_location,
+        search_val,
+        loadingStore,
+    } from "$lib/stores/stores";
     import { fetchRequest } from "$lib/lib";
     let { children } = $props();
 
@@ -12,6 +17,9 @@
     let successMessage = $state("");
 
     let loginAlertModalShow = $state(false);
+
+    let searchModal = $state(false);
+    let searchArea = $derived({});
 
     function movePage(e) {
         const link = this.dataset.link;
@@ -36,6 +44,14 @@
             }, 800);
             $user_info = {};
         }
+    }
+
+    function searchFunc() {
+        console.log($search_val);
+        localStorage.setItem("search_val", $search_val);
+        invalidateAll();
+        searchModal = false;
+        $loadingStore = true;
     }
 </script>
 
@@ -84,6 +100,29 @@
     </div>
 </CustomModal>
 
+<CustomModal
+    bind:visible={searchModal}
+    positionTop={true}
+    closeOnBackground={false}
+    focusInput={true}
+>
+    <div class="pt-5">
+        <form on:submit|preventDefault={searchFunc}>
+            <div class="flex gap-3 items-center">
+                <input
+                    type="text"
+                    class="border w-full py-2 px-3 border-gray-400 focus:outline-none focus:border-blue-500 text-sm rounded-md"
+                    bind:value={$search_val}
+                    bind:this={searchArea}
+                />
+                <button class="btn btn-active btn-accent text-white">
+                    검색
+                </button>
+            </div>
+        </form>
+    </div>
+</CustomModal>
+
 <div
     class="fixed top-0 left-1/2 max-w-[640px] w-full -translate-x-1/2 bg-white pt-3 px-3 shadow-bottom suit-font z-20"
 >
@@ -121,6 +160,10 @@
 
             <button
                 class="btn btn-outline btn-info btn-xs md:btn-sm hover:text-white"
+                on:click={() => {
+                    searchModal = true;
+                    console.log(searchArea);
+                }}
             >
                 <i class="fa fa-search" aria-hidden="true"></i>
                 <span>검색</span>

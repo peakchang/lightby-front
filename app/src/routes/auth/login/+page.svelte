@@ -16,16 +16,10 @@
     let alertMessage = $state("");
     let modalLoading = $state(false);
 
-    console.log($user_info);
+
     
 
     onMount(async () => {
-
-        
-
-        console.log($user_info);
-
-        
         if ($user_info.idx) {
             alertMessage = "이미 로그인 되어 있습니다.";
             alertModal = true;
@@ -40,10 +34,6 @@
 
     async function loginSubmit(e) {
         e.preventDefault();
-
-        console.log($page);
-        console.log($page.url.searchParams.get("path"));
-
         const movePath = $page.url.searchParams.get("path");
 
         let errorMessage = "";
@@ -68,7 +58,6 @@
                 }
             }, random);
         } catch (err) {
-            console.log(err.response.data.message);
             const m = err.response.data.message;
 
             alertModal = true;
@@ -86,15 +75,6 @@
     };
 </script>
 
-<button
-    on:click={() => {
-        console.log($page);
-        
-        console.log($user_info);
-    }}
->
-    gogogo
-</button>
 <CustomModal bind:visible={successModal} closeBtn={false}>
     <div class="text-center">
         <div class=" text-green-700 text-3xl mb-2">

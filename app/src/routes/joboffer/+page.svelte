@@ -21,12 +21,21 @@
     import { feeBases, iconList } from "./jopoffer";
     import { onDestroy, onMount, tick } from "svelte";
     import Cookies from "js-cookie";
+    import { loadingStore } from "$lib/stores/stores";
 
     let { data } = $props();
-    console.log(data);
+
+    let postNum = $state(0);
 
     let businessArr = $state([]); // 업종분류 변수 담을 임시 배열
     let occupationArr = $state([]); // 직종분류 변수 담을 임시 배열
+    let imgModifyList = $state("");
+
+    // 이전 게시물 열어보기 모달
+    let prevPostListModal = $state(false);
+    let prevPostList = $state([]);
+    let prevPostChkModal = $state(false);
+    let setPrevPostIdx = $state(0); // 이전 게시물 불러오는데 만약 입력된 값들이 있을 경우 대비해서 아이디 값만 저장!
 
     // 등록 전 결제 및 물어보는거 모달
     let submitPrevModal = $state(false); // 모달 변수
@@ -63,6 +72,23 @@
     let successPrevModal = $state(false);
     let successPrevModalMessage = $state("");
 
+    const chkBoolList = [
+        { var: "imgs", label: "현장 이미지" },
+        { var: "subject", label: "공고 제목(현장명)" },
+        { var: "point", label: "현장 한마디" },
+        { var: "addr", label: "근무지 주소" },
+        { var: "location", label: "지역 선택" },
+        { var: "agency", label: "분양대행사명" },
+        { var: "name", label: "담당자 성함" },
+        { var: "phone", label: "담당자 연락처" },
+        { var: "business", label: "업종분류선택" },
+        { var: "occupation", label: "직종분류선택" },
+        { var: "career", label: "경력 입력" },
+        { var: "number_people", label: "인원 입력" },
+        { var: "fee_type", label: "수수료 타입" },
+        { var: "fee", label: "수수료 입력" },
+    ];
+
     // 시작 셋팅
     onMount(async () => {
         await tick();
@@ -70,22 +96,26 @@
             goto("/");
         }
 
+        postNum = data.postNum;
+        if (postNum === 0) {
+            paymentStatus = true;
+        }
+
+        console.log(`paymentStatus : ${paymentStatus}`);
+        
+
         // 삭제할 이미지 있으면 쿠키에서 값 가져와서 삭제하기! (글쓰는 페이지 적용!!)
         const refreshFlag = Cookies.get("del_img_list");
-        console.log(refreshFlag);
-
         if (refreshFlag) {
             try {
                 const res = await axios.post(`${back_api}/img/delete_many`, {
                     delImgList: refreshFlag.split(","),
                 });
             } catch (err) {
-                console.error(err.meesage);
+                console.error(err);
             }
             Cookies.remove("del_img_list");
         }
-
-        console.log($user_info);
 
         $all_data["user_id"] = $user_info.idx;
 
@@ -129,49 +159,27 @@
             occupationArr = $all_data["occupation"].split(",");
         }
 
-        // 상품 값 없을경우 기본값 free
-        if (!$all_data["product"]) {
+        // 상품 값 없을경우 기본값 free // 먄약 첫 글일 경우 premium
+        if (!$all_data["product"] && postNum === 0) {
+            $all_data["product"] = "premium";
+        } else if (!$all_data["product"]) {
             $all_data["product"] = "free";
-        }
-
-        // 결제 eventListener 등록하기! (팝업 창 닫힐때라서 window.addEventListener 로만 등록 가능)
-        if (!$paymentActRegistered && browser) {
-            window.addEventListener("message", paymentSuccessAct);
-            $paymentActRegistered = true;
         }
     });
 
     // 페이지 나갈때 버리거나 셋팅
-    onDestroy(() => {
-        if ($paymentActRegistered && browser) {
-            window.removeEventListener("message", paymentSuccessAct);
-            $paymentActRegistered = false;
-            console.log(`페이지 나감! store 값은? ${$paymentActRegistered}`);
-        }
-    });
+    onDestroy(() => {});
 
     // 페이지 값 변경시 체크 사항
     beforeNavigate((nav) => {
-        const mustDatafields = [
-            "subject",
-            "point",
-            "res_addr",
-            "location",
-            "agency",
-            "name",
-            "phone",
-            "fee",
-        ];
         let hasData = false;
         if (delImgList && delImgList.length > 0) {
             hasData = true;
         }
-        if ($all_data["subject"] || $all_data["point"]) {
-            hasData = true;
-        }
+
+        hasData = chkBoolList.some((item) => $all_data[item.var]);
 
         if (blockBack && hasData) {
-            console.log("여기는 왜 들어오지?!!");
             toPage = nav.to.url.pathname;
             escapePageModal = true;
             nav.cancel();
@@ -184,25 +192,77 @@
         if (delImgList.length > 0) {
             const delImgListStr = delImgList.join(",");
             Cookies.set("del_img_list", delImgListStr, {
-                path: "/",
+                path: "/joboffer",
                 expires: 7,
+                sameSite: "Lax",
             });
         } else {
             Cookies.remove("del_img_list", { path: "/" });
         }
     });
 
-    // 결제 완료시 success 페이지에서 요청이 오면 처리하는 부분!!
-    const paymentSuccessAct = async (e) => {
+    async function useChkPrevPost() {
+        setPrevPostIdx = this.dataset.idx;
+        const hasData = chkBoolList.some((item) => $all_data[item.var]);
+        if (hasData) {
+            prevPostChkModal = true;
+        } else {
+            usePrevPost();
+        }
+        prevPostListModal = false;
+    }
+
+    async function usePrevPost() {
+        console.log(delImgList);
+        if (delImgList && delImgList.length > 0) {
+            try {
+                const res = await axios.post(`${back_api}/img/delete_many`, {
+                    delImgList,
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        try {
+            const res = await axios.post(`${back_api}/regist/load_prev_post`, {
+                postIdx: setPrevPostIdx,
+            });
+            $all_data = res.data.prevPost;
+            imgModifyList = $all_data["imgs"];
+
+            console.log($all_data);
+            $all_data["product"] = "free";
+            $all_data["icons"] = "";
+
+            businessArr = $all_data["business"].split(",");
+            occupationArr = $all_data["occupation"].split(",");
+        } catch (error) {}
+    }
+
+    // '이전 등록한 공고 불러오기' 버튼 클릭하면, 모달 열면서 기존 공고 불러오기
+    async function loadPreviousPostList() {
+        try {
+            const res = await axios.post(`${back_api}/regist/load_prev_list`, {
+                user_idx: $user_info.idx,
+            });
+            console.log(res.data);
+
+            prevPostList = res.data.prevPostList;
+            prevPostListModal = true;
+        } catch (error) {}
+    }
+
+    // 결제 성공시 action! on:message 에 등록~
+    async function paymentSuccess(e) {
         if (e.data.status) {
+            $loadingStore = false;
             $all_data["payment_key"] = e.data.paymentInfo.payment_key;
+            paymentStatus = true;
             try {
                 const res = await axios.post(`${back_api}/regist/upload`, {
                     allData: $all_data,
                 });
-
-                console.log("요청 완료111");
-
                 blockBack = false;
                 successPrevModal = true;
                 successPrevModalMessage = "업로드가 완료 되었습니다.";
@@ -210,30 +270,36 @@
                     successPrevModal = false;
                     $all_data = {};
                     goto("/");
-                }, 4500);
+                }, 3500);
             } catch (err) {
+                // 결제가 에러 나는 경우 결제 취소 해주자!!!
+
                 const m = err.response.data.message;
                 console.error(`에러남!!!!`);
             }
         }
-    };
+    }
 
     // 상품 업로드 함수!!!
     async function uploadRegist() {
-        console.log("등록 대기대기!!!");
-
         $all_data["icons"] = icons.join(",");
 
         // 유료 상품이면 팝업 열고 리턴 처리!!
         if ($all_data["product"] != "free" && paymentStatus == false) {
+            console.log("유료 상품 결제 시 진입!!!!");
+
             const payProductName = `${productInfo.name} + 아이콘${iconNames.length}`;
             popup = window.open(
                 `/payments?user_id=${$user_info.idx}&order_name=${payProductName}&amount=${$all_data["sum"]}`,
                 "popup",
                 "width=550,height=670",
             );
+
+            $loadingStore = true;
             return;
         }
+
+        console.log("진짜 결제 Start!!!!!!!!!!!!!");
 
         try {
             const res = await axios.post(`${back_api}/regist/upload`, {
@@ -253,8 +319,7 @@
         }
     }
 
-    // 최종 업로드 부분!!!!!!!!!
-
+    // 최종 업로드 (결제 및 아이콘 선택하는 모달) 모달 열기! / 결제 창 떠있는지도
     function uploadChkRegist(e) {
         if (popup) {
             alertModalShow = true;
@@ -265,22 +330,7 @@
         $all_data["business"] = businessArr.join(",");
         $all_data["occupation"] = occupationArr.join(",");
 
-        const chkBool = chkEssentialValue([
-            { var: "imgs", label: "현장 이미지" },
-            { var: "subject", label: "공고 제목(현장명)" },
-            { var: "point", label: "현장 한마디" },
-            { var: "addr", label: "근무지 주소" },
-            { var: "location", label: "지역 선택" },
-            { var: "agency", label: "분양대행사명" },
-            { var: "name", label: "담당자 성함" },
-            { var: "phone", label: "담당자 연락처" },
-            { var: "business", label: "업종분류선택" },
-            { var: "occupation", label: "직종분류선택" },
-            { var: "career", label: "경력 입력" },
-            { var: "number_people", label: "인원 입력" },
-            { var: "fee_type", label: "수수료 타입" },
-            { var: "fee", label: "수수료 입력" },
-        ]);
+        const chkBool = chkEssentialValue(chkBoolList);
 
         if (!chkBool) {
             return;
@@ -288,6 +338,7 @@
         submitPrevModal = true;
     }
 
+    // uploadChkRegist 함수 실행 시 필수 항목 체크하는 함수!
     function chkEssentialValue(objArr) {
         for (let i = 0; i < objArr.length; i++) {
             const e = objArr[i];
@@ -358,7 +409,7 @@
         $all_data["sum"] = productInfo.price + iconSum;
     }
 
-    // 모달에서 뒤로가기 했을때 뜨는 창!!
+    // 페이지 벗어나기(뒤로가기) 하면 나오는 모달에서 뒤로가기 승낙 했을때 뜨는 창!!
     async function goToBackAndArrangeImg() {
         if (delImgList.length > 0) {
             try {
@@ -374,10 +425,9 @@
         goto(toPage);
     }
 
+    // SoartImg 컴포넌트 에서 이미지 업로드 후 처리 함수!
     function updateImg(e) {
         // 새로고침 또는 뒤로가기 시에 삭제할 이미지 리스트 정하기
-        console.log(e.type);
-
         if (e["type"]) {
             if (e.type == "add") {
                 delImgList.push(e.url);
@@ -510,6 +560,58 @@
     ></script>
 </svelte:head>
 
+<svelte:window on:message={paymentSuccess} />
+
+<!-- svelte-ignore event_directive_deprecated -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<!-- 이전 공고 불러오기 리스트 모달 -->
+<CustomModal bind:visible={prevPostListModal}>
+    <div class="mb-5 font-bold">이전 등록 공고 불러오기</div>
+
+    <div>
+        {#each prevPostList as post}
+            <div
+                class="mb-2 text-sm border border-gray-200 bg-gray-200 p-3 rounded-md hover:bg-white cursor-pointer flex justify-between items-center"
+                data-idx={post.idx}
+                on:click={useChkPrevPost}
+            >
+                <span>{post.subject}</span>
+                <button
+                    type="button"
+                    class="btn btn-outline btn-info btn-sm hover:text-white"
+                >
+                    적용
+                </button>
+            </div>
+        {/each}
+    </div>
+</CustomModal>
+
+<!-- 이전 공고 선택시 기존 데이터 있으면 확인하는 모달 -->
+<!-- svelte-ignore event_directive_deprecated -->
+<CustomModal bind:visible={prevPostChkModal} closeBtn={false}>
+    <div class="text-center">
+        <div class=" text-blue-500 text-3xl mb-5">
+            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+        </div>
+        <div class="mb-5">
+            <p>현재 작성중인 공고가 있습니다.</p>
+            <p>현재 내용을 삭제하고 불러오기를 진행 하겠습니까?</p>
+        </div>
+        <div class="flex justify-center items-center gap-3">
+            <button
+                class="btn btn-info w-1/3 text-white"
+                on:click={usePrevPost}
+            >
+                불러오기
+            </button>
+            <button class="btn btn-soft w-1/3">취소</button>
+        </div>
+    </div>
+</CustomModal>
+
+<!-- 결제 완료 후 뜨는 모달 -->
 <!-- svelte-ignore event_directive_deprecated -->
 <CustomModal bind:visible={successPrevModal} closeBtn={false}>
     <div class="text-center">
@@ -526,6 +628,7 @@
     </div>
 </CustomModal>
 
+<!-- 경고창 모달 -->
 <!-- svelte-ignore event_directive_deprecated -->
 <CustomModal bind:visible={alertModalShow} closeBtn={false}>
     <div class="text-center">
@@ -541,6 +644,7 @@
     </div>
 </CustomModal>
 
+<!-- 페이지 벗어나려고 할 시 보이는 모달 -->
 <!-- svelte-ignore event_directive_deprecated -->
 <CustomModal bind:visible={escapePageModal} closeBtn={false}>
     <div class="text-center">
@@ -548,7 +652,7 @@
             <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
         </div>
         <div class="mb-5">
-            페이지에서 벗어날시 등록중인 글은 삭제됩니다. 진행하시겠습니까?
+            페이지에서 벗어날시 등록중인 내용은 삭제됩니다. 진행하시겠습니까?
         </div>
         <div class="flex justify-center items-center gap-3">
             <button
@@ -562,17 +666,22 @@
     </div>
 </CustomModal>
 
+<!-- 상품 선택 및 결제 모달 -->
 <CustomModal bind:visible={submitPrevModal} closeBtn={false}>
     <!-- svelte-ignore event_directive_deprecated -->
     <div class="text-center">
-        <div class=" text-green-700 text-3xl mb-2">
-            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
-        </div>
-
         <div>
+            <div class=" text-green-700 text-3xl mb-2">
+                <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+            </div>
+
             <div class="mb-5">
-                <p class="md:text-lg">첫글 작성자 혜택!</p>
-                <p>구인글 최초 1회 프리미엄 무료등록</p>
+                {#if postNum === 0}
+                    <p class="md:text-lg">첫글 작성자 혜택!</p>
+                    <p>구인글 최초 1회 프리미엄 무료등록</p>
+                {:else}
+                    <p class="md:text-lg">상품을 선택하세요</p>
+                {/if}
             </div>
 
             <label>
@@ -587,14 +696,22 @@
                 <div
                     class="mb-5 border-2 peer-checked:border-blue-500 border-gray-200 p-2 mx-auto rounded-lg"
                 >
-                    <p class="text-sm md:text-base mb-2">
-                        프리미엄 등록 특가
-                        <span class="line-through text-gray-500">
-                            132,000원
-                        </span>
-                        ->
-                        <span class="font-bold">66,000원</span>
-                    </p>
+                    {#if postNum === 0}
+                        <p class="line-through text-gray-500">
+                            프리미엄 등록 특가 132,000 -> 66,000원
+                        </p>
+                        <p>첫글 등록시 프리미엄 무료!</p>
+                    {:else}
+                        <p class="text-sm md:text-base mb-2">
+                            프리미엄 등록 특가
+                            <span class="line-through text-gray-500">
+                                132,000원
+                            </span>
+                            ->
+                            <span class="font-bold">66,000원</span>
+                        </p>
+                    {/if}
+
                     <p class="text-xs md:text-sm">
                         시작페이지 / 지역페이지 모든 지면
                     </p>
@@ -713,10 +830,7 @@
         </div>
 
         <div class="text-right">
-            <button
-                class="bg-gray-400 text-white px-3 py-1.5"
-                on:click={uploadRegist}
-            >
+            <button class="btn btn-success text-white" on:click={uploadRegist}>
                 결제 및 등록
             </button>
         </div>
@@ -755,12 +869,13 @@
 <!-- svelte-ignore event_directive_deprecated -->
 <div class="bg-white relative min-h-screen">
     <div class="max-w-[530px] mx-auto pretendard pt-14 pb-24">
-        <button
-            on:click={() => {
-                successPrevModalMessage = "업로드가 완료 되었습니다.";
-                successPrevModal = true;
-            }}>dfdfdf</button
-        >
+        <!-- <button on:click={testFunc}> testBtn </button> -->
+        {#if postNum == 0}
+            <div class="text-right text-blue-700">
+                <i class="fa fa-hand-pointer-o" aria-hidden="true"></i>
+                <span>첫번째 구인공고 작성시 프리미엄 무료!</span>
+            </div>
+        {/if}
         <div
             class=" bg-white p-3 flex justify-between items-center border-b border-gray-300"
         >
@@ -772,11 +887,12 @@
                 <span class=" text-blue-700 text-lg mr-2">
                     <i class="fa fa-file-text-o" aria-hidden="true"></i>
                 </span>
-                <span
+                <button
                     class="text-xs bg-blue-400 text-white px-3 py-1.5 rounded-lg"
+                    on:click={loadPreviousPostList}
                 >
                     이전 등록한 공고 불러오기
-                </span>
+                </button>
             </div>
         </div>
 
@@ -802,7 +918,7 @@
                     type="text"
                     placeholder="공고 제목(현장명을 입력하세요)(필수)"
                     bind:value={$all_data["subject"]}
-                    class="input input-bordered input-info input-sm w-full"
+                    class="input input-bordered input-info w-full"
                 />
             </div>
 
@@ -810,7 +926,7 @@
             <div class="mt-1.5">
                 <input
                     type="text"
-                    class="input input-bordered input-info input-sm w-full"
+                    class="input input-bordered input-info w-full"
                     placeholder="현장 한마디를 입력해주세요(필수)"
                     bind:value={$all_data["point"]}
                 />
@@ -989,7 +1105,7 @@
                             type="text"
                             bind:value={$all_data["fee"]}
                             placeholder="숫자만 입력해주세요"
-                            class="input input-bordered input-info input-sm w-full"
+                            class="input input-bordered input-info w-full"
                         />
                         <div class=" w-12">만 원</div>
                     </div>

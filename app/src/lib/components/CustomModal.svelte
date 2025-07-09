@@ -5,9 +5,23 @@
 
     export let width = 512;
     export let closeOnBackground = true;
-    export let closeBtn = true;
+    export let closeBtn = false;
     export let xBtn = true;
     export let visible = false;
+    export let positionTop = false;
+    export let focusInput = false;
+
+    let mainArea;
+
+    $: mainArea, focusInp();
+
+    function focusInp() {
+        if (mainArea && focusInput) {
+            const inputArea = mainArea.querySelector('input')
+            inputArea.focus();
+            
+        }
+    }
 
     function closeModal(e) {
         e.preventDefault();
@@ -20,6 +34,7 @@
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
         class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+        class:pb-96={positionTop}
         on:click={() => {
             if (closeOnBackground) {
                 visible = false;
@@ -50,7 +65,11 @@
                     </div>
                 {/if}
 
-                <div class=" overflow-auto" style="max-height: 500px;">
+                <div
+                    class="overflow-auto"
+                    style="max-height: 500px;"
+                    bind:this={mainArea}
+                >
                     <slot></slot>
                 </div>
 

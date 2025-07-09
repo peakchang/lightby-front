@@ -16,11 +16,8 @@
 	import { user_info } from "$lib/stores/stores";
 	import { onMount } from "svelte";
 
-	let { data, children } = $props();
+	let { children } = $props();
 	onMount(() => {
-		if (data.user) {
-			$user_info = data.user;
-		}
 	});
 
 	// 현재 경로 감지용 key 생성

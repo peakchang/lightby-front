@@ -1,9 +1,16 @@
 <script>
     import { toastStore } from "$lib/stores/stores";
 
+    let timeoutId = null;
+
     $effect(() => {
         if ($toastStore.show == true) {
-            setTimeout(() => {
+
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
+
+            timeoutId = setTimeout(() => {
                 toastStore.set({ show: false, message: "" });
             }, 1800);
         }

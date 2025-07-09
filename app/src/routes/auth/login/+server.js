@@ -38,8 +38,8 @@ export async function POST({ request, cookies }) {
                 httpOnly: true,
                 secure: true,
                 path: '/',
-                // maxAge: 60 * 15
-                maxAge: 5
+                maxAge: 60 * 15
+                // maxAge: 5
             });
 
             cookies.set('refresh_token', refreshToken, {
@@ -50,8 +50,6 @@ export async function POST({ request, cookies }) {
             });
 
         } else {
-            console.log('그럼 여기를 들어와야지?');
-            
             return json({ message: '비밀번호가 일치하지 않습니다.' }, { status: 400 })
         }
     } catch (error) {

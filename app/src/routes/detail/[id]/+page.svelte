@@ -4,26 +4,20 @@
     import KakaoMap from "$lib/components/kakaoMap.svelte";
     import DetailMenu from "$lib/components/DetailMenu.svelte";
     import { user_info } from "$lib/stores/stores.js";
+    import CustomModal from "$lib/components/CustomModal.svelte";
+    import { onMount } from "svelte";
 
     let { data } = $props();
 
-    console.log(public_img_bucket);
-
-    console.log(data);
-    console.log(data.favorateBool);
-
     const detailContent = $derived(data.detail);
     let mainImage = $state([]);
-    // svelte-ignore state_referenced_locally
-    mainImage = detailContent.imgs.split(",");
-
-    function contactSms() {}
-
-    function contactCall() {}
+    let sharModal = $state(false);
 
     let imgSwiper = $state({});
+    onMount(() => {
+        mainImage = detailContent.imgs.split(",");
 
-    $effect(() => {
+        // 스와이퍼 셋팅
         imgSwiper = new Swiper(".mySwiper", {
             loop: true,
             navigation: {
@@ -37,10 +31,46 @@
         });
     });
 
+    $effect(() => {
+        if (sharModal) {
+            console.log(sharModal);
+        }
+    });
+
+    function contactSms() {}
+
+    function contactCall() {}
+
+    function openShareModal(e) {
+        sharModal = true;
+    }
+
     //
 </script>
 
-<DetailMenu favorateBool={data.favorateBool} />
+<CustomModal bind:visible={sharModal}>
+    <div class="flex justify-center items-center gap-3">
+        <button
+            class="border border-gray-400 p-2 rounded-md text-gray-600 cursor-pointer"
+        >
+            <div>
+                <i class="fa fa-link" aria-hidden="true"></i>
+            </div>
+            <div class="text-xs md:text-sm">링크복사</div>
+        </button>
+
+        <button
+            class="border border-gray-400 p-2 rounded-md text-gray-600 cursor-pointer bg-yellow-400"
+        >
+            <div class="flex justify-center items-center">
+                <img src="/kakao_logo.png" alt="" width="23" height="23" />
+            </div>
+            <div class="text-xs md:text-sm">카카오톡</div>
+        </button>
+    </div>
+</CustomModal>
+
+<DetailMenu favorateBool={data.favorateBool} {openShareModal} />
 
 <div class=" mb-8">
     {#if mainImage.length == 1}

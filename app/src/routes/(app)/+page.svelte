@@ -3,16 +3,18 @@
     import { goto, invalidateAll } from "$app/navigation";
     import { back_api, public_img_bucket } from "$lib/const.js";
     import PdButton from "$lib/components/PdButton.svelte";
-    import { main_location } from "$lib/stores/stores.js";
+    import { main_location, loadingStore } from "$lib/stores/stores.js";
     import { browser } from "$app/environment";
 
     import { navigating } from "$app/stores";
+    import { onMount } from "svelte";
 
     let { data } = $props();
 
     let premiumList = $state([]);
     let topList = $state([]);
     let siteList = $state([]);
+    let searchModal = $state(false);
 
     let locationList = $derived([
         "전국",
@@ -20,12 +22,6 @@
         "충청/전라",
         "강원/경상/제주",
     ]);
-
-    let loading = $state(false);
-
-    if ($navigating == null) {
-        loading = true;
-    }
 
     const businessReplaceDict = $derived({
         도시형생활주택: "도생",
@@ -43,8 +39,9 @@
         siteList = data.siteList;
 
         setTimeout(() => {
-            loading = false;
+            $loadingStore = false;
         }, 500);
+
         return () => {};
     });
 
@@ -53,6 +50,8 @@
         return str.replace(regex, (match) => map[match]);
     }
 </script>
+
+
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -75,7 +74,7 @@
                         $main_location = $main_location;
                         localStorage.setItem("location", $main_location);
                         invalidateAll();
-                        loading = true;
+                        $loadingStore = true;
                     }}
                 >
                     {location}
@@ -84,291 +83,282 @@
         </ul>
     </div>
 
-    {#if loading}
-        <div class="mt-20 text-center">
-            <div>로딩중</div>
-            <span class="loading loading-dots loading-xl"></span>
-        </div>
-    {:else}
-        <div class="premium-area mb-10">
-            <!-- 프리미엄 영역 -->
+    <div class="premium-area mb-10">
+        <!-- 프리미엄 영역 -->
+        <div
+            class="mb-3 ml-6 text-lg font-bold text-cyan-700 flex items-center"
+        >
+            <span class="mr-2">
+                <i class="fa fa-bell" aria-hidden="true"></i>
+            </span>
+            <span class="mr-4">프리미엄</span>
             <div
-                class="mb-3 ml-6 text-lg font-bold text-cyan-700 flex items-center"
+                class=" w-[50%] md:w-[40%] rounded-full"
+                style="height: 2px; background-color: #007595;"
+            ></div>
+        </div>
+        {#each premiumList as value}
+            <a
+                href="/detail/{value.idx}"
+                on:click|preventDefault={() => {
+                    goToDetail(value.idx);
+                }}
             >
-                <span class="mr-2">
-                    <i class="fa fa-bell" aria-hidden="true"></i>
-                </span>
-                <span class="mr-4">프리미엄</span>
                 <div
-                    class=" w-[50%] md:w-[40%] rounded-full"
-                    style="height: 2px; background-color: #007595;"
-                ></div>
-            </div>
-            {#each premiumList as value}
-                <a
-                    href="/detail/{value.idx}"
-                    on:click|preventDefault={() => {
-                        goToDetail(value.idx);
-                    }}
+                    class="border border-gray-300 rounded-lg p-2 mb-3 shadow-sm cursor-pointer relative"
                 >
+                    <div class="absolute bottom-0 right-0 p-3">
+                        {#if value.icons}
+                            <div class="w-full flex justify-end gap-1">
+                                {#each value.icons.split(",") as icon}
+                                    <div
+                                        class="w-1/3 max-w-[45px] md:max-w-[55px]"
+                                    >
+                                        <img
+                                            src="/icons/icon-{icon}.png"
+                                            alt=""
+                                        />
+                                    </div>
+                                {/each}
+                            </div>
+                        {/if}
+                    </div>
                     <div
-                        class="border border-gray-300 rounded-lg p-2 mb-3 shadow-sm cursor-pointer relative"
+                        class="flex gap-3 md:gap-5 items-center border-b-gray-300"
                     >
-                        <div class="absolute bottom-0 right-0 p-3">
-                            {#if value.icons}
-                                <div class="w-full flex justify-end gap-1">
-                                    {#each value.icons.split(",") as icon}
-                                        <div
-                                            class="w-1/3 max-w-[45px] md:max-w-[55px]"
-                                        >
-                                            <img
-                                                src="/icons/icon-{icon}.png"
-                                                alt=""
-                                            />
-                                        </div>
-                                    {/each}
-                                </div>
+                        <div
+                            class="w-32 h-[100px] md:w-36 md:h-28 rounded-lg overflow-hidden flex-shrink-0"
+                        >
+                            {#if value.thumbnail}
+                                <img
+                                    src={`${public_img_bucket}${value.thumbnail}`}
+                                    alt=""
+                                    class="w-full h-full object-cover"
+                                />
                             {/if}
                         </div>
                         <div
-                            class="flex gap-3 md:gap-5 items-center border-b-gray-300"
+                            class="flex flex-col justify-around overflow-hidden"
                         >
                             <div
-                                class="w-32 h-[100px] md:w-36 md:h-28 rounded-lg overflow-hidden flex-shrink-0"
+                                class="text-xs md:text-sm text-amber-800 truncate"
                             >
-                                {#if value.thumbnail}
-                                    <img
-                                        src={`${public_img_bucket}${value.thumbnail}`}
-                                        alt=""
-                                        class="w-full h-full object-cover"
-                                    />
-                                {/if}
+                                {value.point}
                             </div>
-                            <div
-                                class="flex flex-col justify-around overflow-hidden"
-                            >
-                                <div
-                                    class="text-xs md:text-sm text-amber-800 truncate"
-                                >
-                                    {value.point}
-                                </div>
 
-                                <div class="text-sm md:text-base truncate">
-                                    <span>{value.subject}</span>
-                                </div>
+                            <div class="text-sm md:text-base truncate">
+                                <span>{value.subject}</span>
+                            </div>
 
+                            <div>
                                 <div>
-                                    <div>
-                                        <div class="mb-1">
-                                            <span
-                                                class=" bg-[#0a0078] text-xs md:text-sm px-2 py-0.5 text-white rounded-md font-bold"
-                                            >
-                                                {value.fee_type}
-                                                {value.fee}
-                                            </span>
-                                        </div>
-
-                                        <div
-                                            class="text-[10px] md:text-xs flex flex-wrap"
+                                    <div class="mb-1">
+                                        <span
+                                            class=" bg-[#0a0078] text-xs md:text-sm px-2 py-0.5 text-white rounded-md font-bold"
                                         >
-                                            <span
-                                                class="bg-[#3a86ff] px-1.5 py-0.5 text-white rounded-md mr-1"
-                                            >
-                                                {multiReplace(
-                                                    value.business,
-                                                    businessReplaceDict,
-                                                )}
-                                            </span>
+                                            {value.fee_type}
+                                            {value.fee}
+                                        </span>
+                                    </div>
 
-                                            <span
-                                                class="bg-[#3a86ff] px-2 py-0.5 text-white rounded-md mr-1"
-                                            >
-                                                {value.occupation}
-                                            </span>
-                                        </div>
+                                    <div
+                                        class="text-[10px] md:text-xs flex flex-wrap"
+                                    >
+                                        <span
+                                            class="bg-[#3a86ff] px-1.5 py-0.5 text-white rounded-md mr-1"
+                                        >
+                                            {multiReplace(
+                                                value.business,
+                                                businessReplaceDict,
+                                            )}
+                                        </span>
+
+                                        <span
+                                            class="bg-[#3a86ff] px-2 py-0.5 text-white rounded-md mr-1"
+                                        >
+                                            {value.occupation}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </a>
-            {/each}
-        </div>
+                </div>
+            </a>
+        {/each}
+    </div>
 
-        <div class="top-area mb-10">
-            <!-- 지역탑 영역 -->
+    <div class="top-area mb-10">
+        <!-- 지역탑 영역 -->
+        <div
+            class="mb-3 ml-6 text-lg font-bold text-cyan-700 flex items-center"
+        >
+            <span class="mr-2">
+                <i class="fa fa-bell" aria-hidden="true"></i>
+            </span>
+            <span class="mr-4">지역 TOP</span>
             <div
-                class="mb-3 ml-6 text-lg font-bold text-cyan-700 flex items-center"
+                class=" w-[50%] md:w-[40%] rounded-full"
+                style="height: 2px; background-color: #007595;"
+            ></div>
+        </div>
+        {#each topList as value}
+            <a
+                href="/detail/{value.idx}"
+                on:click|preventDefault={() => {
+                    goToDetail(value.idx);
+                }}
             >
-                <span class="mr-2">
-                    <i class="fa fa-bell" aria-hidden="true"></i>
-                </span>
-                <span class="mr-4">지역 TOP</span>
                 <div
-                    class=" w-[50%] md:w-[40%] rounded-full"
-                    style="height: 2px; background-color: #007595;"
-                ></div>
-            </div>
-            {#each topList as value}
-                <a
-                    href="/detail/{value.idx}"
-                    on:click|preventDefault={() => {
-                        goToDetail(value.idx);
-                    }}
+                    class="border border-gray-300 rounded-lg p-2 mb-3 shadow-sm cursor-pointer relative"
                 >
+                    <div class="absolute bottom-0 right-0 p-3 max-w-1/3">
+                        {#if value.icons}
+                            <div class="w-full flex justify-end gap-1">
+                                {#each value.icons.split(",") as icon}
+                                    <div
+                                        class="w-1/3 max-w-[45px] md:max-w-[55px]"
+                                    >
+                                        <img
+                                            src="/icons/icon-{icon}.png"
+                                            alt=""
+                                        />
+                                    </div>
+                                {/each}
+                            </div>
+                        {/if}
+                    </div>
                     <div
-                        class="border border-gray-300 rounded-lg p-2 mb-3 shadow-sm cursor-pointer relative"
+                        class="flex gap-3 md:gap-5 items-center border-b-gray-300"
                     >
-                        <div class="absolute bottom-0 right-0 p-3 max-w-1/3">
-                            {#if value.icons}
-                                <div class="w-full flex justify-end gap-1">
-                                    {#each value.icons.split(",") as icon}
-                                        <div
-                                            class="w-1/3 max-w-[45px] md:max-w-[55px]"
-                                        >
-                                            <img
-                                                src="/icons/icon-{icon}.png"
-                                                alt=""
-                                            />
-                                        </div>
-                                    {/each}
-                                </div>
+                        <div
+                            class="w-32 h-[100px] md:w-36 md:h-28 rounded-lg overflow-hidden flex-shrink-0"
+                        >
+                            {#if value.thumbnail}
+                                <img
+                                    src={`${public_img_bucket}${value.thumbnail}`}
+                                    alt=""
+                                    class="w-full h-full object-cover"
+                                />
                             {/if}
                         </div>
                         <div
-                            class="flex gap-3 md:gap-5 items-center border-b-gray-300"
+                            class="flex flex-col justify-around overflow-hidden"
                         >
                             <div
-                                class="w-32 h-[100px] md:w-36 md:h-28 rounded-lg overflow-hidden flex-shrink-0"
+                                class="text-xs md:text-sm text-amber-800 truncate"
                             >
-                                {#if value.thumbnail}
-                                    <img
-                                        src={`${public_img_bucket}${value.thumbnail}`}
-                                        alt=""
-                                        class="w-full h-full object-cover"
-                                    />
-                                {/if}
+                                {value.point}
                             </div>
-                            <div
-                                class="flex flex-col justify-around overflow-hidden"
-                            >
-                                <div
-                                    class="text-xs md:text-sm text-amber-800 truncate"
-                                >
-                                    {value.point}
-                                </div>
 
-                                <div class="text-sm md:text-base truncate">
-                                    <span>{value.subject}</span>
-                                </div>
+                            <div class="text-sm md:text-base truncate">
+                                <span>{value.subject}</span>
+                            </div>
 
+                            <div>
                                 <div>
-                                    <div>
-                                        <div class="mb-1">
-                                            <span
-                                                class=" bg-[#0a0078] text-xs md:text-sm px-2 py-0.5 text-white rounded-md font-bold"
-                                            >
-                                                {value.fee_type}
-                                                {value.fee}
-                                            </span>
-                                        </div>
-
-                                        <div
-                                            class="text-[10px] md:text-xs flex flex-wrap"
+                                    <div class="mb-1">
+                                        <span
+                                            class=" bg-[#0a0078] text-xs md:text-sm px-2 py-0.5 text-white rounded-md font-bold"
                                         >
-                                            <span
-                                                class="bg-[#3a86ff] px-1.5 py-0.5 text-white rounded-md mr-1"
-                                            >
-                                                {multiReplace(
-                                                    value.business,
-                                                    businessReplaceDict,
-                                                )}
-                                            </span>
+                                            {value.fee_type}
+                                            {value.fee}
+                                        </span>
+                                    </div>
 
-                                            <span
-                                                class="bg-[#3a86ff] px-2 py-0.5 text-white rounded-md mr-1"
-                                            >
-                                                {value.occupation}
-                                            </span>
-                                        </div>
+                                    <div
+                                        class="text-[10px] md:text-xs flex flex-wrap"
+                                    >
+                                        <span
+                                            class="bg-[#3a86ff] px-1.5 py-0.5 text-white rounded-md mr-1"
+                                        >
+                                            {multiReplace(
+                                                value.business,
+                                                businessReplaceDict,
+                                            )}
+                                        </span>
+
+                                        <span
+                                            class="bg-[#3a86ff] px-2 py-0.5 text-white rounded-md mr-1"
+                                        >
+                                            {value.occupation}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </a>
-            {/each}
+                </div>
+            </a>
+        {/each}
+    </div>
+
+    <div>
+        <!-- 지역탑 영역 -->
+        <div
+            class="mb-3 ml-6 text-lg font-bold text-cyan-700 flex items-center"
+        >
+            <span class="mr-2">
+                <i class="fa fa-bell" aria-hidden="true"></i>
+            </span>
+            <span class="mr-4">일반 공고</span>
+            <div
+                class=" w-[50%] md:w-[40%] rounded-full"
+                style="height: 2px; background-color: #007595;"
+            ></div>
         </div>
 
-        <div>
-            <!-- 지역탑 영역 -->
-            <div
-                class="mb-3 ml-6 text-lg font-bold text-cyan-700 flex items-center"
+        {#each siteList as value}
+            <a
+                href="/detail/test"
+                on:click|preventDefault={() => {
+                    goToDetail(value.idx);
+                }}
             >
-                <span class="mr-2">
-                    <i class="fa fa-bell" aria-hidden="true"></i>
-                </span>
-                <span class="mr-4">일반 공고</span>
                 <div
-                    class=" w-[50%] md:w-[40%] rounded-full"
-                    style="height: 2px; background-color: #007595;"
-                ></div>
-            </div>
-
-            {#each siteList as value}
-                <a
-                    href="/detail/test"
-                    on:click|preventDefault={() => {
-                        goToDetail(value.idx);
-                    }}
+                    class="mt-5 relative border border-gray-300 rounded-lg p-2 shadow-sm cursor-pointer"
                 >
-                    <div
-                        class="mt-5 relative border border-gray-300 rounded-lg p-2 shadow-sm cursor-pointer"
-                    >
-                        <div class="flex justify-between items-center">
-                            <div class="pl-4 max-w-[55%]">
-                                <div
-                                    class="text-xs md:text-sm text-amber-800 truncate"
-                                >
-                                    {value.point}
-                                </div>
-                                <div class="text-sm md:text-base">
-                                    {value.subject}
-                                </div>
+                    <div class="flex justify-between items-center">
+                        <div class="pl-4 max-w-[55%]">
+                            <div
+                                class="text-xs md:text-sm text-amber-800 truncate"
+                            >
+                                {value.point}
                             </div>
+                            <div class="text-sm md:text-base">
+                                {value.subject}
+                            </div>
+                        </div>
 
-                            <div class=" max-w-[45%]">
-                                <div
-                                    class="mb-1 text-[10px] flex flex-wrap gap-1"
+                        <div class=" max-w-[45%]">
+                            <div class="mb-1 text-[10px] flex flex-wrap gap-1">
+                                <span
+                                    class=" bg-[#0a0078] px-2 py-1 text-white rounded-md font-bold inline-block"
                                 >
-                                    <span
-                                        class=" bg-[#0a0078] px-2 py-1 text-white rounded-md font-bold inline-block"
-                                    >
-                                        {value.fee_type}
-                                        {value.fee}
-                                    </span>
-                                    <span
-                                        class="bg-[#3a86ff] px-1.5 py-1 text-white rounded-md inline-block"
-                                    >
-                                        {multiReplace(
-                                            value.business.split(",")[0],
-                                            businessReplaceDict,
-                                        )}
-                                    </span>
+                                    {value.fee_type}
+                                    {value.fee}
+                                </span>
+                                <span
+                                    class="bg-[#3a86ff] px-1.5 py-1 text-white rounded-md inline-block"
+                                >
+                                    {multiReplace(
+                                        value.business.split(",")[0],
+                                        businessReplaceDict,
+                                    )}
+                                </span>
 
-                                    <span
-                                        class="bg-[#3a86ff] px-2 py-1 text-white rounded-md inline-block"
-                                    >
-                                        {value.occupation.split(",")[0]}
-                                    </span>
-                                </div>
+                                <span
+                                    class="bg-[#3a86ff] px-2 py-1 text-white rounded-md inline-block"
+                                >
+                                    {value.occupation.split(",")[0]}
+                                </span>
                             </div>
                         </div>
                     </div>
-                </a>
-            {/each}
-        </div>
-    {/if}
+                </div>
+            </a>
+        {/each}
+    </div>
 </div>
 
 <style>

@@ -1,8 +1,8 @@
 import imageCompression from "browser-image-compression";
 import axios from "axios";
 import { loadingStore } from "$lib/stores/stores.js";
-
-
+import Cookies from "js-cookie";
+import { back_api } from "$lib/const";
 export function formatTime(seconds) {
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -43,6 +43,22 @@ export function getRandBet(min, max) {
 
 
 
+export function formatPhoneNum(phone) {
+    const clean = phone.replace(/\D/g, '');
+
+    if (clean.length == 11) {
+        return clean.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
+    } else if (clean.length === 10) {
+        return clean.replace(/(\d{2,3})(\d{3,4})(\d{4})/, '$1-$2-$3');
+    } else {
+        return phone
+    }
+
+
+
+}
+
+
 
 /**
  * 이미지 업로드 액션 생성 함수
@@ -54,20 +70,17 @@ export function getRandBet(min, max) {
  */
 const uploadImageAct = (back_api_url, options = {}, callback) => {
 
-    console.log('함수 진입은 해??');
 
     const folder = options.folder || "testfolder2";
     // const maxWidthOrHeight = options.maxWidth || 1200;
 
     const input = document.createElement("input");
-    console.log(input);
 
     input.setAttribute("type", "file");
     input.setAttribute("accept", ".png,.jpg,.jpeg,.webp");
     input.click();
 
     input.onchange = async (e) => {
-        console.log(loadingStore);
         loadingStore.set(true)
 
         const imageFile = e.target.files[0];
@@ -88,9 +101,6 @@ const uploadImageAct = (back_api_url, options = {}, callback) => {
             const fileName = `${timestamp}${Math.random()
                 .toString(36)
                 .substring(2, 11)}.${compressedFile.name.split(".")[1]}`;
-
-            console.log(fileName);
-            console.log('*/*/*/*/*/*/*/*/*/*/*/*/*/*/');
 
 
             imgForm.append("folder", folder);

@@ -8,7 +8,7 @@
         img_bucket,
     } from "$lib/const";
     import uploadImageAct from "$lib/lib";
-    
+
     import fileinput from "daisyui/components/fileinput";
 
     let {
@@ -22,15 +22,17 @@
     let sortable = $state(null);
     let setDetailImgCount = $state(0);
 
-    if (imgModifyList && imgModifyList.length > 0) {
-        const tempImgArr = [];
-        for (let i = 0; i < imgModifyList.length; i++) {
-            const con = imgModifyList[i];
-            const imgObj = { id: i + 1, href: con };
-            tempImgArr.push(imgObj);
+    $effect(() => {
+        if (imgModifyList && imgModifyList.length > 0) {
+            const tempImgArr = [];
+            for (let i = 0; i < imgModifyList.length; i++) {
+                const con = imgModifyList[i];
+                const imgObj = { id: i + 1, href: con };
+                tempImgArr.push(imgObj);
+            }
+            imgArr = tempImgArr;
         }
-        imgArr = tempImgArr;
-    }
+    });
 
     function addVal(getHerf) {
         const newId =
@@ -65,12 +67,10 @@
     }
 
     function onFileSelected() {
-        
         uploadImageAct(
             `${back_api}/img/upload_single`,
             { folder },
             (err, imgData) => {
-                
                 if (err) {
                     alert("이미지 업로드 실패! 다시 시도해주세요!");
                 }

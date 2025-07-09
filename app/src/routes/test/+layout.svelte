@@ -21,6 +21,4 @@
     {/key}
 
     {@render children()}
-
-    <div>레이아웃!!!!</div>
 </div>

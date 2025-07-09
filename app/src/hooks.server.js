@@ -13,8 +13,6 @@ export async function handle({ event, resolve }) {
     const refreshToken = event.cookies.get('refresh_token');
     // 기본 초기화~
     let userInfo = {}
-    console.log('액세스 토큰은 무엇?!?!');
-    console.log(accessToken);
     try {
         if (accessToken) {
             const payload = jwt.verify(accessToken, ACCESS_TOKEN_SECRET)
@@ -38,24 +36,27 @@ export async function handle({ event, resolve }) {
 
             // userInfoRow.length 가 0 이면 아이디가 없는것 / 토큰 불일치 하면 다시 로그인 하라고 리턴처리
             if (userInfoRow.length == 0 || userInfoRow[0].refresh_token != refreshToken) {
+
                 event.cookies.delete('access_token', { path: '/' });
                 event.cookies.delete('refresh_token', { path: '/' });
 
                 event.locals.userInfo = {};
                 return await resolve(event);
             }
-
             const newAccessToken = jwt.sign({ userId: userInfoRow[0].idx }, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+
             event.cookies.set('access_token', newAccessToken, {
                 httpOnly: true,
                 secure: true,
                 path: '/',
-                // maxAge: 60 * 15
-                maxAge: 5
+                maxAge: 60 * 15
+                // maxAge: 5
             });
 
-            userInfo = { idx: user.idx };
-        } catch (error) {
+            userInfo = { idx: userInfoRow[0].idx };
+            event.locals.userInfo = userInfo;
+        } catch (err) {
+            console.error(err.message);
             // 와중에 에러나면 그냥 토큰 다 날리기~
             event.cookies.delete('access_token', { path: '/' });
             event.cookies.delete('refresh_token', { path: '/' });
