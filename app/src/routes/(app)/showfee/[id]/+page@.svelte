@@ -37,14 +37,10 @@
     let replyInpArea = $derived({});
     let replyContent = $state("");
 
-
     onMount(() => {
-        console.log('onMounted!!!!');
+        console.log("onMounted!!!!");
         console.log($user_info);
-        
-    })
-
-
+    });
 
     async function uploadReply() {
         console.log(replyContent);
@@ -74,6 +70,19 @@
                 });
             }, ranVal);
         }
+    }
+
+    async function likeActFunc() {
+        console.log($user_info.idx);
+        console.log($page.params.id);
+
+        try {
+            const res = await axios.post(`${back_api}/board/like_action`, {
+                user_id: $user_info.idx,
+                post_id: $page.params.id,
+            });
+        } catch (error) {}
+        console.log("alsdfjlasijfd");
     }
 </script>
 
@@ -113,7 +122,7 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="bg-white relative min-h-screen px-3">
     <div class="max-w-[530px] mx-auto pretendard pt-14 pb-24">
-        <div class="content-area border-b border-gray-300">
+        <div class="content-area border-b border-gray-300 pb-5">
             <div class="text-lg font-semibold">
                 {boardItem.subject}
             </div>
@@ -156,6 +165,16 @@
                 <div class:mt-8={boardItem.imgs}>
                     {boardItem.content}
                 </div>
+            </div>
+
+            <div class="text-center">
+                <button
+                    class="text-sm border border-gray-400 text-gray-600 py-1.5 px-3 rounded-full cursor-pointer"
+                    on:click={likeActFunc}
+                >
+                    <i class="fa fa-heart-o" aria-hidden="true"></i>
+                    <span>좋아요</span>
+                </button>
             </div>
         </div>
 

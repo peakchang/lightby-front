@@ -226,7 +226,7 @@
 
                 <div class="mt-5">
                     <textarea
-                        rows="10"
+                        rows="5"
                         class="border border-gray-300 rounded-lg p-2 w-full focus:outline-none focus:border-blue-400 text-xs md:text-sm"
                         bind:value={content}
                         bind:this={contentArea}
