@@ -12,39 +12,48 @@
     import { page } from "$app/stores";
     import { getRandBet } from "$lib/lib.js";
     import { onMount } from "svelte";
-
-    console.log(`$user_info : ${$user_info.idx}`);
-    console.log($page);
+    import DetailMenu from "$lib/components/DetailMenu.svelte";
+    import Like from "$lib/components/Like.svelte";
 
     let { data } = $props();
-    let boardItem = $state({});
+    let postItem = $state({});
     let replyList = $state([]);
-    boardItem = data.boardItem;
-    replyList = data.replyList;
+
     let loginAlertModalShow = $state(false);
-
     let replyAreaShow = $state(false);
-
     let imgList = $state([]);
-    // svelte-ignore state_referenced_locally
-    if (boardItem.imgs) {
-        imgList = boardItem.imgs.split(",");
-        console.log(imgList);
-    }
-
     let tempArr = [1, 2, 3, 4, 5, 6, 7];
     let replyInpBorder = $state(false);
     let replyInpArea = $derived({});
     let replyContent = $state("");
+    let likeCount = $state(0);
+    let replyCount = $state(0);
+
+    let loopStop = $state(false);
 
     onMount(() => {
-        console.log("onMounted!!!!");
-        console.log($user_info);
+        likeCount = data.likeCount;
+        postItem = data.postItem;
+        replyCount = replyList.length;
+        if (postItem.imgs) {
+            imgList = postItem.imgs.split(",");
+        }
+    });
+
+    $effect(() => {
+
+        if(data){
+            console.log(data);
+            
+            likeCount = data.likeCount;
+        }
+        if (data.replyList) {
+            replyList = data.replyList;
+        }
     });
 
     async function uploadReply() {
-        console.log(replyContent);
-
+        loopStop = false;
         $loadingStore = true;
         try {
             const res = await axios.post(`${back_api}/board/upload_reply`, {
@@ -52,37 +61,30 @@
                 user_id: $user_info.idx,
                 replyContent,
             });
-
-            // invalidateAll();
         } catch (error) {
-            console.log("에러?");
-
             alert("업로드 실패~");
         } finally {
             const ranVal = getRandBet(500, 1200);
+
             setTimeout(() => {
                 $loadingStore = false;
+                invalidateAll();
+
                 toastStore.set({
                     show: true,
                     message: "댓글이 등록 되었습니다.",
                     // color: "#FF3636",
                     color: "#2478FF",
                 });
+                replyContent = "";
+                replyAreaShow = false;
             }, ranVal);
         }
     }
 
-    async function likeActFunc() {
-        console.log($user_info.idx);
-        console.log($page.params.id);
-
-        try {
-            const res = await axios.post(`${back_api}/board/like_action`, {
-                user_id: $user_info.idx,
-                post_id: $page.params.id,
-            });
-        } catch (error) {}
-        console.log("alsdfjlasijfd");
+    async function likeAction(e) {
+        console.log(e.likeStatus);
+        invalidateAll();
     }
 </script>
 
@@ -115,7 +117,7 @@
     </div>
 </CustomModal>
 
-<PageHeader></PageHeader>
+<DetailMenu favorateShow={false}></DetailMenu>
 
 <!-- svelte-ignore event_directive_deprecated -->
 <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -124,21 +126,21 @@
     <div class="max-w-[530px] mx-auto pretendard pt-14 pb-24">
         <div class="content-area border-b border-gray-300 pb-5">
             <div class="text-lg font-semibold">
-                {boardItem.subject}
+                {postItem.subject}
             </div>
 
             <div class=" mt-3 flex justify-end flex-wrap items-center">
-                <span class="text-xs md:text-sm">{boardItem.nickname}</span>
+                <span class="text-xs md:text-sm">{postItem.nickname}</span>
                 <span class="mx-1.5">|</span>
                 <span class="flex items-center gap-1 text-sm">
                     <i class="fa fa-heart-o" aria-hidden="true"></i>
                     <span
                         class="border border-gray-400 px-1.5 py-0.5 rounded-full text-[10px] md:text-xs"
                     >
-                        {boardItem.good_count ? boardItem.good_count : 0}
+                        {likeCount}
                     </span>
                 </span>
-                <span class="mx-1">|</span>
+                <span class="mx-2">|</span>
 
                 <span class="flex items-center gap-1 text-sm">
                     <i class="fa fa-commenting text-gray-500" aria-hidden="true"
@@ -146,14 +148,14 @@
                     <span
                         class="border border-gray-400 px-2 py-0.5 rounded-full text-[10px] md:text-xs"
                     >
-                        195
+                        {replyList.length}
                     </span>
                 </span>
 
-                <span class="mx-1">|</span>
+                <span class="mx-2">|</span>
 
                 <span class="text-xs md:text-sm">
-                    {moment(boardItem.created_at).format("YY/MM/DD HH:mm")}
+                    {moment(postItem.created_at).format("YY/MM/DD HH:mm")}
                 </span>
             </div>
 
@@ -162,12 +164,12 @@
                     <img src={`${public_img_bucket}${img}`} alt="" />
                 {/each}
 
-                <div class:mt-8={boardItem.imgs}>
-                    {boardItem.content}
+                <div class:mt-8={postItem.imgs}>
+                    {postItem.content}
                 </div>
             </div>
 
-            <div class="text-center">
+            <!-- <div class="text-center">
                 <button
                     class="text-sm border border-gray-400 text-gray-600 py-1.5 px-3 rounded-full cursor-pointer"
                     on:click={likeActFunc}
@@ -175,7 +177,9 @@
                     <i class="fa fa-heart-o" aria-hidden="true"></i>
                     <span>좋아요</span>
                 </button>
-            </div>
+            </div> -->
+
+            <Like {likeAction}></Like>
         </div>
 
         <div class="my-5 flex justify-between">
@@ -184,8 +188,6 @@
                 class="btn btn-accent btn-sm text-white"
                 on:click={() => {
                     if (!$user_info.idx) {
-                        console.log("진입은 하잖아?");
-
                         loginAlertModalShow = true;
                         return;
                     }

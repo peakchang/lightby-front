@@ -17,8 +17,7 @@
 	import { onMount } from "svelte";
 
 	let { children } = $props();
-	onMount(() => {
-	});
+	onMount(() => {});
 
 	// 현재 경로 감지용 key 생성
 	const key = derived(page, ($page) => $page.url.pathname);
@@ -99,6 +98,10 @@
 		rel="stylesheet"
 		href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
 	/>
+
+	
+
+	<!-- <script src="https://developers.kakao.com/sdk/js/kakao.js"></script> -->
 </svelte:head>
 
 <div class="site-wrab">

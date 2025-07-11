@@ -1,7 +1,13 @@
 <script>
     import { user_info } from "$lib/stores/stores";
-    import { goto } from "$app/navigation";
+    import { goto, invalidateAll } from "$app/navigation";
     import { navigating, page } from "$app/stores";
+    import { interestTabNum } from "$lib/stores/stores";
+    import { onMount } from "svelte";
+    import moment from "moment-timezone";
+    import { public_img_bucket, img_bucket } from "$lib/const";
+
+    let { data } = $props();
 
     let tempArr = [
         { thumbnail: "sample_img1.jpg" },
@@ -12,18 +18,27 @@
         {},
     ];
 
+    let interestStatus = $state(false);
+    let postList = $state([]);
+    let statusMessage = $state("");
+
+    $effect(() => {
+        interestStatus = data.interestStatus;
+        postList = data.postList;
+        statusMessage = data.statusMessage;
+    });
+
     let tabArea = $derived({});
-    let tabNum = $state(0); // 탭에 넘버 부여하고 변경 될때마다 관심 지역 / 찜한 목록 등 변경됨
 
     function changeTab(e) {
-        tabNum = e.target.dataset.num;
-
-        console.log(tabNum);
+        $interestTabNum = e.target.dataset.num;
 
         for (const el of tabArea.children) {
             el.classList.remove("tab-active");
         }
         tabArea.children[e.target.dataset.num].classList.add("tab-active");
+
+        invalidateAll();
     }
 </script>
 
@@ -35,7 +50,7 @@
         <!-- svelte-ignore event_directive_deprecated -->
         <div class="tab-area cursor-pointer pt-20" bind:this={tabArea}>
             <div
-                class:tab-active={tabNum == 0}
+                class:tab-active={$interestTabNum == 0}
                 data-num="0"
                 on:click={changeTab}
             >
@@ -43,14 +58,14 @@
             </div>
             <div
                 data-num="1"
-                class:tab-active={tabNum == 1}
+                class:tab-active={$interestTabNum == 1}
                 on:click={changeTab}
             >
                 찜한 목록
             </div>
             <div
                 data-num="2"
-                class:tab-active={tabNum == 2}
+                class:tab-active={$interestTabNum == 2}
                 on:click={changeTab}
             >
                 내 주변 현장
@@ -59,43 +74,62 @@
 
         <!-- svelte-ignore event_directive_deprecated -->
 
-        {#if tabNum == 0 || tabNum == 1}
-            <div class="z-50 suit-font px-3 mt-5" style="padding-bottom:70px">
-                {#each tempArr as value}
-                    <a
-                        href="/detail/{value.idx}"
-                        on:click|preventDefault={() => {}}
-                    >
-                        <div
-                            class="border border-gray-300 rounded-lg p-2 mb-3 shadow-sm cursor-pointer relative"
-                        >
+        {#if $interestTabNum == 0 || $interestTabNum == 1}
+            {#if interestStatus}
+                <div
+                    class="z-50 suit-font px-3 mt-5"
+                    style="padding-bottom:70px"
+                >
+                    {#each postList as post}
+                        <a href="/detail/{post.idx}">
                             <div
-                                class="flex gap-3 md:gap-5 items-center border-b-gray-300"
+                                class="border border-gray-300 rounded-lg p-2 mb-3 shadow-sm cursor-pointer relative"
                             >
-                                {#if value.thumbnail}
-                                    <div
-                                        class=" w-28 h-16 md:w-32 md:h-20 rounded-lg overflow-hidden flex-shrink-0"
-                                    >
-                                        <img
-                                            src={value.thumbnail}
-                                            alt=""
-                                            class="w-full h-full object-cover"
-                                        />
-                                    </div>
-                                {:else}
-                                    <div class="w-4"></div>
-                                {/if}
+                                <div
+                                    class="flex gap-3 md:gap-5 items-center border-b-gray-300"
+                                >
+                                    {#if post.thumbnail}
+                                        <div
+                                            class=" w-28 h-16 md:w-32 md:h-20 rounded-lg overflow-hidden flex-shrink-0"
+                                        >
+                                            <img
+                                                src={`${public_img_bucket}${post.thumbnail}`}
+                                                alt=""
+                                                class="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                    {:else}
+                                        <div class="w-4"></div>
+                                    {/if}
 
-                                <div class="flex flex-col justify-between">
-                                    <div class="mb-1">모모 현장입니다~~~</div>
-                                    <div class="text-sm">25/06/20 15:32</div>
+                                    <div class="flex flex-col justify-between">
+                                        <div class="mb-1">
+                                            {post.subject}
+                                        </div>
+                                        <div class="text-sm">
+                                            {moment(post.created_at).format(
+                                                "YY/MM/DD HH:mm",
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </a>
-                {/each}
-            </div>
-        {:else if tabNum == 2}
+                        </a>
+                    {/each}
+                </div>
+            {:else if !interestStatus && $interestTabNum == 0}
+                <div class="text-center mt-20">
+                    <div class=" text-6xl text-blue-500">
+                        <i class="fa fa-frown-o" aria-hidden="true"></i>
+                    </div>
+                    <div class="mt-3 whitespace-pre-line">
+                        {statusMessage}
+                    </div>
+                </div>
+            {:else if !interestStatus && $interestTabNum == 1}
+                찜한 목록이 없습니다.
+            {/if}
+        {:else if $interestTabNum == 2}
             <div class="pt-10 pb-32 suit-font px-3">
                 <div
                     class="text-center text-xl bg-green-700 text-white w-[80%] md:w-[50%] mx-auto py-3 rounded-full mt-20"

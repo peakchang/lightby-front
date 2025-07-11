@@ -61,6 +61,8 @@
         defer
         src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=72689d54e68abd94260d9284c64d7545&libraries=services&autoload=false`}
     ></script>
+
+    <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
 </svelte:head>
 
 <CustomModal bind:visible={loginAlertModalShow} closeBtn={false}>
