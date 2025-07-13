@@ -255,36 +255,36 @@
 
     // 결제 성공시 action! on:message 에 등록~
     async function paymentSuccess(e) {
-        console.log(e.data);
+        // console.log(e.data);
         
-        // if (e.data.status) {
+        if (e.data.status) {
 
-        //     console.log('success 가 안되는거야?!?!?!?!?!??!?!');
-        //     console.log('진짜 좆같은새끼 끝까지 말썽이네?!?!?!');
+            console.log('success 가 안되는거야?!?!?!?!?!??!?!');
+            console.log('진짜 좆같은새끼 끝까지 말썽이네?!?!?!');
             
             
-        //     // $loadingStore = false;
-        //     $all_data["payment_key"] = e.data.paymentInfo.payment_key;
-        //     paymentStatus = true;
-        //     try {
-        //         const res = await axios.post(`${back_api}/regist/upload`, {
-        //             allData: $all_data,
-        //         });
-        //         blockBack = false;
-        //         successPrevModal = true;
-        //         successPrevModalMessage = "업로드가 완료 되었습니다.";
-        //         setTimeout(() => {
-        //             successPrevModal = false;
-        //             $all_data = {};
-        //             goto("/");
-        //         }, 3500);
-        //     } catch (err) {
-        //         // 결제가 에러 나는 경우 결제 취소 해주자!!!
+            // $loadingStore = false;
+            $all_data["payment_key"] = e.data.paymentInfo.payment_key;
+            paymentStatus = true;
+            try {
+                const res = await axios.post(`${back_api}/regist/upload`, {
+                    allData: $all_data,
+                });
+                blockBack = false;
+                successPrevModal = true;
+                successPrevModalMessage = "업로드가 완료 되었습니다.";
+                setTimeout(() => {
+                    successPrevModal = false;
+                    $all_data = {};
+                    goto("/");
+                }, 3500);
+            } catch (err) {
+                // 결제가 에러 나는 경우 결제 취소 해주자!!!
 
-        //         const m = err.response.data.message;
-        //         console.error(`에러남!!!!`);
-        //     }
-        // }
+                const m = err.response.data.message;
+                console.error(`에러남!!!!`);
+            }
+        }
     }
 
     // 상품 업로드 함수!!!

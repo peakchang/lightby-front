@@ -42,8 +42,10 @@
             .requestPayment({
                 orderId: orderId,
                 orderName: orderName,
-                successUrl: "http://localhost:5173/payments/success",
-                failUrl: "http://localhost:5173/payments/fail",
+                // successUrl: "http://localhost:5173/payments/success",
+                // failUrl: "http://localhost:5173/payments/fail",
+                successUrl: "https://lightby.co.kr/payments/success",
+                failUrl: "https://lightby.co.kr/payments/fail",
                 // customerEmail: "customer123@gmail.com",
                 customerName: customerName,
             })
