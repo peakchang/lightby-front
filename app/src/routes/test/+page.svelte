@@ -42,6 +42,16 @@
     //         ],
     //     });
     // }
+
+    function ssibalTest() {
+        window.open(`/testpop`, "popup", "width=550,height=670");
+    }
+
+    function paymentSuccess(e) {
+        console.log(e.data);
+    }
 </script>
 
-<!-- <button on:click={kakaoTest}> testBtn </button> -->
+<svelte:window on:message={paymentSuccess} />
+
+<button on:click={ssibalTest}> testBtn </button>
