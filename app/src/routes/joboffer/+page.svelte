@@ -255,9 +255,13 @@
 
     // 결제 성공시 action! on:message 에 등록~
     async function paymentSuccess(e) {
+        console.log(e.data);
+        
         if (e.data.status) {
 
             console.log('success 가 안되는거야?!?!?!?!?!??!?!');
+            console.log('진짜 좆같은새끼 끝까지 말썽이네?!?!?!');
+            
             
             $loadingStore = false;
             $all_data["payment_key"] = e.data.paymentInfo.payment_key;
@@ -298,11 +302,9 @@
                 "width=550,height=670",
             );
 
-            $loadingStore = true;
+            // $loadingStore = true;
             return;
         }
-
-        console.log("진짜 결제 Start!!!!!!!!!!!!!");
 
         try {
             const res = await axios.post(`${back_api}/regist/upload`, {

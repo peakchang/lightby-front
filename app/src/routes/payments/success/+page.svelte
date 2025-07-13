@@ -37,7 +37,7 @@
 
                     if (countdown <= 0) {
                         clearInterval(countdownInterval);
-                        window.close();
+                        // window.close();
                     }
                 }, 1000);
 
