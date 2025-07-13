@@ -7,6 +7,10 @@
     import CustomModal from "$lib/components/CustomModal.svelte";
     import { onMount } from "svelte";
 
+    let headerShowBool = $state(true); // 스크롤 내릴시 상단 메뉴 보이게 하기 위한 변수!
+    let showBool = $state(true); // 처음 페이지 로딩시 위로 올라가는 잔상 없애기 위해!
+    let y = $state(0);
+
     let { data } = $props();
 
     const detailContent = $derived(data.detail);
@@ -15,6 +19,8 @@
 
     let imgSwiper = $state({});
     onMount(() => {
+        console.log(detailContent);
+
         mainImage = detailContent.imgs.split(",");
 
         // 스와이퍼 셋팅
@@ -35,11 +41,18 @@
         if (sharModal) {
             console.log(sharModal);
         }
+        if (y != 0) {
+            // 스크롤 조금이라도 움직이면 hidden 해제!
+            showBool = false;
+        }
+
+        // 스크롤이 250 이상으로 내려가면 애니메이션 적용!
+        if (y > 250) {
+            headerShowBool = false;
+        } else {
+            headerShowBool = true;
+        }
     });
-
-    function contactSms() {}
-
-    function contactCall() {}
 
     function openShareModal(e) {
         sharModal = true;
@@ -47,6 +60,54 @@
 
     //
 </script>
+
+<svelte:window bind:scrollY={y} />
+<div
+    class="fixed top-0 left-0 w-full z-50 suit-font slide-menu"
+    class:hidden={showBool}
+    class:show={!headerShowBool}
+>
+    <div class="max-w-[530px] mx-auto bg-white">
+        <DetailMenu favorateBool={data.favorateBool} {openShareModal} />
+    </div>
+</div>
+<!-- svelte-ignore event_directive_deprecated -->
+<div class="fixed bottom-0 left-0 w-full z-20 suit-font">
+    <div class="max-w-[530px] mx-auto pretendard">
+        <div
+            class="flex gap-2 justify-center bg-white pt-3 pb-3 border-t border-gray-200"
+        >
+            <a href="TEL:{detailContent.phone}" class="w-1/4">
+                <button class="btn btn-info btn-sm w-full text-white">
+                    <i class="fa fa-phone" aria-hidden="true"></i>
+                    전화하기
+                </button>
+            </a>
+
+            <a
+                href="SMS:{detailContent.phone}?body=테스트입니다."
+                class="w-1/4"
+            >
+                <button class="btn btn-success btn-sm w-full text-white">
+                    <i class="fa fa-envelope-o" aria-hidden="true"></i>
+                    문자하기
+                </button>
+            </a>
+
+            <button
+                class="btn btn-warning btn-sm w-1/4 text-white"
+                on:click={contactSms}
+            >
+                <i class="fa fa-envelope-o" aria-hidden="true"></i>
+                공유하기
+            </button>
+        </div>
+
+        <!-- 버튼들~~~ (전화하기 / 문자하기 / 공유하기)
+        - 문자하기 버튼 클릭하면 양식 > 현장명 + 번개분양 보고 문의드립니다.
+        - 공유하기는 카카오 공유 / 문자공유(문자로 링크 보내기) / 링크복사 2가지 -->
+    </div>
+</div>
 
 <CustomModal bind:visible={sharModal}>
     <div class="flex justify-center items-center gap-3">
@@ -238,5 +299,14 @@
         width: 100%;
         /* height: 100%; */
         object-fit: cover;
+    }
+
+    .slide-menu {
+        transform: translateY(-100%);
+        transition: transform 0.3s ease;
+    }
+
+    .slide-menu.show {
+        transform: translateY(0);
     }
 </style>
