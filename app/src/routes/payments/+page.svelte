@@ -3,6 +3,8 @@
     import { browser } from "$app/environment";
     import { page } from "$app/stores";
 
+    console.log($page);
+
     let { data } = $props();
     const clientKey = "test_gck_ex6BJGQOVDKvLWdjenWO3W4w2zNb"; // 상점을 특정하는 키
 
@@ -44,8 +46,8 @@
                 orderName: orderName,
                 // successUrl: "http://localhost:5173/payments/success",
                 // failUrl: "http://localhost:5173/payments/fail",
-                successUrl: "https://lightby.co.kr/payments/success",
-                failUrl: "https://lightby.co.kr/payments/fail",
+                successUrl: `${$page.url.origin}/payments/success`,
+                failUrl: `${$page.url.origin}/payments/fail`,
                 // customerEmail: "customer123@gmail.com",
                 customerName: customerName,
             })

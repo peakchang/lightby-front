@@ -102,7 +102,6 @@
         }
 
         console.log(`paymentStatus : ${paymentStatus}`);
-        
 
         // 삭제할 이미지 있으면 쿠키에서 값 가져와서 삭제하기! (글쓰는 페이지 적용!!)
         const refreshFlag = Cookies.get("del_img_list");
@@ -213,7 +212,8 @@
     }
 
     async function usePrevPost() {
-        console.log(delImgList);
+
+
         if (delImgList && delImgList.length > 0) {
             try {
                 const res = await axios.post(`${back_api}/img/delete_many`, {
@@ -234,6 +234,13 @@
             console.log($all_data);
             $all_data["product"] = "free";
             $all_data["icons"] = "";
+            getAddress = $all_data["addr"];
+            delete $all_data.created_at;
+            delete $all_data.updated_at;
+            delete $all_data.sum;
+            delete $all_data.idx;
+
+            console.log($all_data);
 
             businessArr = $all_data["business"].split(",");
             occupationArr = $all_data["occupation"].split(",");
@@ -256,13 +263,11 @@
     // 결제 성공시 action! on:message 에 등록~
     async function paymentSuccess(e) {
         // console.log(e.data);
-        
-        if (e.data.status) {
 
-            console.log('success 가 안되는거야?!?!?!?!?!??!?!');
-            console.log('진짜 좆같은새끼 끝까지 말썽이네?!?!?!');
-            
-            
+        if (e.data.status) {
+            console.log("success 가 안되는거야?!?!?!?!?!??!?!");
+            console.log("진짜 좆같은새끼 끝까지 말썽이네?!?!?!");
+
             $loadingStore = false;
             $all_data["payment_key"] = e.data.paymentInfo.payment_key;
             paymentStatus = true;
