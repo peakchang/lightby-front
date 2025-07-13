@@ -19,6 +19,8 @@
                     payment_key: paymentKey,
                 };
 
+                console.log('보내자고!!!!!!!!!!!!!!!');
+                
                 // 부모 페이지로 메시지 전송
                 window.opener.postMessage(
                     {

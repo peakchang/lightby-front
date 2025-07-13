@@ -256,6 +256,9 @@
     // 결제 성공시 action! on:message 에 등록~
     async function paymentSuccess(e) {
         if (e.data.status) {
+
+            console.log('success 가 안되는거야?!?!?!?!?!??!?!');
+            
             $loadingStore = false;
             $all_data["payment_key"] = e.data.paymentInfo.payment_key;
             paymentStatus = true;
