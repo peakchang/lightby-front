@@ -19,8 +19,8 @@
                     payment_key: paymentKey,
                 };
 
-                console.log('보내자고!!!!!!!!!!!!!!!');
-                
+                console.log("보내자고!!!!!!!!!!!!!!!");
+
                 // 부모 페이지로 메시지 전송
                 window.opener.postMessage(
                     {
@@ -43,7 +43,7 @@
 
                 // orderId=order_12&paymentKey=taedp20250615162321MXTw8&amount=11000
             } else {
-                alert('에러에러에러!!!')
+                alert("에러에러에러!!!");
                 console.log("부모 페이지 없음 ㅠㅠ");
             }
         }
@@ -56,10 +56,26 @@
 </script>
 
 <div class="suit-font pt-18 text-center">
+    <button
+        onclick={() => {
+            // 부모 페이지로 메시지 전송
+            window.opener.postMessage(
+                {
+                    status: true,
+                    paymentInfo: paymentInfo,
+                },
+                window.location.origin,
+            ); // 같은 도메인이면 origin 사용
+        }}
+    >
+        testSend!!!!!
+    </button>
     <div class=" text-3xl font-bold">결제가 완료 되었습니다.</div>
     <div class=" text-7xl mt-8 text-green-600">
         <i class="fa fa-check-circle" aria-hidden="true"></i>
     </div>
-    <div class="text-lg mt-8">{countdown}초 뒤 결제 완료 페이지로 돌아갑니다.</div>
+    <div class="text-lg mt-8">
+        {countdown}초 뒤 결제 완료 페이지로 돌아갑니다.
+    </div>
     <span class="loading loading-ring loading-xl mt-8"></span>
 </div>
