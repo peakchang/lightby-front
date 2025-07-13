@@ -20,6 +20,7 @@
     });
 
     function contactCall() {}
+    function contactSms() {}
 </script>
 
 <svelte:window bind:scrollY={y} />
@@ -38,7 +39,6 @@
     </div>
 </div>
 
-
 <div class="bg-white relative min-h-screen">
     <div class="max-w-[530px] mx-auto pretendard pb-16">
         {@render children()}
@@ -51,7 +51,6 @@
         <div
             class="flex gap-2 justify-center bg-white pt-3 pb-3 border-t border-gray-200"
         >
-            
             <button
                 class="btn btn-info btn-sm w-1/4 text-white"
                 on:click={contactCall}
