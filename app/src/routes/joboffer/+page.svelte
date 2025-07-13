@@ -21,7 +21,7 @@
     import { feeBases, iconList } from "./jopoffer";
     import { onDestroy, onMount, tick } from "svelte";
     import Cookies from "js-cookie";
-    // import { loadingStore } from "$lib/stores/stores";
+    import { loadingStore } from "$lib/stores/stores";
 
     let { data } = $props();
 
@@ -263,7 +263,7 @@
             console.log('진짜 좆같은새끼 끝까지 말썽이네?!?!?!');
             
             
-            // $loadingStore = false;
+            $loadingStore = false;
             $all_data["payment_key"] = e.data.paymentInfo.payment_key;
             paymentStatus = true;
             try {
@@ -302,7 +302,7 @@
                 "width=550,height=670",
             );
 
-            // $loadingStore = true;
+            $loadingStore = true;
             return;
         }
 

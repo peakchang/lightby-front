@@ -37,7 +37,7 @@
 
                     if (countdown <= 0) {
                         clearInterval(countdownInterval);
-                        // window.close();
+                        window.close();
                     }
                 }, 1000);
 
@@ -56,20 +56,7 @@
 </script>
 
 <div class="suit-font pt-18 text-center">
-    <button
-        onclick={() => {
-            // 부모 페이지로 메시지 전송
-            window.opener.postMessage(
-                {
-                    status: true,
-                    paymentInfo: paymentInfo,
-                },
-                window.location.origin,
-            ); // 같은 도메인이면 origin 사용
-        }}
-    >
-        testSend!!!!!
-    </button>
+
     <div class=" text-3xl font-bold">결제가 완료 되었습니다.</div>
     <div class=" text-7xl mt-8 text-green-600">
         <i class="fa fa-check-circle" aria-hidden="true"></i>
