@@ -4,45 +4,43 @@
     import { user_info } from "$lib/stores/stores";
     import axios from "axios";
     import { back_api } from "$lib/const";
+    import { favorateBool } from "$lib/stores/stores";
+    import { toastStore } from "$lib/stores/stores";
 
-    let {
-        favorateBool = false,
-        favorateShow = true,
-        shareShow = true,
-        openShareModal,
-    } = $props();
+    let { favorateShow = true, shareShow = true, openShareModal } = $props();
 
     let notLoginAlertModal = $state(false);
-
-    // 토스트
-    let toastShow = $state("0");
-    let toastArea = $state({});
-    let toastMessage = $state("");
 
     async function favorateAct() {
         if (!$user_info.idx) {
             notLoginAlertModal = true;
         }
 
+        console.log("좋아요 클릭?!?!?!?");
+        console.log(this.value);
+
         try {
-            const res = await axios.post(`${back_api}/detail/favorate`, {
+            const res = await axios.post(`${back_api}/detail/postlike_act`, {
                 user_id: $user_info.idx,
                 item_id: $page.params.id,
                 type: this.value,
             });
 
-            favorateBool = !favorateBool;
-            toastShow = 1;
-            if (favorateBool) {
-                toastMessage = "관심현장에 등록 되었습니다.";
+            $favorateBool = !$favorateBool;
+            //     toastShow = 1;
+            if ($favorateBool) {
+                toastStore.set({
+                    show: true,
+                    message: "관심현장에 등록 되었습니다.",
+                    color: "#6799FF",
+                });
             } else {
-                toastMessage = "관심현장에 해제 되었습니다.";
+                toastStore.set({
+                    show: true,
+                    message: "관심현장에 해제 되었습니다.",
+                    color: "#6799FF",
+                });
             }
-
-            setTimeout(() => {
-                toastShow = 0;
-            }, 1200);
-            console.log(favorateBool);
         } catch (err) {
             console.log(err.response.data.message);
         }
@@ -62,16 +60,6 @@
         </div>
     </div>
 </CustomModal>
-
-<div
-    id="toast"
-    class="toast opacity-{toastShow} suit-font"
-    bind:this={toastArea}
->
-    <div class="alert alert-info text-white">
-        {toastMessage}
-    </div>
-</div>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -95,7 +83,7 @@
 
     <div>
         {#if favorateShow}
-            {#if favorateBool}
+            {#if $favorateBool}
                 <button
                     class="cursor-pointer"
                     value="unfav"

@@ -8,6 +8,7 @@ import { browser } from "$app/environment";
 export const load = async ({ params, url, data }) => {
     let userIdx = '';
     let userInfo = {}
+    let postCount = 0
     user_info.subscribe((v) => {
         userIdx = v.idx;
     })
@@ -15,7 +16,8 @@ export const load = async ({ params, url, data }) => {
     if (userIdx) {
         const res = await axios.post(`${back_api}/load_user_info`, { userIdx })
         userInfo = res.data.userInfo
+        postCount = res.data.postCount
     }
 
-    return { userInfo }
+    return { userInfo, postCount }
 }

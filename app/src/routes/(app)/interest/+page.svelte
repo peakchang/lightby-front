@@ -9,21 +9,14 @@
 
     let { data } = $props();
 
-    let tempArr = [
-        { thumbnail: "sample_img1.jpg" },
-        { thumbnail: "sample_img2.jpg" },
-        {},
-        {},
-        { thumbnail: "sample_img1.jpg" },
-        {},
-    ];
-
     let interestStatus = $state(false);
     let postList = $state([]);
     let statusMessage = $state("");
 
     $effect(() => {
         interestStatus = data.interestStatus;
+        console.log(interestStatus);
+
         postList = data.postList;
         statusMessage = data.statusMessage;
     });
@@ -117,7 +110,7 @@
                         </a>
                     {/each}
                 </div>
-            {:else if !interestStatus && $interestTabNum == 0}
+            {:else if !interestStatus}
                 <div class="text-center mt-20">
                     <div class=" text-6xl text-blue-500">
                         <i class="fa fa-frown-o" aria-hidden="true"></i>
@@ -126,8 +119,6 @@
                         {statusMessage}
                     </div>
                 </div>
-            {:else if !interestStatus && $interestTabNum == 1}
-                찜한 목록이 없습니다.
             {/if}
         {:else if $interestTabNum == 2}
             <div class="pt-10 pb-32 suit-font px-3">

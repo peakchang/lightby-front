@@ -39,6 +39,8 @@ export const load = async ({ params, url, data }) => {
             interestStatus = res.data.interestStatus
             statusMessage = res.data.statusMessage
             postList = res.data.postList
+            console.log(postList);
+            
 
         } catch (error) {
 

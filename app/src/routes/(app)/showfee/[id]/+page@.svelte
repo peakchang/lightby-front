@@ -34,6 +34,8 @@
     onMount(() => {
         likeCount = data.likeCount;
         postItem = data.postItem;
+        console.log(postItem);
+
         replyCount = replyList.length;
         if (postItem.imgs) {
             imgList = postItem.imgs.split(",");
@@ -41,10 +43,9 @@
     });
 
     $effect(() => {
-
-        if(data){
+        if (data) {
             console.log(data);
-            
+
             likeCount = data.likeCount;
         }
         if (data.replyList) {

@@ -28,12 +28,12 @@
 	const animatedRoutes = [
 		"registjob",
 		"detail",
-		"manage_board",
 		"auth/manage",
 		"showfee/",
 		"simplewrite",
 		"test/t1",
 		"joboffer",
+		"faq",
 	];
 
 	const unsubscribe = page.subscribe(($page) => {
@@ -98,8 +98,6 @@
 		rel="stylesheet"
 		href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
 	/>
-
-	
 
 	<!-- <script src="https://developers.kakao.com/sdk/js/kakao.js"></script> -->
 </svelte:head>

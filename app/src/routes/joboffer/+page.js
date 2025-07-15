@@ -8,9 +8,30 @@ export const load = async ({ params, url, data }) => {
 
     let userId = ''
     let postNum = 0
+    let modifyIdx = undefined
+    let modifyContent = {}
+
     user_info.subscribe((v) => {
         userId = v.idx
     })
+
+    console.log(url);
+    if (url.searchParams.get('modifyidx')) {
+        modifyIdx = url.searchParams.get('modifyidx')
+
+        try {
+            const res = await axios.post(`${back_api}/regist/load_modify_content`, { userId, modifyIdx })
+
+            modifyContent = res.data.modifyContent
+        } catch (error) {
+
+        }
+    }
+
+    console.log(modifyIdx);
+
+
+
 
     if (userId) {
         const res = await axios.post(`${back_api}/regist/get_post_count`, { userId })
@@ -18,5 +39,5 @@ export const load = async ({ params, url, data }) => {
     }
 
 
-    return { postNum }
+    return { postNum, modifyContent, modifyIdx }
 }

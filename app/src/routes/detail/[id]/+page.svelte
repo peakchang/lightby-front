@@ -6,6 +6,9 @@
     import { user_info } from "$lib/stores/stores.js";
     import CustomModal from "$lib/components/CustomModal.svelte";
     import { onMount } from "svelte";
+    import { toastStore } from "$lib/stores/stores.js";
+    import { page } from "$app/stores";
+    import { favorateBool } from "$lib/stores/stores.js";
 
     let headerShowBool = $state(true); // 스크롤 내릴시 상단 메뉴 보이게 하기 위한 변수!
     let showBool = $state(true); // 처음 페이지 로딩시 위로 올라가는 잔상 없애기 위해!
@@ -15,11 +18,16 @@
 
     const detailContent = $derived(data.detail);
     let mainImage = $state([]);
-    let sharModal = $state(false);
+    let shareModal = $state(false);
 
     let imgSwiper = $state({});
     onMount(() => {
         console.log(detailContent);
+
+        console.log(data.favorateBool);
+        
+
+        $favorateBool = data.favorateBool;
 
         mainImage = detailContent.imgs.split(",");
 
@@ -38,9 +46,6 @@
     });
 
     $effect(() => {
-        if (sharModal) {
-            console.log(sharModal);
-        }
         if (y != 0) {
             // 스크롤 조금이라도 움직이면 hidden 해제!
             showBool = false;
@@ -55,7 +60,26 @@
     });
 
     function openShareModal(e) {
-        sharModal = true;
+        shareModal = true;
+    }
+
+    function cliboardHref() {
+        navigator.clipboard
+            .writeText($page.url.href)
+            .then(() =>
+                toastStore.set({
+                    show: true,
+                    message: "주소가 복사되었습니다",
+                    color: "#53C14B",
+                }),
+            )
+            .catch((err) =>
+                toastStore.set({
+                    show: true,
+                    message: "주소 복사에 실패 했습니다.",
+                    color: "#53C14B",
+                }),
+            );
     }
 
     //
@@ -68,7 +92,7 @@
     class:show={!headerShowBool}
 >
     <div class="max-w-[530px] mx-auto bg-white">
-        <DetailMenu favorateBool={data.favorateBool} {openShareModal} />
+        <DetailMenu {openShareModal} />
     </div>
 </div>
 <!-- svelte-ignore event_directive_deprecated -->
@@ -96,7 +120,9 @@
 
             <button
                 class="btn btn-warning btn-sm w-1/4 text-white"
-                on:click={contactSms}
+                on:click={() => {
+                    shareModal = true;
+                }}
             >
                 <i class="fa fa-envelope-o" aria-hidden="true"></i>
                 공유하기
@@ -109,29 +135,30 @@
     </div>
 </div>
 
-<CustomModal bind:visible={sharModal}>
+<CustomModal bind:visible={shareModal}>
     <div class="flex justify-center items-center gap-3">
         <button
             class="border border-gray-400 p-2 rounded-md text-gray-600 cursor-pointer"
+            on:click={cliboardHref}
         >
             <div>
                 <i class="fa fa-link" aria-hidden="true"></i>
             </div>
-            <div class="text-xs md:text-sm">링크복사</div>
+            <div class="text-xs md:text-sm">주소복사</div>
         </button>
 
-        <button
+        <!-- <button
             class="border border-gray-400 p-2 rounded-md text-gray-600 cursor-pointer bg-yellow-400"
         >
             <div class="flex justify-center items-center">
                 <img src="/kakao_logo.png" alt="" width="23" height="23" />
             </div>
             <div class="text-xs md:text-sm">카카오톡</div>
-        </button>
+        </button> -->
     </div>
 </CustomModal>
 
-<DetailMenu favorateBool={data.favorateBool} {openShareModal} />
+<DetailMenu {openShareModal} />
 
 <div class=" mb-8">
     {#if mainImage.length == 1}

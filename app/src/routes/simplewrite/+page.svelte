@@ -11,6 +11,9 @@
     import { onMount, tick } from "svelte";
     import Cookies from "js-cookie";
 
+    let { data } = $props();
+    console.log(data);
+
     let delImgList = $state([]);
     let imgs = $state("");
     let subjectArea = $derived({});
@@ -28,13 +31,25 @@
     let blockBack = $state(true);
     let toPage = $state("");
 
+    let imgModifyList = $state("");
+    let modifyIdx = $state(undefined);
+
     onMount(async () => {
         await tick();
 
         console.log($user_info);
-        
+
         if (!$user_info.idx) {
             goto("/");
+        }
+        modifyIdx = data.modifyIdx;
+        if (modifyIdx) {
+            const modifyContent = data.modifyContent;
+            console.log(modifyContent);
+            imgModifyList = modifyContent.imgs.split(",");
+            imgs = modifyContent.imgs;
+            subject = modifyContent.subject;
+            content = modifyContent.content;
         }
 
         // 새로고침, 최초 로딩시 삭제할 이미지 있으면 쿠키에서 값 가져와서 삭제하기! (글쓰는 페이지 적용!!)
@@ -109,12 +124,6 @@
             return;
         }
 
-        console.log(subject);
-        console.log(content);
-        console.log(imgs);
-        console.log(back_api);
-        console.log($user_info);
-
         try {
             const res = await axios.post(`${back_api}/board/upload`, {
                 user_id: $user_info.idx,
@@ -131,6 +140,42 @@
                 color: "#2478FF",
             });
             goto("/showfee");
+        } catch (err) {
+            const m = err.response.data.message;
+            console.log(m);
+        }
+    }
+
+    async function updateShowFee() {
+        if (!subject) {
+            uploadChkModalTxt = "제목을 입력 해 주세요.";
+            uploadChkModalShow = true;
+            errType = "subject";
+            return;
+        }
+        if (!content) {
+            uploadChkModalTxt = "내용을 입력 해 주세요.";
+            uploadChkModalShow = true;
+            errType = "content";
+            return;
+        }
+
+        try {
+            const res = await axios.post(`${back_api}/board/update`, {
+                item_id: modifyIdx,
+                subject,
+                content,
+                imgs,
+            });
+
+            blockBack = false;
+            toastStore.set({
+                show: true,
+                message: "게시글 업데이트가 완료 되었습니다.",
+                // color: "#FF3636",
+                color: "#2478FF",
+            });
+            goto("/manage_board");
         } catch (err) {
             const m = err.response.data.message;
             console.log(m);
@@ -221,7 +266,11 @@
                     />
                 </div>
                 <!-- imgModifyList={} -->
-                <SortableImg {updateImg} maxImgCount={10} folder={"boardfee"}
+                <SortableImg
+                    {updateImg}
+                    maxImgCount={10}
+                    folder={"boardfee"}
+                    {imgModifyList}
                 ></SortableImg>
 
                 <div class="mt-5">
@@ -234,12 +283,21 @@
                 </div>
 
                 <div class="text-center mt-3">
-                    <button
-                        class="btn btn-success text-white w-1/2 md:w-1/3"
-                        on:click={uploadShowFee}
-                    >
-                        등록하기
-                    </button>
+                    {#if modifyIdx}
+                        <button
+                            class="btn btn-success text-white w-1/2 md:w-1/3"
+                            on:click={updateShowFee}
+                        >
+                            수정하기
+                        </button>
+                    {:else}
+                        <button
+                            class="btn btn-success text-white w-1/2 md:w-1/3"
+                            on:click={uploadShowFee}
+                        >
+                            등록하기
+                        </button>
+                    {/if}
                 </div>
 
                 <div class="mt-8 text-xs">

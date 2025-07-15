@@ -16,6 +16,8 @@
 
     let { data } = $props();
 
+    console.log(data);
+
     let userInfo = $derived({});
 
     // 관심 정보
@@ -64,7 +66,13 @@
     }
 
     let interestModalBool = $state(false);
+    let alertModalBool = $state(false);
 </script>
+
+<!-- 관심지역 설정 모달 -->
+<CustomModal bind:visible={alertModalBool} closeBtn={false}>
+    준비중입니다. 문구 짜죠
+</CustomModal>
 
 <!-- 관심지역 설정 모달 -->
 <CustomModal bind:visible={interestModalBool} closeBtn={false}>
@@ -198,7 +206,7 @@
                     <div
                         class="bg-white w-7 h-7 rounded-lg flex justify-center items-center text-xs"
                     >
-                        0
+                        {data.postCount}
                     </div>
                     <div class="text-sm font-semibold">내 글 관리</div>
                 </div>
@@ -220,7 +228,7 @@
                 <div
                     class="flex gap-2 items-center cursor-pointer"
                     on:click={() => {
-                        goto("/registtalent");
+                        alertModalBool = true;
                     }}
                 >
                     <div
@@ -242,10 +250,14 @@
                     class="btn btn-outline w-1/2 border-gray-500 text-gray-500"
                     >로그아웃</button
                 >
-                <button
-                    class="btn btn-outline w-1/2 border-gray-500 text-gray-500"
-                    >고객센터</button
-                >
+
+                <a href="/faq" class="w-full">
+                    <button
+                        class="btn btn-outline w-full border-gray-500 text-gray-500"
+                    >
+                        고객센터
+                    </button>
+                </a>
             </div>
         </div>
     {:else}

@@ -25,6 +25,8 @@
 
     let { data } = $props();
 
+    console.log(data);
+
     let postNum = $state(0);
 
     let businessArr = $state([]); // 업종분류 변수 담을 임시 배열
@@ -94,6 +96,12 @@
         await tick();
         if (!$user_info.idx) {
             goto("/");
+        }
+
+        // 수정시에 전체 변수에 불러온 수정 데이터 담기!!
+        if (data.modifyIdx) {
+            $all_data = data.modifyContent;
+            console.log($all_data);
         }
 
         postNum = data.postNum;
@@ -212,8 +220,6 @@
     }
 
     async function usePrevPost() {
-
-
         if (delImgList && delImgList.length > 0) {
             try {
                 const res = await axios.post(`${back_api}/img/delete_many`, {
@@ -329,6 +335,36 @@
         }
     }
 
+    // 상품 업데이트 (수정) 함수!!!
+    async function updateRegist() {
+        // 먼저 값들 다 제대로 들어갔는지 체크!
+        const chkBool = chkEssentialValue(chkBoolList);
+        if (!chkBool) {
+            return;
+        }
+
+        $all_data["business"] = businessArr.join(",");
+        $all_data["occupation"] = occupationArr.join(",");
+
+        console.log("수정하쟈!!!!!");
+
+        try {
+            const res = await axios.post(`${back_api}/regist/update`, {
+                allData: $all_data,
+            });
+        } catch (error) {}
+
+        blockBack = false;
+        successPrevModal = true;
+        successPrevModalMessage = "업데이트가 완료 되었습니다.";
+
+        setTimeout(() => {
+            successPrevModal = false;
+            $all_data = {};
+            goto("/manage_board");
+        }, 2500);
+    }
+
     // 최종 업로드 (결제 및 아이콘 선택하는 모달) 모달 열기! / 결제 창 떠있는지도
     function uploadChkRegist(e) {
         if (popup) {
@@ -337,14 +373,15 @@
             return;
         }
 
-        $all_data["business"] = businessArr.join(",");
-        $all_data["occupation"] = occupationArr.join(",");
-
         const chkBool = chkEssentialValue(chkBoolList);
 
         if (!chkBool) {
             return;
         }
+
+        $all_data["business"] = businessArr.join(",");
+        $all_data["occupation"] = occupationArr.join(",");
+
         submitPrevModal = true;
     }
 
@@ -889,21 +926,29 @@
         <div
             class=" bg-white p-3 flex justify-between items-center border-b border-gray-300"
         >
-            <div class="text-center font-semibold text-2xl">구인글 등록</div>
+            {#if !data.modifyIdx}
+                <div class="text-center font-semibold text-2xl">
+                    구인글 등록
+                </div>
 
-            <div
-                class="border border-gray-300 px-3 py-1.5 rounded-lg flex justify-center items-center cursor-pointer"
-            >
-                <span class=" text-blue-700 text-lg mr-2">
-                    <i class="fa fa-file-text-o" aria-hidden="true"></i>
-                </span>
-                <button
-                    class="text-xs bg-blue-400 text-white px-3 py-1.5 rounded-lg"
-                    on:click={loadPreviousPostList}
+                <div
+                    class="border border-gray-300 px-3 py-1.5 rounded-lg flex justify-center items-center cursor-pointer"
                 >
-                    이전 등록한 공고 불러오기
-                </button>
-            </div>
+                    <span class=" text-blue-700 text-lg mr-2">
+                        <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                    </span>
+                    <button
+                        class="text-xs bg-blue-400 text-white px-3 py-1.5 rounded-lg"
+                        on:click={loadPreviousPostList}
+                    >
+                        이전 등록한 공고 불러오기
+                    </button>
+                </div>
+            {:else}
+                <div class="text-center font-semibold text-2xl">
+                    구인글 수정
+                </div>
+            {/if}
         </div>
 
         <div class="mt-2 bg-white p-5">
@@ -1164,14 +1209,25 @@
                 ></textarea>
             </div>
 
-            <div class="mt-1.5">
-                <button
-                    class="btn btn-success w-full text-white"
-                    on:click={uploadChkRegist}
-                >
-                    등록하기
-                </button>
-            </div>
+            {#if data.modifyIdx}
+                <div class="mt-1.5">
+                    <button
+                        class="btn btn-success w-full text-white"
+                        on:click={updateRegist}
+                    >
+                        수정하기
+                    </button>
+                </div>
+            {:else}
+                <div class="mt-1.5">
+                    <button
+                        class="btn btn-success w-full text-white"
+                        on:click={uploadChkRegist}
+                    >
+                        등록하기
+                    </button>
+                </div>
+            {/if}
         </div>
     </div>
 </div>

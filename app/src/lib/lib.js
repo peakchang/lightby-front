@@ -3,6 +3,10 @@ import axios from "axios";
 import { loadingStore } from "$lib/stores/stores.js";
 import Cookies from "js-cookie";
 import { back_api } from "$lib/const";
+import moment from "moment-timezone";
+
+
+
 export function formatTime(seconds) {
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -53,10 +57,22 @@ export function formatPhoneNum(phone) {
     } else {
         return phone
     }
-
-
-
 }
+
+// 10일이 안지났으면 (광고 중이면) true 지났으면 (광고 끝났으면) false
+export function isWithin10Days(dateString) {
+    const inputDate = moment(dateString);
+    const now = moment();
+
+    const diffInDays = now.diff(inputDate, 'days'); // 경과 일수
+    const daysLeft = 10 - diffInDays;
+
+    return {
+        status: diffInDays < 10,
+        daysLeft
+    };
+}
+
 
 
 

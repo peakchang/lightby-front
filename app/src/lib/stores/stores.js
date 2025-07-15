@@ -19,3 +19,7 @@ export const paymentActRegistered = writable(false);
 export const paymentKey = writable("")
 
 export const interestTabNum = writable(0)
+
+export const manageBoardTabNum = writable(0)
+
+export const favorateBool = writable(false)
