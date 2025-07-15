@@ -69,7 +69,7 @@
 
 <!-- 하위 페이지나 레이아웃 -->
 <div class="fullscreen-override z-30 mt-16 suit-font">
-    <div class=" max-w-[1200px] mx-auto border px-5">
+    <div class=" max-w-[1250px] mx-auto px-1">
         {@render children()}
     </div>
 </div>
@@ -82,5 +82,9 @@
         width: 100vw;
         height: 100vh;
         background: white;
+    }
+
+    :global(.tb) {
+        border: 1px solid #d5d5d5;
     }
 </style>

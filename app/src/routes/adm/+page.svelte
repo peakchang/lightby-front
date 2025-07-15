@@ -1,5 +1,21 @@
 <div class="overflow-x-auto">
     <table class="table">
+        <thead>
+            <tr class="text-center">
+                <th></th>
+                <th>아이디</th>
+                <th>비번변경</th>
+                <th>SNS</th>
+                <th>휴대폰번호</th>
+                <th>이름</th>
+                <th>닉네임</th>
+                <th>등급</th>
+                <th>프로필</th>
+                <th>가입일자</th>
+                <th>마지막접속</th>
+            </tr>
+        </thead>
+
         <tfoot>
             <tr class="text-center">
                 <th>관리자</th>
@@ -11,27 +27,27 @@
                 <th>Favorite Color</th>
             </tr>
         </tfoot>
-
-        <thead>
-            <tr class="text-center">
-                <th></th>
-                <th>Name</th>
-                <th>Job</th>
-                <th>company</th>
-                <th>location</th>
-                <th>Last Login</th>
-                <th>Favorite Color</th>
-            </tr>
-        </thead>
         <tbody>
             <tr class="text-center">
-                <th>1</th>
-                <td>Cy Ganderton</td>
-                <td>Quality Control Specialist</td>
-                <td>Littel, Schaden and Vandervort</td>
-                <td>Canada</td>
-                <td>12/16/2020</td>
-                <td>Blue</td>
+                <th class="tb">1</th>
+                <td class="tb">아이디</td>
+                <td class="tb">
+                    <div class="flex gap-1">
+                        <input type="text" class="tb rounded-md w-full" />
+                        <button class="btn btn-sm">변경</button>
+                    </div>
+                </td>
+                <td class="tb">KAKAO</td>
+                <td class="tb"> 010-2190-2197</td>
+                <td class="tb">박창용</td>
+                <td class="tb">john spartan</td>
+                <td class="tb">일반</td>
+                <td class="tb">
+                    <button class="btn btn-sm">보기</button>
+                </td>
+
+                <td class="tb"> 25/7/15 </td>
+                <td class="tb"> 25/7/15 13:40 </td>
             </tr>
         </tbody>
     </table>

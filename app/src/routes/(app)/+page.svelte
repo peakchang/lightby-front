@@ -152,6 +152,12 @@
                                     alt=""
                                     class="w-full h-full object-cover"
                                 />
+                            {:else}
+                                <img
+                                    src={`${public_img_bucket}${value.imgs.split(",")[0]}`}
+                                    alt=""
+                                    class="w-full h-full object-cover"
+                                />
                             {/if}
                         </div>
                         <div

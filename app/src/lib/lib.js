@@ -93,13 +93,18 @@ const uploadImageAct = (back_api_url, options = {}, callback) => {
     const input = document.createElement("input");
 
     input.setAttribute("type", "file");
-    input.setAttribute("accept", ".png,.jpg,.jpeg,.webp");
+    input.setAttribute("accept", ".png,.jpg,.jpeg,.webp,.gif");
     input.click();
 
     input.onchange = async (e) => {
         loadingStore.set(true)
 
         const imageFile = e.target.files[0];
+
+        console.log(imageFile);
+
+
+
         const options = {
             maxSizeMB: 1, // 최대 파일 크기 (MB)
             // maxWidthOrHeight: 1024, // 최대 너비 또는 높이
@@ -107,10 +112,24 @@ const uploadImageAct = (back_api_url, options = {}, callback) => {
         };
 
         try {
-            const compressedFile = await imageCompression(
-                imageFile,
-                options,
-            );
+
+            let compressedFile = {}
+            const maxSize = 1 * 1024 * 1024; // 1MB
+
+            if (imageFile.name.split('.')[1] == 'gif') {
+                if (imageFile.size >= maxSize) {
+                    throw new Error("파일 용량이 1MB 이상입니다.");
+                }
+                compressedFile = imageFile
+            } else {
+                compressedFile = await imageCompression(
+                    imageFile,
+                    options,
+                );
+            }
+
+
+
 
             let imgForm = new FormData();
             const timestamp = new Date().getTime();
@@ -123,15 +142,15 @@ const uploadImageAct = (back_api_url, options = {}, callback) => {
             imgForm.append("onimg", compressedFile, fileName);
 
             // FormData의 key 값과 value값 찾기
-            // let keys = imgForm.keys();
-            // for (const pair of keys) {
-            //     console.log(`name : ${pair}`);
-            // }
+            let keys = imgForm.keys();
+            for (const pair of keys) {
+                console.log(`name : ${pair}`);
+            }
 
-            // let values = imgForm.values();
-            // for (const pair of values) {
-            //     console.log(`value : ${pair}`);
-            // }
+            let values = imgForm.values();
+            for (const pair of values) {
+                console.log(`value : ${pair}`);
+            }
 
             const res = await axios.post(
                 back_api_url,
@@ -142,6 +161,7 @@ const uploadImageAct = (back_api_url, options = {}, callback) => {
                     },
                 },
             );
+            console.log('!!!!!!')
 
             loadingStore.set(false)
             if (typeof callback === "function") {
@@ -149,6 +169,7 @@ const uploadImageAct = (back_api_url, options = {}, callback) => {
             }
         } catch (err) {
 
+            loadingStore.set(true)
             const m = err.response?.data?.message;
             if (typeof callback === "function") {
                 callback(err, null);

@@ -8,6 +8,7 @@
         img_bucket,
     } from "$lib/const";
     import uploadImageAct from "$lib/lib";
+    import { loadingStore } from "$lib/stores/stores";
 
     import fileinput from "daisyui/components/fileinput";
 
@@ -72,13 +73,18 @@
             { folder },
             (err, imgData) => {
                 if (err) {
-                    alert("이미지 업로드 실패! 다시 시도해주세요!");
+                    let errMessage = "이미지 업로드 실패!";
+                    if (err.message) {
+                        errMessage = err.message;
+                    }
+                    alert(`${errMessage} 다시 시도해주세요!`);
+                    $loadingStore = false;
+                    return;
                 }
 
                 try {
                     addVal(imgData.saveUrl);
                     setDetailImgCount = imgArr.length - 1;
-
                     const type = "add";
                     updateImg({ imgArr, url: imgData.saveUrl, type });
                 } catch (err) {
@@ -171,10 +177,15 @@
 </ul>
 
 <!-- svelte-ignore event_directive_deprecated -->
-<button
-    class="btn btn-info btn-sm text-white pretendard"
-    type="button"
-    on:click={onFileSelected}
->
-    이미지 추가하기
-</button>
+<div class="">
+    <button
+        class="btn btn-info btn-sm text-white pretendard"
+        type="button"
+        on:click={onFileSelected}
+    >
+        이미지 추가하기
+    </button>
+    <span class="text-xs">
+        GIF 이미지 등록시 1MB 미만 이미지만 등록 가능합니다.
+    </span>
+</div>
