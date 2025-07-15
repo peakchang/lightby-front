@@ -1,9 +1,15 @@
 <script>
     import { fade, fly } from "svelte/transition";
     import { slide } from "svelte/transition";
+    import { user_info } from "$lib/stores/stores";
+    import { onMount } from "svelte";
     let isOpen = $state(false);
 
     let { children } = $props();
+
+    onMount(() => {
+        console.log($user_info);
+    });
 </script>
 
 {#if isOpen}

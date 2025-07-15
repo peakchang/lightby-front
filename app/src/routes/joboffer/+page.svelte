@@ -337,14 +337,18 @@
 
     // 상품 업데이트 (수정) 함수!!!
     async function updateRegist() {
+
+        $all_data["business"] = businessArr.join(",");
+        $all_data["occupation"] = occupationArr.join(",");
+
+        
         // 먼저 값들 다 제대로 들어갔는지 체크!
         const chkBool = chkEssentialValue(chkBoolList);
         if (!chkBool) {
             return;
         }
 
-        $all_data["business"] = businessArr.join(",");
-        $all_data["occupation"] = occupationArr.join(",");
+        
 
         console.log("수정하쟈!!!!!");
 
@@ -373,20 +377,22 @@
             return;
         }
 
+        $all_data["business"] = businessArr.join(",");
+        $all_data["occupation"] = occupationArr.join(",");
+
         const chkBool = chkEssentialValue(chkBoolList);
 
         if (!chkBool) {
             return;
         }
 
-        $all_data["business"] = businessArr.join(",");
-        $all_data["occupation"] = occupationArr.join(",");
-
         submitPrevModal = true;
     }
 
     // uploadChkRegist 함수 실행 시 필수 항목 체크하는 함수!
     function chkEssentialValue(objArr) {
+        console.log(objArr);
+
         for (let i = 0; i < objArr.length; i++) {
             const e = objArr[i];
             if (!$all_data[e.var]) {
