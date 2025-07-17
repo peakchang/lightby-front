@@ -1,3 +1,14 @@
+<script>
+    import moment from "moment-timezone";
+    let { data } = $props();
+
+    let userList = $state([]);
+
+    $effect(() => {
+        userList = data.userList;
+    });
+</script>
+
 <div class="overflow-x-auto">
     <table class="table">
         <thead>
@@ -28,27 +39,31 @@
             </tr>
         </tfoot>
         <tbody>
-            <tr class="text-center">
-                <th class="tb">1</th>
-                <td class="tb">아이디</td>
-                <td class="tb">
-                    <div class="flex gap-1">
-                        <input type="text" class="tb rounded-md w-full" />
-                        <button class="btn btn-sm">변경</button>
-                    </div>
-                </td>
-                <td class="tb">KAKAO</td>
-                <td class="tb"> 010-2190-2197</td>
-                <td class="tb">박창용</td>
-                <td class="tb">john spartan</td>
-                <td class="tb">일반</td>
-                <td class="tb">
-                    <button class="btn btn-sm">보기</button>
-                </td>
+            {#each userList as user}
+                <tr class="text-center">
+                    <th class="tb">1</th>
+                    <td class="tb">{user.id}</td>
+                    <td class="tb">
+                        <div class="flex gap-1">
+                            <input type="text" class="tb rounded-md w-full" />
+                            <button class="btn btn-sm">변경</button>
+                        </div>
+                    </td>
+                    <td class="tb">{user.sns_id ? "KAKAO" : ""}</td>
+                    <td class="tb"> {user.phone}</td>
+                    <td class="tb">{user.name}</td>
+                    <td class="tb">{user.nickname}</td>
+                    <td class="tb">일반</td>
+                    <td class="tb">
+                        <button class="btn btn-sm">보기</button>
+                    </td>
 
-                <td class="tb"> 25/7/15 </td>
-                <td class="tb"> 25/7/15 13:40 </td>
-            </tr>
+                    <td class="tb">
+                        {moment(user.created_at).format("YY/MM/DD")}
+                    </td>
+                    <td class="tb"> 25/7/15 13:40 </td>
+                </tr>
+            {/each}
         </tbody>
     </table>
 </div>
