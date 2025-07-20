@@ -24,6 +24,18 @@
 
 	// 현재 경로에 따라 애니메이션 사용할지 결정
 	let useAnimation = $state(false);
+	let adminPage = $state(false);
+
+	$effect(() => {
+		if ($page.url.pathname.includes("adm")) {
+			adminPage = true;
+		} else {
+			adminPage = false;
+		}
+
+		console.log(`adminPage : ${adminPage}`);
+		
+	});
 
 	const animatedRoutes = [
 		"registjob",
@@ -102,21 +114,25 @@
 	<!-- <script src="https://developers.kakao.com/sdk/js/kakao.js"></script> -->
 </svelte:head>
 
-<div class="site-wrab">
-	<div class="max-w-[640px] mx-auto bg-white min-h-screen text-black">
-		{#key key}
-			{#if useAnimation}
-				<div in:fly={{ y: 300, duration: 300 }}>
-					{@render children()}
-				</div>
-			{:else}
-				<div>
-					{@render children()}
-				</div>
-			{/if}
-		{/key}
+{#if adminPage}
+	{@render children()}
+{:else}
+	<div class="site-wrab">
+		<div class="max-w-[640px] mx-auto bg-white min-h-screen text-black">
+			{#key key}
+				{#if useAnimation}
+					<div in:fly={{ y: 300, duration: 300 }}>
+						{@render children()}
+					</div>
+				{:else}
+					<div>
+						{@render children()}
+					</div>
+				{/if}
+			{/key}
+		</div>
 	</div>
-</div>
+{/if}
 
 <style>
 	:global(body) {

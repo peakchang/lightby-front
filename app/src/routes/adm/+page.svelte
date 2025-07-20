@@ -29,13 +29,17 @@
 
         <tfoot>
             <tr class="text-center">
-                <th>관리자</th>
-                <th>Name</th>
-                <th>Job</th>
-                <th>company</th>
-                <th>location</th>
-                <th>Last Login</th>
-                <th>Favorite Color</th>
+                <th></th>
+                <th>아이디</th>
+                <th>비번변경</th>
+                <th>SNS</th>
+                <th>휴대폰번호</th>
+                <th>이름</th>
+                <th>닉네임</th>
+                <th>등급</th>
+                <th>프로필</th>
+                <th>가입일자</th>
+                <th>마지막접속</th>
             </tr>
         </tfoot>
         <tbody>

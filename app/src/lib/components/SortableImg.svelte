@@ -18,6 +18,7 @@
         maxImgCount = 999999,
         folder = "testfolder",
         detailShow = true,
+        long = false,
     } = $props();
     let imgArr = $state([]);
     let sortable = $state(null);
@@ -159,7 +160,9 @@
         <!-- svelte-ignore a11y_consider_explicit_label -->
         <!-- svelte-ignore event_directive_deprecated -->
         <li
-            class="m-1 flex w-28 h-24 items-center justify-center gap-1 border border-gray-300 my-handle rounded-lg overflow-hidden relative"
+            class:flex={!long}
+            class:w-28={!long}
+            class="m-1 h-24 items-center justify-center gap-1 border border-gray-300 my-handle rounded-lg overflow-hidden relative"
             data-idx={idx}
         >
             <button
