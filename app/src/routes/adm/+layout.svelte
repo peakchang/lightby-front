@@ -7,12 +7,14 @@
 
     let { children } = $props();
 
+    let drawerChecked = $state(false);
+
     onMount(() => {
-        console.log($user_info);
+        // console.log($user_info);
     });
 
     function moveAdmMenu() {
-        isOpen = false;
+        drawerChecked = false;
     }
 </script>
 
@@ -68,14 +70,19 @@
 
 <div class="fixed top-0 left-0 w-full py-3 z-45 bg-white suit-font pl-16">
     <div class="flex items-center gap-7">
-  
-
         <div class="">
-            <input id="my-drawer" type="checkbox" class="drawer-toggle" />
+            <input
+                id="my-drawer"
+                type="checkbox"
+                class="drawer-toggle"
+                bind:checked={drawerChecked}
+            />
             <div class="drawer-content">
                 <!-- Page content here -->
                 <label for="my-drawer">
-                    <i class="fa fa-bars" aria-hidden="true"></i>
+                    <div class="cursor-pointer">
+                        <i class="fa fa-bars" aria-hidden="true"></i>
+                    </div>
                 </label>
             </div>
             <div class="drawer-side">
@@ -87,10 +94,49 @@
                 <ul
                     class="menu bg-base-200 text-base-content min-h-full w-80 p-4"
                 >
-                <button>gogo</button>
+                    <div class="text-right">
+                        <!-- svelte-ignore a11y_consider_explicit_label -->
+                        <button
+                            onclick={() => {
+                                drawerChecked = false;
+                            }}
+                            class="w-8 h-8 rounded-full hover:bg-gray-200"
+                        >
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                        </button>
+                    </div>
+
                     <!-- Sidebar content here -->
-                    <li><a>Sidebar Item 1</a></li>
-                    <li><a>Sidebar Item 2</a></li>
+
+                    <li>
+                        <a href="/adm" onclick={moveAdmMenu}>
+                            <div>회원관리</div>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="/adm/banner" onclick={moveAdmMenu}>
+                            <div>배너관리</div>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="/adm/qna" onclick={moveAdmMenu}>
+                            <div>FAQ / QnA</div>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="/adm/manage_job" onclick={moveAdmMenu}>
+                            <div>공고관리</div>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="/adm/manage_board" onclick={moveAdmMenu}>
+                            <div>게시물 관리</div>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>

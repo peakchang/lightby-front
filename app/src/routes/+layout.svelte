@@ -32,8 +32,6 @@
 		} else {
 			adminPage = false;
 		}
-
-		console.log(`adminPage : ${adminPage}`);
 		
 	});
 

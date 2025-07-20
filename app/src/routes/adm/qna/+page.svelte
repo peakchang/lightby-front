@@ -6,16 +6,20 @@
     import { invalidateAll } from "$app/navigation";
 
     let { data } = $props();
-
+    // faq 관련!!!
+    let faqList = $state([]); // faq 리스트
     let faqOpen = $state(false); // faq 작성 부분 열기 변수
     let faqWriteType = $state("upload"); // faq 작성 수정 or 작성
 
     let faqQuestion = $state(""); // faq 질문
     let faqAnswer = $state(""); // faq 답변
 
-    let faqList = $state([]); // faq 리스트
-
+    // qna 관련!!!
     let qnaList = $state([]); // qna 리스트
+
+    let qnaOpen = $state(false);
+    let qnaQuestion = $state("");
+    let qnaAnswer = $state("");
 
     let modifyIdx = $state(0); // 수정 또는 답변시 idx 값 (같은 테이블이니까 같이 쓰쟈)
 
@@ -67,6 +71,29 @@
             faqOpen = true;
         } catch (error) {}
     }
+
+    async function updateQna() {
+        console.log(qnaAnswer);
+        console.log(modifyIdx);
+
+        if (!qnaAnswer) {
+            alert("답변을 입력해주세요!");
+            return false;
+        }
+        try {
+            const res = await axios.post(`${back_api}/qna/upload_qna_answer`, {
+                qnaAnswer,
+                idx: modifyIdx,
+            });
+
+            qnaOpen = false;
+            qnaQuestion = "";
+            qnaAnswer = "";
+            invalidateAll();
+
+            alert("답변이 등록 되었습니다.");
+        } catch (error) {}
+    }
 </script>
 
 <div class=" text-2xl font-extrabold">QnA!!!</div>
@@ -86,7 +113,7 @@
                 </tr>
             </thead>
             <tbody>
-                {#each qnaList as val}
+                {#each qnaList as val, idx}
                     <tr class="text-center">
                         <td class="tb w-[250px]">
                             <div class="w-[250px] truncate">
@@ -117,7 +144,12 @@
                             <button
                                 class="btn btn-info btn-sm text-white"
                                 value={val.idx}
-                                onclick={loadFaqModify}
+                                onclick={(e) => {
+                                    qnaOpen = true;
+                                    modifyIdx = e.target.value;
+                                    qnaQuestion = qnaList[idx]["question"];
+                                    qnaAnswer = qnaList[idx]["answer"];
+                                }}
                             >
                                 답변
                             </button>
@@ -126,6 +158,45 @@
                 {/each}
             </tbody>
         </table>
+    </div>
+{/if}
+
+{#if qnaOpen}
+    <div class="mt-3 mb-12">
+        <div class="mb-3">
+            <div>Question</div>
+
+            <div
+                class="border border-gray-400 w-full max-w-[600px] rounded-md p-3 bg-gray-100 whitespace-pre-wrap"
+            >
+                {qnaQuestion}
+            </div>
+        </div>
+
+        <div>
+            <div>Answer</div>
+            <textarea
+                class="border border-gray-400 w-full max-w-[600px] rounded-md focus:outline-none focus:border-blue-500 p-3"
+                rows="3"
+                bind:value={qnaAnswer}
+            ></textarea>
+        </div>
+
+        <button
+            class="btn btn-info text-white"
+            value="upload"
+            onclick={updateQna}
+        >
+            QnA 답변 등록 완료 하기
+        </button>
+        <button
+            class="btn btn-error text-white"
+            onclick={() => {
+                faqOpen = false;
+            }}
+        >
+            취소
+        </button>
     </div>
 {/if}
 

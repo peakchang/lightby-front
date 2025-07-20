@@ -8,6 +8,7 @@ import { browser } from "$app/environment";
 export const load = async ({ params, url, data }) => {
 
 
+    let baseEnv = {} // 배너 리스트 불러오기 위해서!
     // 메인에 노출될 사이트 리스트 불러오기
 
     let premiumList = [];
@@ -46,11 +47,19 @@ export const load = async ({ params, url, data }) => {
         siteList = res.data.site_list
 
 
+        baseEnv = res.data.baseEnv
+
+        console.log(`baseEnv : ${baseEnv}`);
+        console.log(baseEnv);
+        
+        
+
+
 
 
     } catch (error) {
-        
+
     }
 
-    return { premiumList, topList, siteList }
+    return { premiumList, topList, siteList, baseEnv }
 }

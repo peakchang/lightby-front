@@ -5,7 +5,6 @@
     import PdButton from "$lib/components/PdButton.svelte";
     import { main_location, loadingStore } from "$lib/stores/stores.js";
     import { browser } from "$app/environment";
-
     import { navigating } from "$app/stores";
     import { onDestroy, onMount } from "svelte";
 
@@ -29,17 +28,23 @@
         "상가/쇼핑몰": "상가",
     });
 
-    const bannerList = ["banner-1.jpg", "banner-2.jpg", "banner-3.jpg"];
+    const bannerList = $state(
+        data.baseEnv.banners ? data.baseEnv.banners.split(",") : [],
+    );
+
+    console.log(bannerList);
 
     let bannerInterval;
     let nowBanner = $state(bannerList[0]);
 
     onMount(() => {
-        bannerInterval = setInterval(() => {
-            const currentIndex = bannerList.indexOf(nowBanner);
-            const nextIndex = (currentIndex + 1) % bannerList.length;
-            nowBanner = bannerList[nextIndex];
-        }, 2500); // 예: 3초마다 변경
+        if (bannerList.length > 0) {
+            bannerInterval = setInterval(() => {
+                const currentIndex = bannerList.indexOf(nowBanner);
+                const nextIndex = (currentIndex + 1) % bannerList.length;
+                nowBanner = bannerList[nextIndex];
+            }, 2500); // 예: 3초마다 변경
+        }
     });
 
     onDestroy(() => {
@@ -72,9 +77,11 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <!-- svelte-ignore event_directive_deprecated -->
 <div class="pt-20 pb-32 suit-font px-3">
-    <div class=" border border-gray-300 rounded-lg p-2">
-        <img src={`/banners/${nowBanner}`} alt="" />
-    </div>
+    {#if bannerList.length > 0}
+        <div class=" border border-gray-300 rounded-lg p-2">
+            <img src={`${public_img_bucket}${nowBanner}`} alt="" />
+        </div>
+    {/if}
 
     <div class="my-3">
         <ul class="grid grid-cols-3 md:grid-cols-4 gap-x-5 md:gap-x-2 gap-y-1">
