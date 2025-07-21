@@ -16,9 +16,6 @@
     let alertMessage = $state("");
     let modalLoading = $state(false);
 
-
-    
-
     onMount(async () => {
         if ($user_info.idx) {
             alertMessage = "이미 로그인 되어 있습니다.";
@@ -170,7 +167,7 @@
 
             <div class="mt-3 text-center">
                 <button
-                    class="text-xs text-blue-600 cursor-pointer"
+                    class="btn btn-success text-white w-full"
                     on:click={() => {
                         goto("/auth/join");
                     }}
