@@ -71,7 +71,7 @@
 
 <!-- 관심지역 설정 모달 -->
 <CustomModal bind:visible={alertModalBool} closeBtn={false}>
-    준비중입니다. 문구 짜죠
+    ⏳ 현재 빠르게 준비 중입니다.
 </CustomModal>
 
 <!-- 관심지역 설정 모달 -->
