@@ -43,6 +43,7 @@
     let submitPrevModal = $state(false); // 모달 변수
     let paymentStatus = $state(false); // 업로드시에 결제 완료 여부 체크 변수!!
     let popup = $state();
+    let popupCheckInterval = $state(); // 팝업이 닫혔을때 감지!!
 
     // 모달 내 계산기 관련
     let productInfo = $state({ name: "일반", price: 0 }); // 상품 정보가 담김!
@@ -313,6 +314,23 @@
                 "width=550,height=670",
             );
 
+            popupCheckInterval = setInterval(() => {
+                if (popup && popup.closed) {
+                    clearInterval(popupCheckInterval);
+                    popupCheckInterval = null;
+
+                    if (!paymentStatus) {
+                        $loadingStore = false;
+                        alertModalShow = true;
+                        alertModalMessage =
+                            "결제가 취소되었습니다. 다시 시도해주세요.";
+                        popup = null;
+                    }
+
+                    // 여기에 닫힌 후 실행할 코드 추가
+                }
+            }, 500); // 0.5초마다 감지
+
             $loadingStore = true;
             return;
         }
@@ -337,18 +355,14 @@
 
     // 상품 업데이트 (수정) 함수!!!
     async function updateRegist() {
-
         $all_data["business"] = businessArr.join(",");
         $all_data["occupation"] = occupationArr.join(",");
 
-        
         // 먼저 값들 다 제대로 들어갔는지 체크!
         const chkBool = chkEssentialValue(chkBoolList);
         if (!chkBool) {
             return;
         }
-
-        
 
         console.log("수정하쟈!!!!!");
 
@@ -1205,12 +1219,12 @@
         </div>
 
         <div class="mt-2 bg-white p-5">
-            <div class="font-semibold text-lg">상세내용</div>
+            <div class="font-semibold">상세내용</div>
             <div class="mt-1.5">
                 <textarea
-                    class="textarea textarea-info w-full p-2"
+                    class="textarea textarea-info w-full p-2 text-base"
                     placeholder="현장에 대한 상세 내용을 입력해주세요"
-                    rows="5"
+                    rows="8"
                     bind:value={$all_data["detail_content"]}
                 ></textarea>
             </div>

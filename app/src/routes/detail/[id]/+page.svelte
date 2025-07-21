@@ -1,6 +1,6 @@
 <script>
     import { goto } from "$app/navigation";
-    import { public_img_bucket, img_bucket } from "$lib/const";
+    import { public_img_bucket, img_bucket, back_api } from "$lib/const";
     import KakaoMap from "$lib/components/kakaoMap.svelte";
     import DetailMenu from "$lib/components/DetailMenu.svelte";
     import { user_info } from "$lib/stores/stores.js";
@@ -9,6 +9,7 @@
     import { toastStore } from "$lib/stores/stores.js";
     import { page } from "$app/stores";
     import { favorateBool } from "$lib/stores/stores.js";
+    import axios from "axios";
 
     let headerShowBool = $state(true); // 스크롤 내릴시 상단 메뉴 보이게 하기 위한 변수!
     let showBool = $state(true); // 처음 페이지 로딩시 위로 올라가는 잔상 없애기 위해!
@@ -17,16 +18,14 @@
     let { data } = $props();
 
     const detailContent = $derived(data.detail);
+
     let mainImage = $state([]);
     let shareModal = $state(false);
 
     let imgSwiper = $state({});
+
+    let alertModalBool = $state(false);
     onMount(() => {
-        console.log(detailContent);
-
-        console.log(data.favorateBool);
-        
-
         $favorateBool = data.favorateBool;
 
         mainImage = detailContent.imgs.split(",");
@@ -82,7 +81,33 @@
             );
     }
 
-    //
+    // 포스트 삭제!!
+
+    async function deletePost() {
+        console.log(detailContent);
+
+        console.log(detailContent.thumbnail);
+
+        try {
+            const res = await axios.post(`${back_api}/regist/delete`, {
+                delImgs: detailContent.imgs,
+                delThumbnail: detailContent.thumbnail,
+                idx: detailContent.idx,
+            });
+
+            console.log(res);
+        } catch (error) {
+            console.error(error.message);
+        }
+
+        if ($page.url.searchParams.get("prev") == "my") {
+            goto("/manage_board");
+        } else {
+            goto("/");
+        }
+
+        console.log($page);
+    }
 </script>
 
 <svelte:window bind:scrollY={y} />
@@ -135,6 +160,7 @@
     </div>
 </div>
 
+<!-- svelte-ignore event_directive_deprecated -->
 <CustomModal bind:visible={shareModal}>
     <div class="flex justify-center items-center gap-3">
         <button
@@ -158,11 +184,62 @@
     </div>
 </CustomModal>
 
+<CustomModal bind:visible={alertModalBool}>
+    <div class="text-center">
+        <div class=" text-red-500 text-3xl mb-5">
+            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+        </div>
+
+        {#if detailContent.product == "free"}
+            <div class="mb-5">
+                <p>삭제되는 내용은 복구가 불가합니다.</p>
+                <p>진행 하시겠습니까?</p>
+            </div>
+        {:else}
+            <div class="mb-5">
+                <p>삭제한 내용은 복구가 불가하며</p>
+                <p>결제하신 내역까지 전부 사라지게 됩니다.</p>
+                <p>진행 하시겠습니까?</p>
+            </div>
+        {/if}
+        <div class="flex justify-center items-center gap-3">
+            <button class="btn btn-error w-1/3 text-white" on:click={deletePost}
+                >삭제</button
+            >
+            <button class="btn btn-active w-1/3">취소</button>
+        </div>
+    </div>
+</CustomModal>
+
 <DetailMenu {openShareModal} />
 
+<!-- svelte-ignore event_directive_deprecated -->
 <div class=" mb-8">
-    {#if mainImage.length == 1}
-        <div class=" min-h-[300px] max-h-[500px]">
+    {#if detailContent.user_id == $user_info.idx}
+        <div class="text-right my-3">
+            <button
+                class="btn btn-info text-white btn-sm"
+                on:click={() => {
+                    goto(`/joboffer?modifyidx=${detailContent.idx}`);
+                }}
+            >
+                내 글 수정
+            </button>
+            <button
+                class="btn btn-error text-white btn-sm"
+                on:click={() => {
+                    alertModalBool = true;
+                }}
+            >
+                내 글 삭제
+            </button>
+        </div>
+    {/if}
+
+    {#if mainImage.length == 0}
+        <div></div>
+    {:else if mainImage.length == 1}
+        <div class="">
             <img src={`${public_img_bucket}${mainImage[0]}`} alt="" />
         </div>
     {:else}
@@ -225,14 +302,14 @@
     </div>
 </div>
 
-<div class="mt-3 p-3 bg-white rounded-lg">
+<div class="mt-10 p-3 bg-white rounded-lg">
     <div class="text-lg">
         <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
         <span>채용정보</span>
     </div>
 
     <div class="my-3 font-semibold text-lg">기본정보</div>
-    <div class="leading-relaxed">
+    <div class="leading-loose">
         <p>대행사 : {detailContent.agency}</p>
         <p>담당자 성함 : {detailContent.name}</p>
         <p>
@@ -250,7 +327,7 @@
     </div>
 
     <div class="my-3 font-semibold text-lg">급여 및 영업지원 정보</div>
-    <div class="leading-relaxed">
+    <div class="leading-loose">
         <p>수수료 : {detailContent.fee_type} {detailContent.fee}</p>
         <p>
             일비 : {detailContent.daily_expense
@@ -280,7 +357,7 @@
         <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
         <span>상세정보</span>
     </div>
-    <div class="leading-relaxed mt-3">
+    <div class="leading-relaxed mt-3 whitespace-pre-wrap">
         {detailContent.detail_content ? detailContent.detail_content : "-"}
     </div>
 </div>

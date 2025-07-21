@@ -133,10 +133,10 @@
                 >
                     <div class="absolute bottom-0 right-0 p-3">
                         {#if value.icons}
-                            <div class="w-full flex justify-end gap-1">
+                            <div class="w-full flex justify-end gap-1 min-w-[114px]">
                                 {#each value.icons.split(",") as icon}
                                     <div
-                                        class="w-1/3 max-w-[45px] md:max-w-[55px]"
+                                        class="w-1/3 max-w-[35px] md:max-w-[60px]"
                                     >
                                         <img
                                             src="/icons/icon-{icon}.png"

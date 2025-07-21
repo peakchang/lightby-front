@@ -6,6 +6,7 @@
     import { back_api } from "$lib/const";
     import { favorateBool } from "$lib/stores/stores";
     import { toastStore } from "$lib/stores/stores";
+    import { goto } from "$app/navigation";
 
     let { favorateShow = true, shareShow = true, openShareModal } = $props();
 
@@ -69,7 +70,11 @@
     <div
         class="text-3xl w-12 cursor-pointer"
         on:click={() => {
-            window.history.back();
+            if ($page.url.pathname.includes("detail")) {
+                goto("/");
+            } else if ($page.url.pathname.includes("showfee")) {
+                goto("/showfee");
+            }
         }}
     >
         <i class="fa fa-angle-left" aria-hidden="true"></i>

@@ -47,11 +47,17 @@
     }
 
     function searchFunc() {
-        console.log($search_val);
         localStorage.setItem("search_val", $search_val);
         invalidateAll();
         searchModal = false;
         $loadingStore = true;
+    }
+
+    function goToMain() {
+        $main_location = "전국";
+        localStorage.removeItem("location");
+        localStorage.removeItem("search_val");
+        goto("/", { invalidateAll: true });
     }
 </script>
 
@@ -108,9 +114,10 @@
     closeOnBackground={false}
     focusInput={true}
 >
+    <!-- svelte-ignore event_directive_deprecated -->
     <div class="pt-5">
         <form on:submit|preventDefault={searchFunc}>
-            <div class="flex gap-3 items-center">
+            <div class="flex gap-2 items-center">
                 <input
                     type="text"
                     class="border w-full py-2 px-3 border-gray-400 focus:outline-none focus:border-blue-500 text-sm rounded-md"
@@ -119,6 +126,18 @@
                 />
                 <button class="btn btn-active btn-accent text-white">
                     검색
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-warning text-white"
+                    on:click={() => {
+                        localStorage.removeItem("search_val");
+                        invalidateAll();
+                        searchModal = false;
+                        $loadingStore = true;
+                    }}
+                >
+                    초기화
                 </button>
             </div>
         </form>
@@ -130,7 +149,8 @@
 >
     <div class="flex justify-between items-center">
         <div>
-            <a href="/">
+            <!-- svelte-ignore event_directive_deprecated -->
+            <a href="/" on:click|preventDefault={goToMain}>
                 <img
                     src="/logo.png"
                     alt=""
@@ -160,6 +180,7 @@
                 </a>
             {/if}
 
+            <!-- svelte-ignore event_directive_deprecated -->
             <button
                 class="btn btn-outline btn-info btn-xs md:btn-sm hover:text-white"
                 on:click={() => {
@@ -200,8 +221,7 @@
                             loginAlertModalShow = true;
                             return;
                         }
-
-                        goto("/joboffer");
+                        goto(`/joboffer?prev=${$page.url.pathname}`);
                     }}
                 >
                     <PdButton

@@ -134,7 +134,7 @@
                             <button
                                 class="btn btn-info btn-xs text-sm min-w-[60px] text-white mb-2"
                                 on:click={() => {
-                                    goto(`/detail/${value.idx}`);
+                                    goto(`/detail/${value.idx}?prev=my`);
                                 }}
                             >
                                 보기
@@ -205,7 +205,7 @@
                         <button
                             class="btn btn-info btn-xs text-sm min-w-[60px] text-white mb-2"
                             on:click={() => {
-                                goto(`/showfee/${value.idx}`);
+                                goto(`/showfee/${value.idx}?prev=my`);
                             }}
                         >
                             보기
