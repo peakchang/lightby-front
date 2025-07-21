@@ -70,11 +70,17 @@
     <div
         class="text-3xl w-12 cursor-pointer"
         on:click={() => {
-            if ($page.url.pathname.includes("detail")) {
+            const movePage = $page.url.searchParams.get("prev");
+            if (movePage) {
+                goto(movePage);
+            } else {
                 goto("/");
-            } else if ($page.url.pathname.includes("showfee")) {
-                goto("/showfee");
             }
+            // if ($page.url.pathname.includes("detail")) {
+            //     goto("/");
+            // } else if() {
+            //     goto(`/${$page.url.pathname}`);
+            // }
         }}
     >
         <i class="fa fa-angle-left" aria-hidden="true"></i>

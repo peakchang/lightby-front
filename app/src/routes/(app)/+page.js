@@ -1,4 +1,4 @@
-import { back_api } from "$lib/const.js";
+import { back_api, public_img_bucket } from "$lib/const.js";
 import { user_info } from "$lib/stores/stores.js";
 import { main_location, search_val } from "$lib/stores/stores.js";
 import axios from "axios";
@@ -47,19 +47,27 @@ export const load = async ({ params, url, data }) => {
         siteList = res.data.site_list
 
 
+        // [premiumList, topList, siteList].forEach(applyMainImgSrc);
+
+        // console.log(premiumList);
+        // console.log(topList);
+        
+
+
         baseEnv = res.data.baseEnv
-
-        console.log(`baseEnv : ${baseEnv}`);
-        console.log(baseEnv);
-        
-        
-
-
-
-
     } catch (error) {
 
     }
 
     return { premiumList, topList, siteList, baseEnv }
 }
+
+const applyMainImgSrc = list => {
+    list.forEach(item => {
+        item.mainImgSrc = item.thumbnail
+            ? `${public_img_bucket}${item.thumbnail}`
+            : item.imgs
+                ? `${public_img_bucket}${item.imgs.split(',')[0]}`
+                : '';
+    });
+};

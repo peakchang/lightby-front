@@ -91,7 +91,7 @@
             <!-- 답변 DIV (조건부 렌더링 + 슬라이드 애니메이션) -->
             {#if isOpen(item.idx) && item.answer}
                 <div
-                    class="text-sm px-4 pb-3 border-t border-gray-200 pt-3 bg-gray-50"
+                    class="text-sm px-4 pb-3 border-t border-gray-200 pt-3 bg-gray-50 whitespace-pre-wrap leading-relaxed"
                     transition:slide
                 >
                     {item.answer}

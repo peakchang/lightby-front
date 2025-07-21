@@ -12,10 +12,10 @@ export const back_api = `${import.meta.env.VITE_SERVER_URL}`
 
 export const regions = [
     "서울",
-    "경기",
+    "경기도",
     "인천",
-    "충청",
-    "전라",
+    "충청도",
+    "전라도",
     "강원도",
     "경상도",
     "제주도",

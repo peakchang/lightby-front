@@ -50,6 +50,7 @@
     let iconNames = $state([]); // 아이콘 이름이 한글로 담김!
     let icons = $state([]); // 아이콘 이름이 영어로 담김!
     let iconSum = $state(0); // 아이콘 갯수에 따른 가격 합계
+    let iconsShow = $state(false);
 
     // 글 작성중 뒤로가기 또는 새로고침시 필요한 변수 (이미지 삭제 관련)
     let escapePageModal = $state(false);
@@ -76,7 +77,7 @@
     let successPrevModalMessage = $state("");
 
     const chkBoolList = [
-        { var: "imgs", label: "현장 이미지" },
+        // { var: "imgs", label: "현장 이미지" },
         { var: "subject", label: "공고 제목(현장명)" },
         { var: "point", label: "현장 한마디" },
         { var: "addr", label: "근무지 주소" },
@@ -86,8 +87,8 @@
         { var: "phone", label: "담당자 연락처" },
         { var: "business", label: "업종분류선택" },
         { var: "occupation", label: "직종분류선택" },
-        { var: "career", label: "경력 입력" },
-        { var: "number_people", label: "인원 입력" },
+        // { var: "career", label: "경력 입력" },
+        // { var: "number_people", label: "인원 입력" },
         { var: "fee_type", label: "수수료 타입" },
         { var: "fee", label: "수수료 입력" },
     ];
@@ -458,12 +459,15 @@
         if (this.value == "premium") {
             productInfo.name = "프리미엄";
             productInfo.price = 66000;
+            iconsShow = true;
         } else if (this.value == "top") {
             productInfo.name = "지역 탑";
             productInfo.price = 49500;
+            iconsShow = true;
         } else if (this.value == "free") {
             productInfo.name = "일반";
             productInfo.price = 0;
+            iconsShow = false;
             if (icons && icons.length > 0) {
                 icons = [];
                 iconNames = [];
@@ -840,31 +844,39 @@
             </label>
         </div>
 
-        <div class="">
-            <div class="mb-4">아이콘 선택 (개당 2,200원)</div>
-            <div class="grid grid-cols-4 md:gap-x-2 gap-y-2">
-                {#each iconList as icon}
-                    <label>
-                        <input
-                            type="checkbox"
-                            class="hidden peer"
-                            value={icon.id}
-                            bind:group={icons}
-                            on:change={iconsChange}
-                        />
-                        <div
-                            class="border-2 peer-checked:border-blue-500 border-gray-200 w-5/6 md:w-4/5 p-2 mx-auto rounded-lg"
-                        >
-                            <img
-                                src="/icons/icon-{icon.id}.png"
-                                alt=""
-                                class="w-full"
+        {#if iconsShow}
+            <div class="">
+                <div class="">※ 아이콘 선택 (개당 2,200원)</div>
+                <div class="mt-1 mb-4 text-xs leading-relaxed">
+                    <p>아이콘은 2개까지 선택 가능하며,</p>
+                    <p>선택하신 아이콘은 메인페이지 우측 하단에 표시됩니다.</p>
+                </div>
+                <div class="grid grid-cols-4 md:gap-x-2 gap-y-2">
+                    {#each iconList as icon}
+                        <label>
+                            <input
+                                type="checkbox"
+                                class="hidden peer"
+                                value={icon.id}
+                                bind:group={icons}
+                                on:change={iconsChange}
                             />
-                        </div>
-                    </label>
-                {/each}
+                            <div
+                                class="border-2 peer-checked:border-blue-500 border-gray-200 w-5/6 md:w-4/5 p-2 mx-auto rounded-lg"
+                            >
+                                <img
+                                    src="/icons/icon-{icon.id}.png"
+                                    alt=""
+                                    class="w-full"
+                                />
+                            </div>
+                        </label>
+                    {/each}
+                </div>
             </div>
-        </div>
+        {:else}
+            아이콘 선택은 프리미엄 또는 지역탑 등록시 선택 가능합니다.
+        {/if}
 
         <div class="w-2/3 md:w-1/2 ml-auto my-4 text-lg font-semibold">
             <div
@@ -972,7 +984,7 @@
         </div>
 
         <div class="mt-2 bg-white p-5">
-            <div class="font-semibold text-lg">이미지 등록 *</div>
+            <div class="font-semibold text-lg">이미지 등록</div>
             <div class="text-xs">
                 이미지는 최대 10장, 슬라이드 형태로 표시됩니다.
             </div>
@@ -1010,19 +1022,28 @@
             <div class="mt-3 font-semibold text-lg">근무지*</div>
 
             <div class="mt-1.5 flex w-full items-center gap-1">
-                {#if $all_data["res_addr"]}
+                <input
+                    type="text"
+                    class="input input-bordered input-info input-sm w-full"
+                    bind:value={$all_data["res_addr"]}
+                />
+                <!-- {#if $all_data["res_addr"]}
                     <div
                         class="border w-full py-1.5 px-2 text-sm border-sky-400 rounded-md"
                     >
                         {$all_data["res_addr"]}
                     </div>
                 {:else}
+
+
                     <div
                         class="border w-full py-1.5 px-2 text-sm border-sky-400 rounded-md text-gray-400"
                     >
+
+
                         우측 주소 입력을 클릭해 주소를 입력해주세요
                     </div>
-                {/if}
+                {/if} -->
 
                 <button
                     class="btn btn-outline btn-info btn-sm"
@@ -1031,6 +1052,21 @@
                 >
                     <span>주소 입력</span>
                 </button>
+
+                <button
+                    class="btn btn-outline btn-info btn-sm"
+                    type="button"
+                    on:click={() => {
+                        getAddress = $all_data["res_addr"];
+                    }}
+                >
+                    <span>맵적용</span>
+                </button>
+            </div>
+
+            <div class="mt-1 text-xs text-right leading-normal">
+                <p>주소입력 클릭 후, 주소 검색 및 적용 하시면 됩니다.</p>
+                <p>원하는 주소가 없을시 직접 입력 후 (맵적용)을 클릭해주세요</p>
             </div>
 
             <!-- <div class="my-2">
@@ -1141,13 +1177,13 @@
             </div>
 
             <QuestionItem
-                sbj="경력 *"
+                sbj="경력 "
                 placeholder="ex) 10년 / 초보"
                 bind:iptVal={$all_data["career"]}
             />
 
             <QuestionItem
-                sbj="인원 *"
+                sbj="인원 "
                 placeholder="ex) 2명 / 00명"
                 bind:iptVal={$all_data["number_people"]}
             />

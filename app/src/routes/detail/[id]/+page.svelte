@@ -28,7 +28,9 @@
     onMount(() => {
         $favorateBool = data.favorateBool;
 
-        mainImage = detailContent.imgs.split(",");
+        if (detailContent.imgs) {
+            mainImage = detailContent.imgs.split(",");
+        }
 
         // 스와이퍼 셋팅
         imgSwiper = new Swiper(".mySwiper", {

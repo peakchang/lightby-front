@@ -7,6 +7,7 @@
     import { browser } from "$app/environment";
     import { navigating } from "$app/stores";
     import { onDestroy, onMount } from "svelte";
+    import JobPostItem from "$lib/components/JobPostItem.svelte";
 
     let { data } = $props();
 
@@ -31,8 +32,6 @@
     const bannerList = $state(
         data.baseEnv.banners ? data.baseEnv.banners.split(",") : [],
     );
-
-    console.log(bannerList);
 
     let bannerInterval;
     let nowBanner = $state(bannerList[0]);
@@ -122,99 +121,7 @@
             ></div>
         </div>
         {#each premiumList as value}
-            <a
-                href="/detail/{value.idx}"
-                on:click|preventDefault={() => {
-                    goToDetail(value.idx);
-                }}
-            >
-                <div
-                    class="border border-gray-300 rounded-lg p-2 mb-3 shadow-sm cursor-pointer relative"
-                >
-                    <div class="absolute bottom-0 right-0 p-3">
-                        {#if value.icons}
-                            <div class="w-full flex justify-end gap-1 min-w-[114px]">
-                                {#each value.icons.split(",") as icon}
-                                    <div
-                                        class="w-1/3 max-w-[35px] md:max-w-[60px]"
-                                    >
-                                        <img
-                                            src="/icons/icon-{icon}.png"
-                                            alt=""
-                                        />
-                                    </div>
-                                {/each}
-                            </div>
-                        {/if}
-                    </div>
-                    <div
-                        class="flex gap-3 md:gap-5 items-center border-b-gray-300"
-                    >
-                        <div
-                            class="w-32 h-[100px] md:w-36 md:h-28 rounded-lg overflow-hidden flex-shrink-0"
-                        >
-                            {#if value.thumbnail}
-                                <img
-                                    src={`${public_img_bucket}${value.thumbnail}`}
-                                    alt=""
-                                    class="w-full h-full object-cover"
-                                />
-                            {:else}
-                                <img
-                                    src={`${public_img_bucket}${value.imgs.split(",")[0]}`}
-                                    alt=""
-                                    class="w-full h-full object-cover"
-                                />
-                            {/if}
-                        </div>
-                        <div
-                            class="flex flex-col justify-around overflow-hidden"
-                        >
-                            <div
-                                class="text-xs md:text-sm text-amber-800 truncate"
-                            >
-                                {value.point}
-                            </div>
-
-                            <div class="text-sm md:text-base truncate">
-                                <span>{value.subject}</span>
-                            </div>
-
-                            <div>
-                                <div>
-                                    <div class="mb-1">
-                                        <span
-                                            class=" bg-[#0a0078] text-xs md:text-sm px-2 py-0.5 text-white rounded-md font-bold"
-                                        >
-                                            {value.fee_type}
-                                            {value.fee}
-                                        </span>
-                                    </div>
-
-                                    <div
-                                        class="text-[10px] md:text-xs flex flex-wrap"
-                                    >
-                                        <span
-                                            class="bg-[#3a86ff] px-1.5 py-0.5 text-white rounded-md mr-1"
-                                        >
-                                            {multiReplace(
-                                                value.business,
-                                                businessReplaceDict,
-                                            )}
-                                        </span>
-
-                                        <span
-                                            class="bg-[#3a86ff] px-2 py-0.5 text-white rounded-md mr-1"
-                                        >
-                                            {value.occupation}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </a>
+            <JobPostItem {value}></JobPostItem>
         {/each}
     </div>
 
@@ -233,93 +140,7 @@
             ></div>
         </div>
         {#each topList as value}
-            <a
-                href="/detail/{value.idx}"
-                on:click|preventDefault={() => {
-                    goToDetail(value.idx);
-                }}
-            >
-                <div
-                    class="border border-gray-300 rounded-lg p-2 mb-3 shadow-sm cursor-pointer relative"
-                >
-                    <div class="absolute bottom-0 right-0 p-3 max-w-1/3">
-                        {#if value.icons}
-                            <div class="w-full flex justify-end gap-1">
-                                {#each value.icons.split(",") as icon}
-                                    <div
-                                        class="w-1/3 max-w-[45px] md:max-w-[55px]"
-                                    >
-                                        <img
-                                            src="/icons/icon-{icon}.png"
-                                            alt=""
-                                        />
-                                    </div>
-                                {/each}
-                            </div>
-                        {/if}
-                    </div>
-                    <div
-                        class="flex gap-3 md:gap-5 items-center border-b-gray-300"
-                    >
-                        <div
-                            class="w-32 h-[100px] md:w-36 md:h-28 rounded-lg overflow-hidden flex-shrink-0"
-                        >
-                            {#if value.thumbnail}
-                                <img
-                                    src={`${public_img_bucket}${value.thumbnail}`}
-                                    alt=""
-                                    class="w-full h-full object-cover"
-                                />
-                            {/if}
-                        </div>
-                        <div
-                            class="flex flex-col justify-around overflow-hidden"
-                        >
-                            <div
-                                class="text-xs md:text-sm text-amber-800 truncate"
-                            >
-                                {value.point}
-                            </div>
-
-                            <div class="text-sm md:text-base truncate">
-                                <span>{value.subject}</span>
-                            </div>
-
-                            <div>
-                                <div>
-                                    <div class="mb-1">
-                                        <span
-                                            class=" bg-[#0a0078] text-xs md:text-sm px-2 py-0.5 text-white rounded-md font-bold"
-                                        >
-                                            {value.fee_type}
-                                            {value.fee}
-                                        </span>
-                                    </div>
-
-                                    <div
-                                        class="text-[10px] md:text-xs flex flex-wrap"
-                                    >
-                                        <span
-                                            class="bg-[#3a86ff] px-1.5 py-0.5 text-white rounded-md mr-1"
-                                        >
-                                            {multiReplace(
-                                                value.business,
-                                                businessReplaceDict,
-                                            )}
-                                        </span>
-
-                                        <span
-                                            class="bg-[#3a86ff] px-2 py-0.5 text-white rounded-md mr-1"
-                                        >
-                                            {value.occupation}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </a>
+            <JobPostItem {value}></JobPostItem>
         {/each}
     </div>
 
@@ -339,54 +160,7 @@
         </div>
 
         {#each siteList as value}
-            <a
-                href="/detail/test"
-                on:click|preventDefault={() => {
-                    goToDetail(value.idx);
-                }}
-            >
-                <div
-                    class="mt-5 relative border border-gray-300 rounded-lg p-2 shadow-sm cursor-pointer"
-                >
-                    <div class="flex justify-between items-center">
-                        <div class="pl-4 max-w-[55%]">
-                            <div
-                                class="text-xs md:text-sm text-amber-800 truncate"
-                            >
-                                {value.point}
-                            </div>
-                            <div class="text-sm md:text-base">
-                                {value.subject}
-                            </div>
-                        </div>
-
-                        <div class=" max-w-[45%]">
-                            <div class="mb-1 text-[10px] flex flex-wrap gap-1">
-                                <span
-                                    class=" bg-[#0a0078] px-2 py-1 text-white rounded-md font-bold inline-block"
-                                >
-                                    {value.fee_type}
-                                    {value.fee}
-                                </span>
-                                <span
-                                    class="bg-[#3a86ff] px-1.5 py-1 text-white rounded-md inline-block"
-                                >
-                                    {multiReplace(
-                                        value.business.split(",")[0],
-                                        businessReplaceDict,
-                                    )}
-                                </span>
-
-                                <span
-                                    class="bg-[#3a86ff] px-2 py-1 text-white rounded-md inline-block"
-                                >
-                                    {value.occupation.split(",")[0]}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </a>
+            <JobPostItem {value}></JobPostItem>
         {/each}
     </div>
 </div>

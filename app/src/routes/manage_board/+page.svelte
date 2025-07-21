@@ -101,8 +101,13 @@
                             <div class="w-4"></div>
                         {/if}
 
+                        <!-- svelte-ignore a11y_click_events_have_key_events -->
+                        <!-- svelte-ignore a11y_no_static_element_interactions -->
                         <div
                             class="flex flex-col justify-between gap-2 w-full h-full"
+                            on:click={() => {
+                                goto(`/detail/${value.idx}?prev=/manage_board`);
+                            }}
                         >
                             <div class="text-sm">{value.subject}</div>
                             <div class="text-xs">
@@ -133,9 +138,6 @@
                         <div class=" text-right">
                             <button
                                 class="btn btn-info btn-xs text-sm min-w-[60px] text-white mb-2"
-                                on:click={() => {
-                                    goto(`/detail/${value.idx}?prev=my`);
-                                }}
                             >
                                 보기
                             </button>

@@ -74,7 +74,7 @@
                     style="padding-bottom:70px"
                 >
                     {#each postList as post}
-                        <a href="/detail/{post.idx}">
+                        <a href="/detail/{post.idx}?prev=/interest">
                             <div
                                 class="border border-gray-300 rounded-lg p-2 mb-3 shadow-sm cursor-pointer relative"
                             >
