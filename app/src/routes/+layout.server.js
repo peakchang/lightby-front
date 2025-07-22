@@ -8,9 +8,9 @@ export const load = async ({ locals }) => {
     console.log('최초에만 나오지?!?!');
 
     try {
-        const res = await axios.get(`${back_api}/today_update`)
+        const res = await axios.get(`${back_api}/today_update`, { withCredentials: true })
     } catch (error) {
-        
+
     }
 
 
