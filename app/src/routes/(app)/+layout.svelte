@@ -200,8 +200,18 @@
     </div>
 </div>
 
-<div class="">
+<div class=" suit-font">
     {@render children()}
+
+    <div class="border-t border-gray-400 mt-8 pb-4"></div>
+    <div class="pb-28 px-10">
+        <div class="text-xs leading-loose">
+            <p>상호: 위드브릿지</p>
+            <p>사업자번호 : 509-63-00569</p>
+            <p>주소 : 경기도화성시효행로1068,6층604-G36호</p>
+            <p>개인정보처리관리자 : 김가연</p>
+        </div>
+    </div>
 </div>
 
 <div class="fixed left-0 bottom-0 w-full suit-font z-40">

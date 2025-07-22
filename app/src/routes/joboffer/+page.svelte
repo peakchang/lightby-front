@@ -80,7 +80,7 @@
         // { var: "imgs", label: "현장 이미지" },
         { var: "subject", label: "공고 제목(현장명)" },
         { var: "point", label: "현장 한마디" },
-        { var: "addr", label: "근무지 주소" },
+        { var: "res_addr", label: "근무지 주소" },
         { var: "location", label: "지역 선택" },
         { var: "agency", label: "분양대행사명" },
         { var: "name", label: "담당자 성함" },
@@ -1025,7 +1025,7 @@
                 <input
                     type="text"
                     class="input input-bordered input-info input-sm w-full"
-                    bind:value={$all_data["res_addr"]}
+                    bind:value={$all_data["addr"]}
                 />
                 <!-- {#if $all_data["res_addr"]}
                     <div
@@ -1057,7 +1057,8 @@
                     class="btn btn-outline btn-info btn-sm"
                     type="button"
                     on:click={() => {
-                        getAddress = $all_data["res_addr"];
+                        $all_data["res_addr"] = $all_data["addr"];
+                        getAddress = $all_data["addr"];
                     }}
                 >
                     <span>맵적용</span>

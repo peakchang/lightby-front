@@ -4,8 +4,7 @@
     import { navigating, page } from "$app/stores";
     import { interestTabNum } from "$lib/stores/stores";
     import { onMount } from "svelte";
-    import moment from "moment-timezone";
-    import { public_img_bucket, img_bucket } from "$lib/const";
+    import InterestPostItem from "$lib/components/InterestPostItem.svelte";
 
     let { data } = $props();
 
@@ -74,40 +73,7 @@
                     style="padding-bottom:70px"
                 >
                     {#each postList as post}
-                        <a href="/detail/{post.idx}?prev=/interest">
-                            <div
-                                class="border border-gray-300 rounded-lg p-2 mb-3 shadow-sm cursor-pointer relative"
-                            >
-                                <div
-                                    class="flex gap-3 md:gap-5 items-center border-b-gray-300"
-                                >
-                                    {#if post.thumbnail}
-                                        <div
-                                            class=" w-28 h-16 md:w-32 md:h-20 rounded-lg overflow-hidden flex-shrink-0"
-                                        >
-                                            <img
-                                                src={`${public_img_bucket}${post.thumbnail}`}
-                                                alt=""
-                                                class="w-full h-full object-cover"
-                                            />
-                                        </div>
-                                    {:else}
-                                        <div class="w-4"></div>
-                                    {/if}
-
-                                    <div class="flex flex-col justify-between">
-                                        <div class="mb-1">
-                                            {post.subject}
-                                        </div>
-                                        <div class="text-sm">
-                                            {moment(post.created_at).format(
-                                                "YY/MM/DD HH:mm",
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
+                        <InterestPostItem {post}></InterestPostItem>
                     {/each}
                 </div>
             {:else if !interestStatus}
