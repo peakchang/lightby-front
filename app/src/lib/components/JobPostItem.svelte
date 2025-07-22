@@ -1,6 +1,7 @@
 <script>
     import { goto, invalidateAll } from "$app/navigation";
     import { back_api, public_img_bucket } from "$lib/const.js";
+    import { prev } from "$lib/stores/stores";
     let { value } = $props();
 
     console.log(value);
@@ -14,6 +15,7 @@
     });
 
     function goToDetail(idx) {
+        $prev = "/";
         goto(`/detail/${idx}`);
     }
     function multiReplace(str, map) {

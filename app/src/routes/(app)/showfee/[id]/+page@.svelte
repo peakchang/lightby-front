@@ -31,12 +31,15 @@
 
     let loopStop = $state(false);
 
+    let alertModalBool = $state(false); // 글 삭제시 먼저 물어보는 모달
+
+    console.log(data);
+
     onMount(() => {
         likeCount = data.likeCount;
         postItem = data.postItem;
         console.log(postItem);
 
-        replyCount = replyList.length;
         if (postItem.imgs) {
             imgList = postItem.imgs.split(",");
         }
@@ -50,6 +53,7 @@
         }
         if (data.replyList) {
             replyList = data.replyList;
+            replyCount = data.replyList.length;
         }
     });
 
@@ -87,6 +91,12 @@
         console.log(e.likeStatus);
         invalidateAll();
     }
+
+    async function deletePost() {
+        if (replyCount > 0) {
+            alertModalBool = true;
+        }
+    }
 </script>
 
 <CustomModal bind:visible={loginAlertModalShow} closeBtn={false}>
@@ -118,14 +128,66 @@
     </div>
 </CustomModal>
 
+<CustomModal bind:visible={alertModalBool}>
+    <div class="text-center">
+        <div class=" text-red-500 text-3xl mb-5">
+            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+        </div>
+
+        {#if replyCount > 0}
+            <div class="mb-5">
+                <p>댓글이 등록되어 있는 글은 삭제가 불가 합니다.</p>
+            </div>
+        {:else}
+            <div class="mb-5">
+                <p>삭제되는 내용은 복구가 불가합니다.</p>
+                <p>진행 하시겠습니까?</p>
+            </div>
+        {/if}
+
+        <div class="flex justify-center items-center gap-3">
+            {#if replyCount == 0}
+                <button
+                    class="btn btn-error w-1/3 text-white"
+                    on:click={deletePost}
+                >
+                    삭제
+                </button>
+            {/if}
+            <button class="btn btn-active w-1/3">취소</button>
+        </div>
+    </div>
+</CustomModal>
+
 <DetailMenu favorateShow={false}></DetailMenu>
 
 <!-- svelte-ignore event_directive_deprecated -->
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="bg-white relative min-h-screen px-3">
-    <div class="max-w-[530px] mx-auto pretendard pt-14 pb-24">
+    <div class="max-w-[530px] mx-auto pretendard pt-10 pb-24">
         <div class="content-area border-b border-gray-300 pb-5">
+            {#if postItem.user_id == $user_info.idx}
+                <div class="text-right my-3">
+                    <button
+                        class="btn btn-info text-white btn-sm"
+                        on:click={() => {
+                            goto(`/simplewrite?modifyidx=${postItem.idx}`);
+                        }}
+                    >
+                        내 글 수정
+                    </button>
+                    <button
+                        class="btn btn-error text-white btn-sm"
+                        on:click={() => {
+                            alertModalBool = true;
+                        }}
+                    >
+                        내 글 삭제
+                    </button>
+                </div>
+            {/if}
+
             <div class="text-lg font-semibold">
                 {postItem.subject}
             </div>

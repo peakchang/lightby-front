@@ -55,13 +55,13 @@
             >
                 찜한 목록
             </div>
-            <div
+            <!-- <div
                 data-num="2"
                 class:tab-active={$interestTabNum == 2}
                 on:click={changeTab}
             >
                 내 주변 현장
-            </div>
+            </div> -->
         </div>
 
         <!-- svelte-ignore event_directive_deprecated -->

@@ -86,10 +86,7 @@
     // 포스트 삭제!!
 
     async function deletePost() {
-        console.log(detailContent);
-
-        console.log(detailContent.thumbnail);
-
+        
         try {
             const res = await axios.post(`${back_api}/regist/delete`, {
                 delImgs: detailContent.imgs,

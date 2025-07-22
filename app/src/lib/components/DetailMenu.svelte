@@ -7,6 +7,7 @@
     import { favorateBool } from "$lib/stores/stores";
     import { toastStore } from "$lib/stores/stores";
     import { goto } from "$app/navigation";
+    import { prev } from "$lib/stores/stores";
 
     let { favorateShow = true, shareShow = true, openShareModal } = $props();
 
@@ -70,17 +71,7 @@
     <div
         class="text-3xl w-12 cursor-pointer"
         on:click={() => {
-            const movePage = $page.url.searchParams.get("prev");
-            if (movePage) {
-                goto(movePage);
-            } else {
-                goto("/");
-            }
-            // if ($page.url.pathname.includes("detail")) {
-            //     goto("/");
-            // } else if() {
-            //     goto(`/${$page.url.pathname}`);
-            // }
+            goto($prev);
         }}
     >
         <i class="fa fa-angle-left" aria-hidden="true"></i>

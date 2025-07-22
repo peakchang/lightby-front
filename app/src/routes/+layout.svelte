@@ -17,7 +17,9 @@
 	import { onMount } from "svelte";
 
 	let { children } = $props();
-	onMount(() => {});
+	onMount(() => {
+		localStorage.removeItem("search_val");
+	});
 
 	// 현재 경로 감지용 key 생성
 	const key = derived(page, ($page) => $page.url.pathname);
@@ -32,7 +34,6 @@
 		} else {
 			adminPage = false;
 		}
-		
 	});
 
 	const animatedRoutes = [
@@ -116,7 +117,9 @@
 	{@render children()}
 {:else}
 	<div class="site-wrab">
-		<div class="max-w-[640px] mx-auto bg-white min-h-screen text-black">
+		<div
+			class="max-w-[640px] mx-auto bg-white min-h-screen text-black site-wrab-inner"
+		>
 			{#key key}
 				{#if useAnimation}
 					<div in:fly={{ y: 300, duration: 300 }}>
@@ -136,7 +139,10 @@
 	:global(body) {
 		user-select: none;
 		-webkit-user-drag: none;
+		-ms-overflow-style: none; /* IE, Edge */
+		overflow-y: scroll; /* 스크롤 유지 */
 	}
+
 	@font-face {
 		font-family: "OKDDUNG";
 		src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2206-02@1.0/OKDDUNG.woff2")

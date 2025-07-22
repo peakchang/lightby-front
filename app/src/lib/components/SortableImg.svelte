@@ -66,6 +66,9 @@
         imgArr.splice(this.value, 1);
         const type = "subtract";
         updateImg({ imgArr, url: delPath, type });
+
+        console.log(imgArr);
+        
     }
 
     function onFileSelected() {

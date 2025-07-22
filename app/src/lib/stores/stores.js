@@ -23,3 +23,5 @@ export const interestTabNum = writable(0)
 export const manageBoardTabNum = writable(0)
 
 export const favorateBool = writable(false)
+
+export const prev = writable("")

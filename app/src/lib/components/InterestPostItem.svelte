@@ -1,13 +1,22 @@
 <script>
+    import { goto } from "$app/navigation";
     import { public_img_bucket, img_bucket } from "$lib/const";
+    import { prev } from "$lib/stores/stores";
     import moment from "moment-timezone";
 
     let { post } = $props();
 
     let imgError = $state(false);
+
+    // /detail/{post.idx}?prev=/interest
+
+    function goToDetail() {
+        $prev = "/interest";
+        goto(`/detail/${post.idx}`);
+    }
 </script>
 
-<a href="/detail/{post.idx}?prev=/interest">
+<a href="/detail/{post.idx}" on:click|preventDefault={goToDetail}>
     <div
         class="border border-gray-300 rounded-lg p-2 mb-3 shadow-sm cursor-pointer relative"
     >

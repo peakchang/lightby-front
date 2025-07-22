@@ -4,6 +4,16 @@
     let { children } = $props();
 </script>
 
+<svelte:head>
+    <script
+        type="text/javascript"
+        defer
+        src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=72689d54e68abd94260d9284c64d7545&libraries=services&autoload=false`}
+    ></script>
+
+    <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+</svelte:head>
+
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <!-- svelte-ignore event_directive_deprecated -->

@@ -8,6 +8,7 @@
     import { navigating } from "$app/stores";
     import { onDestroy, onMount } from "svelte";
     import JobPostItem from "$lib/components/JobPostItem.svelte";
+    import { prev } from "$lib/stores/stores.js";
 
     let { data } = $props();
 
@@ -62,9 +63,6 @@
         return () => {};
     });
 
-    function goToDetail(idx) {
-        goto(`/detail/${idx}`);
-    }
 
     function multiReplace(str, map) {
         const regex = new RegExp(Object.keys(map).join("|"), "g");

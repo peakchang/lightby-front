@@ -46,7 +46,11 @@
         if (modifyIdx) {
             const modifyContent = data.modifyContent;
             console.log(modifyContent);
-            imgModifyList = modifyContent.imgs.split(",");
+
+            if (modifyContent.imgs) {
+                imgModifyList = modifyContent.imgs.split(",");
+            }
+
             imgs = modifyContent.imgs;
             subject = modifyContent.subject;
             content = modifyContent.content;
@@ -200,6 +204,8 @@
             imgStr += con.href + ",";
         }
         imgs = imgStr.slice(0, -1);
+
+        console.log(imgs);
     }
 </script>
 
