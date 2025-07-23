@@ -1,5 +1,5 @@
 <script>
-    import { untrack } from 'svelte';
+    import { untrack } from "svelte";
     import CustomModal from "$lib/components/CustomModal.svelte";
     import { goto, invalidateAll } from "$app/navigation";
     import { back_api, public_img_bucket } from "$lib/const.js";
@@ -96,12 +96,12 @@
             $main_list["free"] = [...currentFreeList, ...data.mainList];
         }
 
-        // if ($loadingStore == true) {
-        //     console.log("요기로!");
-        //     setTimeout(() => {
-        //         $loadingStore = false;
-        //     }, 500);
-        // }
+        if ($loadingStore == true) {
+            console.log("요기로!");
+            setTimeout(() => {
+                $loadingStore = false;
+            }, 500);
+        }
     });
 
     function multiReplace(str, map) {
@@ -138,10 +138,12 @@
                     class:border-white={$main_location == location}
                     data-location={location}
                     on:click={(e) => {
+                        main_list.set({ premium: [], top: [], free: [] });
                         $main_location = e.target.dataset.location;
                         $main_location = $main_location;
                         $site_load_status = "premium";
                         $free_start_num = 0;
+
                         localStorage.setItem("location", $main_location);
                         invalidateAll();
                         $loadingStore = true;
@@ -153,63 +155,69 @@
         </ul>
     </div>
 
-    <div class="premium-area mb-10">
-        <!-- 프리미엄 영역 -->
-        <div
-            class="mb-3 ml-6 text-lg font-bold text-cyan-700 flex items-center"
-        >
-            <span class="mr-2">
-                <i class="fa fa-bell" aria-hidden="true"></i>
-            </span>
-            <span class="mr-4">프리미엄</span>
+    {#if $main_list["premium"].length > 0}
+        <div class="premium-area mb-10">
+            <!-- 프리미엄 영역 -->
             <div
-                class=" w-[50%] md:w-[40%] rounded-full"
-                style="height: 2px; background-color: #007595;"
-            ></div>
+                class="mb-3 ml-6 text-lg font-bold text-cyan-700 flex items-center"
+            >
+                <span class="mr-2">
+                    <i class="fa fa-bell" aria-hidden="true"></i>
+                </span>
+                <span class="mr-4">프리미엄</span>
+                <div
+                    class=" w-[50%] md:w-[40%] rounded-full"
+                    style="height: 2px; background-color: #007595;"
+                ></div>
+            </div>
+            {#each $main_list["premium"] as value}
+                <JobPostItem {value}></JobPostItem>
+            {/each}
         </div>
-        {#each $main_list["premium"] as value}
-            <JobPostItem {value}></JobPostItem>
-        {/each}
-    </div>
+    {/if}
 
-    <div class="top-area mb-10">
-        <!-- 지역탑 영역 -->
-        <div
-            class="mb-3 ml-6 text-lg font-bold text-cyan-700 flex items-center"
-        >
-            <span class="mr-2">
-                <i class="fa fa-bell" aria-hidden="true"></i>
-            </span>
-            <span class="mr-4">지역 TOP</span>
+    {#if $main_list["top"].length > 0}
+        <div class="top-area mb-10">
+            <!-- 지역탑 영역 -->
             <div
-                class=" w-[50%] md:w-[40%] rounded-full"
-                style="height: 2px; background-color: #007595;"
-            ></div>
+                class="mb-3 ml-6 text-lg font-bold text-cyan-700 flex items-center"
+            >
+                <span class="mr-2">
+                    <i class="fa fa-bell" aria-hidden="true"></i>
+                </span>
+                <span class="mr-4">지역 TOP</span>
+                <div
+                    class=" w-[50%] md:w-[40%] rounded-full"
+                    style="height: 2px; background-color: #007595;"
+                ></div>
+            </div>
+            {#each $main_list["top"] as value}
+                <JobPostItem {value}></JobPostItem>
+            {/each}
         </div>
-        {#each $main_list["top"] as value}
-            <JobPostItem {value}></JobPostItem>
-        {/each}
-    </div>
+    {/if}
 
-    <div>
-        <!-- 지역탑 영역 -->
-        <div
-            class="mb-3 ml-6 text-lg font-bold text-cyan-700 flex items-center"
-        >
-            <span class="mr-2">
-                <i class="fa fa-bell" aria-hidden="true"></i>
-            </span>
-            <span class="mr-4">일반 공고</span>
+    {#if $main_list["free"].length > 0}
+        <div>
+            <!-- 지역탑 영역 -->
             <div
-                class=" w-[50%] md:w-[40%] rounded-full"
-                style="height: 2px; background-color: #007595;"
-            ></div>
-        </div>
+                class="mb-3 ml-6 text-lg font-bold text-cyan-700 flex items-center"
+            >
+                <span class="mr-2">
+                    <i class="fa fa-bell" aria-hidden="true"></i>
+                </span>
+                <span class="mr-4">일반 공고</span>
+                <div
+                    class=" w-[50%] md:w-[40%] rounded-full"
+                    style="height: 2px; background-color: #007595;"
+                ></div>
+            </div>
 
-        {#each $main_list["free"] as value}
-            <JobPostItem {value}></JobPostItem>
-        {/each}
-    </div>
+            {#each $main_list["free"] as value}
+                <JobPostItem {value}></JobPostItem>
+            {/each}
+        </div>
+    {/if}
 </div>
 
 <style>
