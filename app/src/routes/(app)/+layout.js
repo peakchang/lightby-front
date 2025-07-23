@@ -17,6 +17,7 @@ export const load = async ({ params, url, data }) => {
         newSiteCount = res.data.newSiteCount
         baseEnv = res.data.baseEnv
 
+        console.log(baseEnv);
         
     } catch (error) {
 
