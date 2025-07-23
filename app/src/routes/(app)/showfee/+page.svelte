@@ -9,7 +9,6 @@
     console.log(data);
     let boardList = $state([]);
     boardList = data.boardList;
-    console.log(boardList);
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -36,9 +35,9 @@
                 <span class="flex items-center gap-1 text-sm">
                     <i class="fa fa-heart-o" aria-hidden="true"></i>
                     <span
-                        class="border border-gray-400 px-1.5 py-0.5 rounded-full text-[10px] md:text-xs"
+                        class="px-1.5 py-0.5 rounded-full text-[10px] md:text-xs"
                     >
-                        {boardData.good_count ? boardData.good_count : 0}
+                        {boardData.post_likes}
                     </span>
                 </span>
                 <span class="mx-1">|</span>
@@ -47,7 +46,7 @@
                     <i class="fa fa-commenting text-gray-500" aria-hidden="true"
                     ></i>
                     <span
-                        class="border border-gray-400 px-2 py-0.5 rounded-full text-[10px] md:text-xs"
+                        class="px-2 py-0.5 rounded-full text-[10px] md:text-xs"
                     >
                         {boardData.reply_count}
                     </span>

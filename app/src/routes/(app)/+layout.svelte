@@ -11,7 +11,8 @@
         loadingStore,
     } from "$lib/stores/stores";
     import { fetchRequest } from "$lib/lib";
-    let { children } = $props();
+
+    let { children, data } = $props();
 
     let successModal = $state(false);
     let successMessage = $state("");
@@ -194,9 +195,9 @@
         </div>
     </div>
     <div class="text-xs text-right pt-2">
-        <span>TODAY : 1,157</span>
+        <span>TODAY : {data.todayCount}</span>
         <span>/</span>
-        <span>신규현장 : 59</span>
+        <span>신규현장 : {data.newSiteCount}</span>
     </div>
 </div>
 

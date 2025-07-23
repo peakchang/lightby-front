@@ -5,12 +5,12 @@ import jwt from 'jsonwebtoken';
 export async function handle({ event, resolve }) {
 
     if (event.url.pathname.startsWith('/.well-known/')) {
-        return new Response('', { status: 204 });
+        return new Response(null, { status: 404 });
     }
-
-
     const accessToken = event.cookies.get('access_token');
     const refreshToken = event.cookies.get('refresh_token');
+    
+    
     // 기본 초기화~
     let userInfo = {}
     try {
@@ -56,7 +56,7 @@ export async function handle({ event, resolve }) {
             userInfo = { idx: userInfoRow[0].idx };
             event.locals.userInfo = userInfo;
         } catch (err) {
-            console.error(err.message);
+            // console.error(err.message);
             // 와중에 에러나면 그냥 토큰 다 날리기~
             event.cookies.delete('access_token', { path: '/' });
             event.cookies.delete('refresh_token', { path: '/' });

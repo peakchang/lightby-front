@@ -1,9 +1,16 @@
 <script>
+    import { untrack } from 'svelte';
     import CustomModal from "$lib/components/CustomModal.svelte";
     import { goto, invalidateAll } from "$app/navigation";
     import { back_api, public_img_bucket } from "$lib/const.js";
     import PdButton from "$lib/components/PdButton.svelte";
-    import { main_location, loadingStore } from "$lib/stores/stores.js";
+    import {
+        main_location,
+        loadingStore,
+        site_load_status,
+        free_start_num,
+        main_list,
+    } from "$lib/stores/stores.js";
     import { browser } from "$app/environment";
     import { navigating } from "$app/stores";
     import { onDestroy, onMount } from "svelte";
@@ -11,12 +18,7 @@
     import { prev } from "$lib/stores/stores.js";
 
     let { data } = $props();
-
-    let premiumList = $state([]);
-    let topList = $state([]);
-    let siteList = $state([]);
     let searchModal = $state(false);
-
     let locationList = $derived([
         "전국",
         "서울/경기/인천",
@@ -51,18 +53,56 @@
         clearInterval(bannerInterval);
     });
 
-    $effect(() => {
-        premiumList = data.premiumList;
-        topList = data.topList;
-        siteList = data.siteList;
+    let loopBlock = true;
+    // $effect(() => {
+    //     console.log(data);
 
-        setTimeout(() => {
-            $loadingStore = false;
-        }, 500);
+    //     if (data.currentStatus == "premium") {
+    //         $main_list["premium"] = data.mainList;
+    //     } else if (data.currentStatus == "top") {
+    //         $main_list["top"] = data.mainList;
+    //     } else if (
+    //         data.currentStatus == "free" &&
+    //         $main_list["free"].length == 0
+    //     ) {
+    //         $main_list["free"] = data.mainList;
+    //     } else if (
+    //         data.currentStatus == "free" &&
+    //         $main_list["free"].length > 0
+    //     ) {
+    //         $main_list["free"] = [...$main_list["free"], ...data.mainList];
+    //     }
 
-        return () => {};
+    //     if ($loadingStore == true) {
+    //         console.log("요기로!");
+
+    //         setTimeout(() => {
+    //             $loadingStore = false;
+    //         }, 500);
+    //     }
+    // });
+
+    let lastDataStatus = "";
+
+    $effect.pre(() => {
+        console.log(data);
+
+        if (data.currentStatus == "premium") {
+            $main_list["premium"] = data.mainList;
+        } else if (data.currentStatus == "top") {
+            $main_list["top"] = data.mainList;
+        } else if (data.currentStatus == "free") {
+            const currentFreeList = untrack(() => $main_list["free"]);
+            $main_list["free"] = [...currentFreeList, ...data.mainList];
+        }
+
+        // if ($loadingStore == true) {
+        //     console.log("요기로!");
+        //     setTimeout(() => {
+        //         $loadingStore = false;
+        //     }, 500);
+        // }
     });
-
 
     function multiReplace(str, map) {
         const regex = new RegExp(Object.keys(map).join("|"), "g");
@@ -74,6 +114,13 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <!-- svelte-ignore event_directive_deprecated -->
 <div class="pt-20 suit-font px-3">
+    <button
+        on:click={() => {
+            invalidateAll();
+        }}
+    >
+        gogogo
+    </button>
     {#if bannerList.length > 0}
         <div class=" border border-gray-300 rounded-lg p-2">
             <img src={`${public_img_bucket}${nowBanner}`} alt="" />
@@ -93,6 +140,8 @@
                     on:click={(e) => {
                         $main_location = e.target.dataset.location;
                         $main_location = $main_location;
+                        $site_load_status = "premium";
+                        $free_start_num = 0;
                         localStorage.setItem("location", $main_location);
                         invalidateAll();
                         $loadingStore = true;
@@ -118,7 +167,7 @@
                 style="height: 2px; background-color: #007595;"
             ></div>
         </div>
-        {#each premiumList as value}
+        {#each $main_list["premium"] as value}
             <JobPostItem {value}></JobPostItem>
         {/each}
     </div>
@@ -137,7 +186,7 @@
                 style="height: 2px; background-color: #007595;"
             ></div>
         </div>
-        {#each topList as value}
+        {#each $main_list["top"] as value}
             <JobPostItem {value}></JobPostItem>
         {/each}
     </div>
@@ -157,7 +206,7 @@
             ></div>
         </div>
 
-        {#each siteList as value}
+        {#each $main_list["free"] as value}
             <JobPostItem {value}></JobPostItem>
         {/each}
     </div>

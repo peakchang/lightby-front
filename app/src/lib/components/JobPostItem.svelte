@@ -3,9 +3,7 @@
     import { back_api, public_img_bucket } from "$lib/const.js";
     import { prev } from "$lib/stores/stores";
     let { value } = $props();
-
-    console.log(value);
-
+    
     let imgError = $state(false);
 
     const businessReplaceDict = $derived({

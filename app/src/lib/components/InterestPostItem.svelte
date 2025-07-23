@@ -16,6 +16,7 @@
     }
 </script>
 
+<!-- svelte-ignore event_directive_deprecated -->
 <a href="/detail/{post.idx}" on:click|preventDefault={goToDetail}>
     <div
         class="border border-gray-300 rounded-lg p-2 mb-3 shadow-sm cursor-pointer relative"
