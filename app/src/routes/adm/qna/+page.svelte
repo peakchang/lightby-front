@@ -44,7 +44,7 @@
     }
 </script>
 
-<div class=" text-2xl font-extrabold">QnA!!!</div>
+<div class=" text-2xl font-extrabold">1:1 문의 게시판</div>
 
 {#if qnaList.length == 0}
     <div class="mt-3 mb-8">등록된 QnA가 없습니다.</div>

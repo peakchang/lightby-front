@@ -281,6 +281,23 @@
             >
             TIP : 번개분양을 보고 연락드렸다고 하시면 보다 상담이 쉬워집니다.
         </div>
+        <!-- svelte-ignore event_directive_deprecated -->
+        <!-- <div class="mt-4 flex gap-2 justify-center">
+            <button
+                class="btn btn-info btn-sm w-1/3 text-white"
+                on:click={contactCall}
+            >
+                <i class="fa fa-phone" aria-hidden="true"></i>
+                전화하기
+            </button>
+            <button
+                class="btn btn-success btn-sm w-1/3 text-white"
+                on:click={contactSms}
+            >
+                <i class="fa fa-envelope-o" aria-hidden="true"></i>
+                문자하기
+            </button>
+        </div> -->
     </div>
 </div>
 

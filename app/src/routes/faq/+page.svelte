@@ -63,16 +63,13 @@
 {#if faqList.length > 0}
     <div class="">
         <h1 class="text-2xl font-bold mb-4">자주 묻는 질문</h1>
-        <CustomAccodian
-            items={faqList}
-            allowMultiple={false}
-        />
+        <CustomAccodian items={faqList} allowMultiple={false} />
     </div>
 {/if}
 
 <!-- svelte-ignore event_directive_deprecated -->
 <div class="mt-5">
-    <h1 class="text-2xl font-bold mb-4">1:1 질문</h1>
+    <h1 class="text-2xl font-bold mb-4">1:1 문의 게시판</h1>
 
     {#if !$user_info.idx}
         QnA 이용은 로그인 후 가능합니다

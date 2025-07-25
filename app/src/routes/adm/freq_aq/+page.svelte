@@ -67,10 +67,10 @@
 
 
 
-<div class=" text-2xl font-extrabold">FAQ!!!</div>
+<div class=" text-2xl font-extrabold">자주묻는질문</div>
 
 {#if faqList.length == 0}
-    <div class="">등록된 FAQ가 없습니다.</div>
+    <div class="">등록된 질문 / 답변이 없습니다.</div>
 {:else}
     <div class="overflow-x-auto">
         <table class="table">

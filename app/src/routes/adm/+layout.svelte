@@ -56,11 +56,11 @@
         </a>
 
         <a href="/adm/freq_aq" onclick={moveAdmMenu}>
-            <div class="p-2 rounded-lg hover:bg-gray-200">FAQ</div>
+            <div class="p-2 rounded-lg hover:bg-gray-200">자주묻는질문</div>
         </a>
 
         <a href="/adm/qna" onclick={moveAdmMenu}>
-            <div class="p-2 rounded-lg hover:bg-gray-200">QnA</div>
+            <div class="p-2 rounded-lg hover:bg-gray-200">1:1 문의</div>
         </a>
 
         <a href="/adm/manage_job" onclick={moveAdmMenu}>
