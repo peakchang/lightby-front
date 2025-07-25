@@ -80,7 +80,7 @@
                             </div>
                         </td>
                         <td class="tb">
-                            {val.id} / {val.nickname}
+                            {val.user_id} / {val.user_nickname}
                         </td>
                         <td class="tb">
                             {moment(val.question_created_at).format(
