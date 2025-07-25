@@ -9,6 +9,7 @@
         main_location,
         search_val,
         loadingStore,
+        viewLimitAlertModal,
     } from "$lib/stores/stores";
     import { fetchRequest } from "$lib/lib";
 
@@ -43,7 +44,7 @@
             setTimeout(() => {
                 successModal = false;
             }, 800);
-            $user_info = {};
+            $user_info = { idx: undefined };
         }
     }
 
@@ -60,6 +61,8 @@
         localStorage.removeItem("search_val");
         goto("/", { invalidateAll: true });
     }
+
+    
 </script>
 
 <svelte:head>

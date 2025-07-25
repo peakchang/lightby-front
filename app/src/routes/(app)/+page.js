@@ -1,14 +1,11 @@
 import { back_api, public_img_bucket } from "$lib/const.js";
 import { user_info } from "$lib/stores/stores.js";
-import { main_location, search_val, site_load_status, free_start_num, main_list } from "$lib/stores/stores.js";
+import { main_location, search_val, main_list } from "$lib/stores/stores.js";
 import axios from "axios";
 import { browser } from "$app/environment";
 
 // 사이트 접속시 user_info store 값에 user 정보 넣기
 export const load = async ({ params, url, data }) => {
-
-    let mainList = [];
-    let currentStatus = ""
 
     // 메인에 노출될 사이트 리스트 불러오기
 
@@ -33,34 +30,46 @@ export const load = async ({ params, url, data }) => {
         }
     }
 
+    // let currentStatus = ""
+    // let siteLoadStatus = ""
+    // let freeStartNum = 0
+    // site_load_status.subscribe((v) => {
+    //     siteLoadStatus = v
+    // })
+    // free_start_num.subscribe((v) => {
+    //     freeStartNum = v
+    // })
 
-    let siteLoadStatus = ""
-    let freeStartNum = 0
-    site_load_status.subscribe((v) => {
-        siteLoadStatus = v
-    })
-
-    free_start_num.subscribe((v) => {
-        freeStartNum = v
-    })
+    /*
+    일단 전체 다 뽑기!!
+    각각 다 가져와서 main_list store 에 담아서 표기 하기!!
+    */
 
 
     try {
-        const res = await axios.post(`${back_api}/sitelist/load_site_list`, { mainLocation, searchVal, siteLoadStatus, freeStartNum })
+        const res = await axios.post(`${back_api}/sitelist/load_site_list`, { mainLocation, searchVal })
 
-        mainList = res.data.loadSiteList
-        site_load_status.set(res.data.setNextStatus)
-        free_start_num.set(res.data.nextStartNum)
-        currentStatus = res.data.currentStatus
+        main_list.set({
+            premium: shuffleArray(res.data.premiumList),
+            top: shuffleArray(res.data.topList),
+            free: res.data.freeList
+        })
 
-        if (currentStatus != 'free') {
-            mainList = shuffleArray(mainList)
-        }
+
+        // mainList = res.data.loadSiteList
+        // site_load_status.set(res.data.setNextStatus)
+        // free_start_num.set(res.data.nextStartNum)
+        // currentStatus = res.data.currentStatus
+        // if (currentStatus != 'free') {
+        //     mainList = shuffleArray(mainList)
+        // }
+
+
     } catch (err) {
         console.error(err.message);
     }
 
-    return { mainList, currentStatus }
+    return {}
 }
 
 

@@ -11,8 +11,6 @@
 
     $effect(() => {
         kakao = window.kakao;
-        console.log(kakao);
-        
         kakaomapArea = document.querySelector("#map-area");
         createMap();
     });

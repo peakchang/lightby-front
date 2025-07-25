@@ -7,8 +7,8 @@
     import {
         main_location,
         loadingStore,
-        site_load_status,
-        free_start_num,
+        // site_load_status,
+        // free_start_num,
         main_list,
     } from "$lib/stores/stores.js";
     import { browser } from "$app/environment";
@@ -53,51 +53,30 @@
         clearInterval(bannerInterval);
     });
 
-    let loopBlock = true;
-    // $effect(() => {
-    //     console.log(data);
+    $effect(() => {
+        // 추후 스크롤 내리면서 로딩 시 적용 시키기!!!
+        // if (data.currentStatus == "premium") {
+        //     $main_list["premium"] = data.mainList;
+        // } else if (data.currentStatus == "top") {
+        //     $main_list["top"] = data.mainList;
+        // } else if (data.currentStatus == "free") {
+        //     const currentFreeList = untrack(() => $main_list["free"] || []);
 
-    //     if (data.currentStatus == "premium") {
-    //         $main_list["premium"] = data.mainList;
-    //     } else if (data.currentStatus == "top") {
-    //         $main_list["top"] = data.mainList;
-    //     } else if (
-    //         data.currentStatus == "free" &&
-    //         $main_list["free"].length == 0
-    //     ) {
-    //         $main_list["free"] = data.mainList;
-    //     } else if (
-    //         data.currentStatus == "free" &&
-    //         $main_list["free"].length > 0
-    //     ) {
-    //         $main_list["free"] = [...$main_list["free"], ...data.mainList];
-    //     }
+        //     // id 기준으로 중복 체크 (실제 고유 필드명으로 변경하세요)
+        //     const newUniqueItems = data.mainList.filter(
+        //         (newItem) =>
+        //             !currentFreeList.some(
+        //                 (existing) => existing.idx === newItem.idx,
+        //             ),
+        //     );
 
-    //     if ($loadingStore == true) {
-    //         console.log("요기로!");
-
-    //         setTimeout(() => {
-    //             $loadingStore = false;
-    //         }, 500);
-    //     }
-    // });
-
-    let lastDataStatus = "";
-
-    $effect.pre(() => {
-        console.log(data);
-
-        if (data.currentStatus == "premium") {
-            $main_list["premium"] = data.mainList;
-        } else if (data.currentStatus == "top") {
-            $main_list["top"] = data.mainList;
-        } else if (data.currentStatus == "free") {
-            const currentFreeList = untrack(() => $main_list["free"]);
-            $main_list["free"] = [...currentFreeList, ...data.mainList];
-        }
+        //     // 새로운 아이템이 있을 때만 업데이트
+        //     if (newUniqueItems.length > 0) {
+        //         $main_list["free"] = [...currentFreeList, ...newUniqueItems];
+        //     }
+        // }
 
         if ($loadingStore == true) {
-            console.log("요기로!");
             setTimeout(() => {
                 $loadingStore = false;
             }, 500);
@@ -114,13 +93,13 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <!-- svelte-ignore event_directive_deprecated -->
 <div class="pt-20 suit-font px-3">
-    <button
+    <!-- <button
         on:click={() => {
             invalidateAll();
         }}
     >
         gogogo
-    </button>
+    </button> -->
     {#if bannerList.length > 0}
         <div class=" border border-gray-300 rounded-lg p-2">
             <img src={`${public_img_bucket}${nowBanner}`} alt="" />
@@ -138,11 +117,14 @@
                     class:border-white={$main_location == location}
                     data-location={location}
                     on:click={(e) => {
-                        main_list.set({ premium: [], top: [], free: [] });
+                        // $main_list.premium = [];
+                        // $main_list.top = [];
+                        // $main_list.free = [];
+                        // $site_load_status = "premium";
+                        // $free_start_num = 0;
+
                         $main_location = e.target.dataset.location;
                         $main_location = $main_location;
-                        $site_load_status = "premium";
-                        $free_start_num = 0;
 
                         localStorage.setItem("location", $main_location);
                         invalidateAll();

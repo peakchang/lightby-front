@@ -9,12 +9,14 @@ export const load = async ({ params, url, data }) => {
     console.log('안들어왕?!');
 
     let userList = []
+    let allCount = 0
     try {
         const res = await axios.post(`${back_api}/adm_users/get_users`, { page: 1 })
         console.log(res.data);
         userList = res.data.userList
+        allCount = res.data.allCount
     } catch (err) {
         console.error(err.message);
     }
-    return { userList }
+    return { userList, allCount }
 }

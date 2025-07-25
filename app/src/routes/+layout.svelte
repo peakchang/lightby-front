@@ -7,7 +7,7 @@
 
 	import { derived } from "svelte/store";
 
-	import { toastStore } from "$lib/stores/stores";
+	import { toastStore, viewLimitAlertModal } from "$lib/stores/stores";
 	import Toast from "$lib/components/Toast.svelte";
 
 	import { loadingStore } from "$lib/stores/stores";
@@ -15,6 +15,10 @@
 
 	import { user_info } from "$lib/stores/stores";
 	import { onMount } from "svelte";
+
+	import CustomModal from "$lib/components/CustomModal.svelte";
+	import PdButton from "$lib/components/PdButton.svelte";
+    import { goto } from "$app/navigation";
 
 	let { children } = $props();
 	onMount(() => {
@@ -29,6 +33,8 @@
 	let adminPage = $state(false);
 
 	$effect(() => {
+		console.log($viewLimitAlertModal);
+
 		if ($page.url.pathname.includes("adm")) {
 			adminPage = true;
 		} else {
@@ -55,6 +61,31 @@
 		);
 	});
 </script>
+
+<CustomModal bind:visible={$viewLimitAlertModal} closeBtn={false}>
+	<div class="text-center">
+		<div class=" text-green-700 text-3xl mb-2">
+			<i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+		</div>
+		<div class="mb-5">
+			<p>게시물을 더 확인 하시려면 로그인이 필요합니다.</p>
+			<p>로그인 하시겠습니까?</p>
+		</div>
+		<div class="flex justify-center gap-3">
+			<!-- svelte-ignore event_directive_deprecated -->
+			<button
+				class="btn btn-info text-white w-1/3"
+				on:click={() => {
+					goto("/auth/login");
+				}}
+			>
+				로그인 바로가기
+			</button>
+
+			<button class="btn btn-soft w-1/3">닫기</button>
+		</div>
+	</div>
+</CustomModal>
 
 <!-- <div class="mt-10">
 	<button

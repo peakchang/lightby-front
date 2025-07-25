@@ -82,6 +82,14 @@ export function getRandomBetween(min, max, isInteger = true) {
     }
 }
 
+// 메인 / 수수료인증 게시판에서 클릭시 조회수 증가 시키는 함수!
+export async function raiseViewCount(table, idx) {
+    try {
+        const res = await axios.post(`${back_api}/raise_view_count`, { table, idx });
+    } catch (err) {
+        console.error(err.message);
+    }
+}
 
 
 

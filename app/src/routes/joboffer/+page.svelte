@@ -21,7 +21,7 @@
     import { feeBases, iconList } from "./jopoffer";
     import { onDestroy, onMount, tick } from "svelte";
     import Cookies from "js-cookie";
-    import { loadingStore } from "$lib/stores/stores";
+    import { loadingStore, prev } from "$lib/stores/stores";
 
     let { data } = $props();
 
@@ -356,6 +356,8 @@
 
     // 상품 업데이트 (수정) 함수!!!
     async function updateRegist() {
+        console.log($prev);
+
         $all_data["business"] = businessArr.join(",");
         $all_data["occupation"] = occupationArr.join(",");
 
@@ -380,7 +382,12 @@
         setTimeout(() => {
             successPrevModal = false;
             $all_data = {};
-            goto("/manage_board");
+
+            if ($prev) {
+                goto($prev);
+            } else {
+                goto("/manage_board");
+            }
         }, 2500);
     }
 
@@ -510,6 +517,8 @@
 
         // 정상적으로 업로드 될 이미지 리스트 셋
         const imgArr = e.imgArr;
+
+        console.log(imgArr);
 
         let imgStr = "";
         for (let i = 0; i < imgArr.length; i++) {
