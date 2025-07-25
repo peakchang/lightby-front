@@ -42,7 +42,7 @@
             <div class="mt-1 font-semibold">
                 {boardData.subject}
             </div>
-            <div class="mt-1 ellipsis">
+            <div class="mt-1 ellipsis whitespace-pre-wrap">
                 {boardData.content}
             </div>
             <div class=" mt-3 flex justify-end flex-wrap items-center">
