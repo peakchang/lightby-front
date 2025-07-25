@@ -1,7 +1,13 @@
 <script>
     import { goto } from "$app/navigation";
     import moment from "moment-timezone";
-    import { prev } from "$lib/stores/stores.js";
+    import {
+        prev,
+        user_info,
+        nonMemberViewLimitNum,
+        viewLimitAlertModal,
+    } from "$lib/stores/stores.js";
+    import { raiseViewCount } from "$lib/lib.js";
 
     let sampleArr = $state([1, 2, 3, 4, 5]);
 
@@ -19,6 +25,16 @@
         <div
             class="border-b py-5 px-3 border-gray-300 cursor-pointer"
             on:click={() => {
+                // 비회원 조회수 제한!!
+                if (!$user_info.idx) {
+                    if ($nonMemberViewLimitNum > 3) {
+                        $viewLimitAlertModal = true;
+                        return;
+                    }
+                    $nonMemberViewLimitNum = $nonMemberViewLimitNum + 1;
+                }
+
+                raiseViewCount("board_fee", boardData.idx);
                 $prev = "/showfee";
                 goto(`/showfee/${boardData.idx}`);
             }}

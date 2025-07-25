@@ -1,9 +1,15 @@
 <script>
     import { goto, invalidateAll } from "$app/navigation";
     import { back_api, public_img_bucket } from "$lib/const.js";
-    import { prev } from "$lib/stores/stores";
+    import {
+        prev,
+        nonMemberViewLimitNum,
+        user_info,
+        viewLimitAlertModal,
+    } from "$lib/stores/stores";
+    import { raiseViewCount } from "$lib/lib";
     let { value } = $props();
-    
+
     let imgError = $state(false);
 
     const businessReplaceDict = $derived({
@@ -13,6 +19,19 @@
     });
 
     function goToDetail(idx) {
+        // 비회원 조회수 제한!!
+        if (!$user_info.idx) {
+            if ($nonMemberViewLimitNum > 3) {
+                $viewLimitAlertModal = true;
+                return;
+            }
+            $nonMemberViewLimitNum = $nonMemberViewLimitNum + 1;
+        }
+
+        // 조회수 올리기
+        raiseViewCount("site", idx);
+
+        // 페이지 이동
         $prev = "/";
         goto(`/detail/${idx}`);
     }

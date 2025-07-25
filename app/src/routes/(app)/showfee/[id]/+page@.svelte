@@ -33,13 +33,10 @@
 
     let alertModalBool = $state(false); // 글 삭제시 먼저 물어보는 모달
 
-    console.log(data);
 
     onMount(() => {
         likeCount = data.likeCount;
         postItem = data.postItem;
-        console.log(postItem);
-
         if (postItem.imgs) {
             imgList = postItem.imgs.split(",");
         }
@@ -47,8 +44,6 @@
 
     $effect(() => {
         if (data) {
-            console.log(data);
-
             likeCount = data.likeCount;
         }
         if (data.replyList) {
@@ -88,7 +83,6 @@
     }
 
     async function likeAction(e) {
-        console.log(e.likeStatus);
         invalidateAll();
     }
 

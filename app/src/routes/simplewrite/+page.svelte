@@ -7,7 +7,7 @@
     import { getCookieValue } from "$lib/lib";
     import axios from "axios";
     import { back_api } from "$lib/const";
-    import { toastStore } from "$lib/stores/stores";
+    import { toastStore, prev } from "$lib/stores/stores";
     import { onMount, tick } from "svelte";
     import Cookies from "js-cookie";
 
@@ -179,7 +179,12 @@
                 // color: "#FF3636",
                 color: "#2478FF",
             });
-            goto("/manage_board");
+
+            if ($prev) {
+                goto($prev);
+            } else {
+                goto("/manage_board");
+            }
         } catch (err) {
             const m = err.response.data.message;
             console.log(m);

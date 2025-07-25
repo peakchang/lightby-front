@@ -15,11 +15,12 @@ export const manageBoardTabNum = writable(0)
 export const favorateBool = writable(false)
 export const prev = writable("/")
 
+export const nonMemberViewLimitNum = writable(0);
+export const viewLimitAlertModal = writable(false)
+
+
+// 이 아래건 나중에 데이터 많아지면 쓰기!!
 export const main_list = writable({ premium: [], top: [], free: [] });
-// export const premium_list_store = writable([]);
-// export const top_list_store = writable([]);
-
-
 export const free_start_num = writable(0);
 export const site_load_status = writable("premium")
 // 3개 다 빈 배열로 잡아놓고 맨 처음 premium 리스트 랜덤으로 채우기 (없으면 패스) / 스크롤 꽉 차면 top 부분 

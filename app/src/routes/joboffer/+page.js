@@ -11,9 +11,15 @@ export const load = async ({ params, url, data }) => {
     let modifyIdx = undefined
     let modifyContent = {}
 
-    user_info.subscribe((v) => {
-        userId = v.idx
-    })
+
+
+    if (url.searchParams.get('manage')) {
+        userId = "on"
+    } else {
+        user_info.subscribe((v) => {
+            userId = v.idx
+        })
+    }
 
     console.log(url);
     if (url.searchParams.get('modifyidx')) {

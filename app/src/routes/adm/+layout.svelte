@@ -3,7 +3,8 @@
     import { slide } from "svelte/transition";
     import { user_info } from "$lib/stores/stores";
     import { onMount } from "svelte";
-    let isOpen = $state(false);
+    import { goto } from "$app/navigation";
+    let isOpen = $state(true);
 
     let { children } = $props();
 
@@ -18,17 +19,17 @@
     }
 </script>
 
-<!-- {#if isOpen}
-    <div class="fixed top-0 left-0 w-full h-full z-40 bg-black/30"></div>
+{#if isOpen}
     <div
-        class="fixed top-0 left-0 w-[200px] border-r border-gray-300 h-full bg-white p-5 flex flex-col gap-5 z-50 suit-font"
+        class="fixed top-0 left-0 w-[200px] border-r border-gray-300 h-full bg-white p-5 flex flex-col gap-1 z-50 suit-font"
         transition:fly={{ x: -200, duration: 350 }}
     >
         <div
-            class="flex justify-between items-center border-b border-gray-300 pb-3"
+            class="flex justify-between items-center border-b border-gray-300 pb-3 mb-5"
         >
             <span>메뉴</span>
 
+            <!-- svelte-ignore a11y_consider_explicit_label -->
             <button
                 onclick={() => {
                     isOpen = !isOpen;
@@ -47,28 +48,105 @@
             </button>
         </div>
         <a href="/adm" onclick={moveAdmMenu}>
-            <div>회원관리</div>
+            <div class="p-2 rounded-lg hover:bg-gray-200">회원관리</div>
         </a>
 
         <a href="/adm/banner" onclick={moveAdmMenu}>
-            <div>배너관리</div>
+            <div class="p-2 rounded-lg hover:bg-gray-200">배너관리</div>
+        </a>
+
+        <a href="/adm/freq_aq" onclick={moveAdmMenu}>
+            <div class="p-2 rounded-lg hover:bg-gray-200">FAQ</div>
         </a>
 
         <a href="/adm/qna" onclick={moveAdmMenu}>
-            <div>FAQ / QnA</div>
+            <div class="p-2 rounded-lg hover:bg-gray-200">QnA</div>
         </a>
 
         <a href="/adm/manage_job" onclick={moveAdmMenu}>
-            <div>공고관리</div>
+            <div class="p-2 rounded-lg hover:bg-gray-200">공고관리</div>
         </a>
 
         <a href="/adm/manage_board" onclick={moveAdmMenu}>
-            <div>게시물 관리</div>
+            <div class="p-2 rounded-lg hover:bg-gray-200">게시물 관리</div>
         </a>
     </div>
-{/if} -->
+{/if}
 
-<div class="fixed top-0 left-0 w-full py-3 z-45 bg-white suit-font pl-16">
+<!-- svelte-ignore a11y_consider_explicit_label -->
+<div class="border-b border-gray-300 p-3.5 suit-font" class:pl-52={isOpen}>
+    <div class="flex items-center gap-4">
+        <button
+            onclick={() => {
+                isOpen = !isOpen;
+            }}
+        >
+            <svg
+                width="30px"
+                height="30px"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    d="M4 18H10"
+                    stroke="#000000"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                />
+                <path
+                    d="M4 12L16 12"
+                    stroke="#000000"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                />
+                <path
+                    d="M4 6L20 6"
+                    stroke="#000000"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                />
+            </svg>
+        </button>
+
+        <button
+            class="cursor-pointer"
+            onclick={() => {
+                goto("/");
+            }}
+        >
+            <svg
+                width="20px"
+                height="20px"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    d="M1 6V15H6V11C6 9.89543 6.89543 9 8 9C9.10457 9 10 9.89543 10 11V15H15V6L8 0L1 6Z"
+                    fill="#000000"
+                />
+            </svg>
+        </button>
+
+        <button
+            class="cursor-pointer"
+            onclick={() => {
+                goto("/admin");
+            }}
+        >
+            <span>어드민 메인</span>
+        </button>
+    </div>
+</div>
+<!-- 하위 페이지나 레이아웃 -->
+<div class="mt-8 suit-font" class:pl-52={isOpen}>
+    <div class="mx-auto px-1">
+        {@render children()}
+    </div>
+</div>
+
+<!-- <div class="fixed top-0 left-0 w-full py-3 z-45 bg-white suit-font pl-16">
     <div class="flex items-center gap-7">
         <div class="">
             <input
@@ -78,7 +156,6 @@
                 bind:checked={drawerChecked}
             />
             <div class="drawer-content">
-                <!-- Page content here -->
                 <label for="my-drawer">
                     <div class="cursor-pointer">
                         <i class="fa fa-bars" aria-hidden="true"></i>
@@ -95,7 +172,7 @@
                     class="menu bg-base-200 text-base-content min-h-full w-80 p-4"
                 >
                     <div class="text-right">
-                        <!-- svelte-ignore a11y_consider_explicit_label -->
+
                         <button
                             onclick={() => {
                                 drawerChecked = false;
@@ -106,7 +183,7 @@
                         </button>
                     </div>
 
-                    <!-- Sidebar content here -->
+
 
                     <li>
                         <a href="/adm" onclick={moveAdmMenu}>
@@ -146,14 +223,7 @@
             <span>어드민 메인</span>
         </button>
     </div>
-</div>
-
-<!-- 하위 페이지나 레이아웃 -->
-<div class=" z-30 mt-16 suit-font">
-    <div class=" max-w-[1250px] mx-auto px-1">
-        {@render children()}
-    </div>
-</div>
+</div> -->
 
 <style>
     :global(.tb) {
