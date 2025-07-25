@@ -87,7 +87,9 @@
                                     );
 
                                     invalidateAll();
-                                } catch (error) {}
+                                } catch (error) {
+                                    
+                                }
                             }}
                         >
                             삭제

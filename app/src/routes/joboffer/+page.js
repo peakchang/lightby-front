@@ -20,8 +20,7 @@ export const load = async ({ params, url, data }) => {
             userId = v.idx
         })
     }
-
-    console.log(url);
+    
     if (url.searchParams.get('modifyidx')) {
         modifyIdx = url.searchParams.get('modifyidx')
 
@@ -33,11 +32,6 @@ export const load = async ({ params, url, data }) => {
 
         }
     }
-
-    console.log(modifyIdx);
-
-
-
 
     if (userId) {
         const res = await axios.post(`${back_api}/regist/get_post_count`, { userId })

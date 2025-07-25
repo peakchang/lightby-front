@@ -2,7 +2,7 @@
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
 import { sql_con } from "$lib/server/db";
-import { KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '$env/static/private';
+import { KAKAO_RESTAPI, KAKAO_REDIRECT_URI, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '$env/static/private';
 
 
 // KAKAO 콜백 처리될때 아이디 있으면 쿠키에 JWT 인증 넣고 리턴~ (JWT 값에는 DB ID 값만 넣기)
@@ -41,7 +41,7 @@ export async function load({ params, url, cookies }) {
             {
                 params: {
                     grant_type: 'authorization_code',
-                    client_id: KAKAO_CLIENT_ID,
+                    client_id: KAKAO_RESTAPI,
                     redirect_uri: KAKAO_REDIRECT_URI,
                     code,
                 },
