@@ -20,3 +20,5 @@
 {#if seoValue.published_time}
     <meta property="article:published_time" content={seoValue.published_time} />
 {/if}
+
+<meta name="naver-site-verification" content="69a089eebb7b97fc18466f32976c7bcc2ba4bf2d" />
