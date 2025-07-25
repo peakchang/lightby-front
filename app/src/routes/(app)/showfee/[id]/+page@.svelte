@@ -33,7 +33,6 @@
 
     let alertModalBool = $state(false); // 글 삭제시 먼저 물어보는 모달
 
-
     onMount(() => {
         likeCount = data.likeCount;
         postItem = data.postItem;
@@ -221,7 +220,7 @@
                     <img src={`${public_img_bucket}${img}`} alt="" />
                 {/each}
 
-                <div class:mt-8={postItem.imgs}>
+                <div class="whitespace-pre-wrap" class:mt-8={postItem.imgs}>
                     {postItem.content}
                 </div>
             </div>
