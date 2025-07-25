@@ -36,15 +36,20 @@
         data.baseEnv.banners ? data.baseEnv.banners.split(",") : [],
     );
 
+    const bannerLinkList = $state(
+        data.baseEnv.banner_links ? data.baseEnv.banner_links.split(",") : [],
+    );
+
     let bannerInterval;
-    let nowBanner = $state(bannerList[0]);
+    let nowBannerIdx = $state(0);
 
     onMount(() => {
         if (bannerList.length > 0) {
             bannerInterval = setInterval(() => {
-                const currentIndex = bannerList.indexOf(nowBanner);
-                const nextIndex = (currentIndex + 1) % bannerList.length;
-                nowBanner = bannerList[nextIndex];
+                nowBannerIdx++;
+                if (nowBannerIdx >= bannerList.length) {
+                    nowBannerIdx = 0;
+                }
             }, 2500); // 예: 3초마다 변경
         }
     });
@@ -102,7 +107,12 @@
     </button> -->
     {#if bannerList.length > 0}
         <div class=" border border-gray-300 rounded-lg p-2">
-            <img src={`${public_img_bucket}${nowBanner}`} alt="" />
+            <a href={bannerLinkList[nowBannerIdx]} target="_blank">
+                <img
+                    src={`${public_img_bucket}${bannerList[nowBannerIdx]}`}
+                    alt=""
+                />
+            </a>
         </div>
     {/if}
 
@@ -181,7 +191,7 @@
 
     {#if $main_list["free"].length > 0}
         <div>
-            <!-- 지역탑 영역 -->
+            <!-- 일반 공고 영역 -->
             <div
                 class="mb-3 ml-6 text-lg font-bold text-cyan-700 flex items-center"
             >
