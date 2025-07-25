@@ -16,6 +16,17 @@
     import { onDestroy, onMount } from "svelte";
     import JobPostItem from "$lib/components/JobPostItem.svelte";
     import { prev } from "$lib/stores/stores.js";
+    import SeoMeta from "$lib/components/SeoMeta.svelte";
+
+    const seoVal = {
+        title: "번개분양 - 분양현장 구인/구직",
+        description:
+            "가장 빠른 분양 구인·구직! 지금 바로 번개분양에서 확인하세요",
+        icon: "/favicon.png",
+        url: "https://lightby.co.kr",
+        image: "/alt_image.jpg",
+        date: "2025-04-27",
+    };
 
     let { data } = $props();
     let searchModal = $state(false);
@@ -93,6 +104,10 @@
         return str.replace(regex, (match) => map[match]);
     }
 </script>
+
+<svelte:head>
+    <SeoMeta seoValue={seoVal}></SeoMeta>
+</svelte:head>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
