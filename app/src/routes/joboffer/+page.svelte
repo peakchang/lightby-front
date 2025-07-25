@@ -22,6 +22,7 @@
     import { onDestroy, onMount, tick } from "svelte";
     import Cookies from "js-cookie";
     import { loadingStore, prev } from "$lib/stores/stores";
+    import moment from "moment-timezone";
 
     let { data } = $props();
 
@@ -278,6 +279,8 @@
 
             $loadingStore = false;
             $all_data["payment_key"] = e.data.paymentInfo.payment_key;
+            const today = moment().format("YYYY-MM-DD");
+            $all_data["ad_start_date"] = today;
             paymentStatus = true;
             try {
                 const res = await axios.post(`${back_api}/regist/upload`, {
