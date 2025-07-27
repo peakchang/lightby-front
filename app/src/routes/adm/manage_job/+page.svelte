@@ -8,6 +8,13 @@
     let { data } = $props();
     let jobOfferList = $state([]);
 
+    const utcTime = "2025-07-27T00:00:00.000Z"; // 예시 UTC 시간
+    const kstTime = moment.utc(utcTime).tz("Asia/Seoul").format();
+    console.log(kstTime); // 출력 결과: 2025-07-27T09:00:00+09:00
+
+    console.log(moment().format('YYYY/MM/DD HH:mm:ss'));
+    
+
     $effect(() => {
         jobOfferList = data.jobOfferList;
     });
