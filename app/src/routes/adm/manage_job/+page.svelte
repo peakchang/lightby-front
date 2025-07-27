@@ -9,8 +9,8 @@
     let jobOfferList = $state([]);
 
     const utcTime = "2025-07-25T17:01:30.000Z"; // 예시 UTC 시간
-    const kstTime = moment.utc(utcTime).tz("Asia/Seoul").format();
-    console.log(kstTime); // 출력 결과: 2025-07-27T09:00:00+09:00
+    const kstTime = moment.utc(utcTime).format();
+    console.log(kstTime);
 
     console.log(moment().format('YYYY/MM/DD HH:mm:ss'));
     
@@ -56,7 +56,7 @@
                     >
                     <th>
                         {moment
-                            .tz(val.created_at, "Asia/Seoul")
+                            .utc(val.created_at)
                             .format("YY/MM/DD HH:mm")}
                     </th>
                     <th>{val.view_count}</th>
