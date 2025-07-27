@@ -4,7 +4,7 @@ import { loadingStore } from "$lib/stores/stores.js";
 import Cookies from "js-cookie";
 import { back_api } from "$lib/const";
 import moment from "moment-timezone";
-
+import { goto } from "$app/navigation";
 
 
 export function formatTime(seconds) {
@@ -92,6 +92,52 @@ export async function raiseViewCount(table, idx) {
 }
 
 
+// 어드민 검색용~~~~~~!!!!! 주소이 쿼리 값 조절!!
+export function setParams(params, clear = false) {
+    const currentUrl = new URL(window.location.href);
+    const searchParams = new URLSearchParams(clear ? '' : currentUrl.search); // clear가 true면 초기화
+
+    // 새로운 파라미터 추가
+    for (const [key, value] of Object.entries(params)) {
+        if (value === undefined || value === null) {
+            searchParams.delete(key); // null 또는 undefined는 삭제
+        } else {
+            searchParams.set(key, value.toString()); // 값 추가
+        }
+    }
+
+    // URL 갱신
+    currentUrl.search = searchParams.toString();
+    console.log('Updated URL:', currentUrl.toString()); // 디버깅용
+
+    // URL 변경
+    goto(currentUrl.pathname + currentUrl.search, { replaceState: true, invalidateAll: true });
+}
+
+
+// 페이지 네이션 구하기!! (현재 페이지 / 전체 페이지)
+export function getPageList(currentPage, maxPage, displayCount = 7) {
+    let pageList = [];
+
+    let startPage = 0
+    let endPage = 0
+    let displayHalf = Number(displayCount / 2)
+
+    if (Number(currentPage) <= Math.round(displayCount / 2)) {
+        startPage = 1
+        endPage = displayCount
+    } else if (currentPage > maxPage - displayHalf) {
+        startPage = maxPage - (displayCount - 1)
+        endPage = maxPage
+    } else {
+        startPage = Number(currentPage) - Math.floor(displayCount / 2)
+        endPage = Number(currentPage) + Math.floor(displayCount / 2)
+    }
+
+    pageList = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
+
+    return pageList;
+}
 
 
 /**

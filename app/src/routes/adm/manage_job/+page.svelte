@@ -8,16 +8,20 @@
     let { data } = $props();
     let jobOfferList = $state([]);
 
-    const utcTime = "2025-07-25T17:01:30.000Z"; // 예시 UTC 시간
-    const kstTime = moment.utc(utcTime).format();
-    console.log(kstTime);
+    const productTypeMap = {
+        premium: "프리미엄",
+        top: "지역탑",
+        free: "무료",
+    };
 
-    console.log(moment().format('YYYY/MM/DD HH:mm:ss'));
-    
+    function getProductTypeLabel(key) {
+        return productTypeMap[key] || "알 수 없음";
+    }
 
     $effect(() => {
         jobOfferList = data.jobOfferList;
     });
+
     console.log(data);
 </script>
 
@@ -33,6 +37,7 @@
                 <th>제목</th>
                 <th>아이디 / 닉네임</th>
                 <th>등록일</th>
+                <th>광고</th>
                 <th>조회수</th>
                 <th>버튼</th>
             </tr>
@@ -40,7 +45,7 @@
         <tbody>
             {#each jobOfferList as val, idx}
                 <tr class="text-center">
-                    <th>
+                    <td>
                         <span
                             class="cursor-pointer"
                             on:click={() => {
@@ -50,17 +55,20 @@
                         >
                             {val.subject}
                         </span>
-                    </th>
-                    <th
-                        >{val.user_id ? val.user_id : "카카오"} / {val.user_nickname}</th
-                    >
-                    <th>
-                        {moment
-                            .utc(val.created_at)
-                            .format("YY/MM/DD HH:mm")}
-                    </th>
-                    <th>{val.view_count}</th>
-                    <th>
+                    </td>
+                    <td>
+                        {val.user_id ? val.user_id : "카카오"} / {val.user_nickname}
+                    </td>
+                    <td>
+                        {moment.utc(val.created_at).format("YY/MM/DD HH:mm")}
+                    </td>
+
+                    <td>
+                        {getProductTypeLabel(val.product)}
+                    </td>
+
+                    <td>{val.view_count}</td>
+                    <td>
                         <a
                             href="/joboffer?modifyidx={val.idx}&manage=on"
                             on:click|preventDefault={() => {
@@ -103,7 +111,7 @@
                         >
                             삭제
                         </button>
-                    </th>
+                    </td>
                 </tr>
             {/each}
         </tbody>

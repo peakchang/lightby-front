@@ -1,9 +1,17 @@
 <script>
     import moment from "moment-timezone";
+    import { setParams } from "$lib/lib.js";
+    import { onMount } from "svelte";
     let { data } = $props();
 
     let userList = $state([]);
     let managerList = $state([]);
+
+    let searchVal = $state("");
+    let searchType = $state("");
+    let nowPage = $state(6);
+
+    let pageList = $state([]);
 
     const tempData = data.userList.filter((v) => Number(v.rate) < 5);
     console.log(tempData);
@@ -11,8 +19,58 @@
     $effect(() => {
         managerList = data.userList.filter((v) => v.rate == 5);
         userList = data.userList.filter((v) => v.rate < 5);
+        pageList = data.pageList;
     });
+
+    function searchFunc() {
+        setParams({ search: searchVal, type: searchType }, true);
+        nowPage = 1;
+    }
+
+    async function chagePage() {
+        console.log(this.value);
+
+        if (this.value == "prev") {
+            console.log("안들어오니?!");
+            if (nowPage - 1 == 0) {
+                alert("첫번째 페이지 입니다.");
+            } else {
+                nowPage = nowPage - 1;
+            }
+        } else if (this.value == "next") {
+            console.log(nowPage);
+            
+            if (nowPage + 1 > 30) {
+                alert("마지막 페이지 입니다.");
+            } else {
+                nowPage = nowPage + 1;
+            }
+        } else {
+            nowPage = this.value;
+        }
+
+        setParams({ page: nowPage });
+    }
 </script>
+
+<div class="mb-5">
+    <div class="flex items-center gap-2">
+        <input
+            type="text"
+            class="border border-gray-400 px-2 py-1 text-sm focus:outline-none focus:border-blue-500 rounded-md"
+            bind:value={searchVal}
+        />
+        <select
+            class="border border-gray-400 px-2 py-1 text-sm focus:outline-none focus:border-blue-500 rounded-md"
+            bind:value={searchType}
+        >
+            <option value="name">이름</option>
+            <option value="phone">휴대폰</option>
+        </select>
+        <!-- svelte-ignore event_directive_deprecated -->
+        <button class="btn btn-soft btn-sm" on:click={searchFunc}>검색</button>
+    </div>
+</div>
 
 <div class="overflow-x-auto">
     <table class="table">
@@ -87,6 +145,44 @@
             {/each}
         </tbody>
     </table>
+    <!-- svelte-ignore a11y_consider_explicit_label -->
+    <!-- svelte-ignore event_directive_deprecated -->
+    <div class="my-5 text-center">
+        <div class="join">
+            <button class="join-item btn" value="first" on:click={chagePage}>
+                <i class="fa fa-angle-double-left" aria-hidden="true"></i>
+            </button>
+            <button class="join-item btn" value="prev" on:click={chagePage}>
+                <i class="fa fa-angle-left" aria-hidden="true"></i>
+            </button>
+
+            {#each pageList as page, idx}
+                {#if page == nowPage}
+                    <button
+                        class="join-item btn btn-active"
+                        value={page}
+                        on:click={chagePage}
+                    >
+                        {page}
+                    </button>
+                {:else}
+                    <button
+                        class="join-item btn"
+                        value={page}
+                        on:click={chagePage}
+                    >
+                        {page}
+                    </button>
+                {/if}
+            {/each}
+            <button class="join-item btn" value="next" on:click={chagePage}>
+                <i class="fa fa-angle-right" aria-hidden="true"></i>
+            </button>
+            <button class="join-item btn" value="last" on:click={chagePage}>
+                <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
 </div>
 
 <style>
