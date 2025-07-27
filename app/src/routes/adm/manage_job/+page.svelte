@@ -47,7 +47,11 @@
                     <th
                         >{val.user_id ? val.user_id : "카카오"} / {val.user_nickname}</th
                     >
-                    <th>{moment(val.created_at).format("YY/MM/DD HH:mm")}</th>
+                    <th>
+                        {moment
+                            .tz(val.created_at, "Asia/Seoul")
+                            .format("YY/MM/DD HH:mm")}
+                    </th>
                     <th>{val.view_count}</th>
                     <th>
                         <a
@@ -87,9 +91,7 @@
                                     );
 
                                     invalidateAll();
-                                } catch (error) {
-                                    
-                                }
+                                } catch (error) {}
                             }}
                         >
                             삭제
