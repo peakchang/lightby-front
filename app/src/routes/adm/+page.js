@@ -9,21 +9,23 @@ export const load = async ({ params, url, data }) => {
 
 
     const nowPage = url.searchParams.get('page');
-    console.log(nowPage);
-
+    const searchVal = url.searchParams.get('search');
+    const searchType = url.searchParams.get('type');
 
     let userList = []
     let allCount = 0
     let pageList = [];
+    let maxPage = 0
     try {
-        const res = await axios.post(`${back_api}/adm_users/get_users`, { page: 1 })
+        const res = await axios.post(`${back_api}/adm_users/get_users`, { nowPage, searchVal, searchType })
         userList = res.data.userList
         allCount = res.data.allCount
-        pageList = getPageList(nowPage, 30)
-        console.log(pageList);
+        maxPage = res.data.maxPage
+        pageList = getPageList(nowPage, maxPage)
+
 
     } catch (err) {
         console.error(err.message);
     }
-    return { userList, allCount, pageList }
+    return { userList, allCount, pageList, maxPage }
 }

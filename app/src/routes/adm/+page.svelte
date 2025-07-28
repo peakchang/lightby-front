@@ -2,6 +2,7 @@
     import moment from "moment-timezone";
     import { setParams } from "$lib/lib.js";
     import { onMount } from "svelte";
+    import { formatPhoneNum } from "$lib/lib.js";
     let { data } = $props();
 
     let userList = $state([]);
@@ -12,9 +13,14 @@
     let nowPage = $state(1);
 
     let pageList = $state([]);
+    let maxPage = $state(0);
 
     const tempData = data.userList.filter((v) => Number(v.rate) < 5);
     console.log(tempData);
+
+    onMount(() => {
+        maxPage = data.maxPage;
+    });
 
     $effect(() => {
         managerList = data.userList.filter((v) => v.rate == 5);
@@ -36,7 +42,7 @@
                 nowPage = Number(nowPage) - 1;
             }
         } else if (this.value == "next") {
-            if (Number(nowPage) + 1 > 30) {
+            if (Number(nowPage) + 1 > maxPage) {
                 alert("마지막 페이지 입니다.");
                 return;
             } else {
@@ -45,7 +51,7 @@
         } else if (this.value == "first") {
             nowPage = 1;
         } else if (this.value == "last") {
-            nowPage = 30;
+            nowPage = maxPage;
         } else {
             nowPage = Number(this.value);
         }
@@ -103,7 +109,7 @@
                         </div>
                     </td>
                     <td class="tb">{manager.sns_id ? "KAKAO" : ""}</td>
-                    <td class="tb"> {manager.phone}</td>
+                    <td class="tb"> {formatPhoneNum(manager.phone)}</td>
                     <td class="tb">{manager.name}</td>
                     <td class="tb">{manager.nickname}</td>
                     <td class="tb">일반</td>
@@ -114,7 +120,7 @@
                     <td class="tb">
                         {moment(manager.created_at).format("YY/MM/DD")}
                     </td>
-                    <td class="tb"> 25/7/15 13:40 </td>
+                    <td class="tb">{moment(manager.connected_at).format("YY/MM/DD HH:mm:ss")}</td>
                 </tr>
             {/each}
         </tfoot>
@@ -130,7 +136,7 @@
                         </div>
                     </td>
                     <td class="tb">{user.sns_id ? "KAKAO" : ""}</td>
-                    <td class="tb"> {user.phone}</td>
+                    <td class="tb">{formatPhoneNum(user.phone)}</td>
                     <td class="tb">{user.name}</td>
                     <td class="tb">{user.nickname}</td>
                     <td class="tb">일반</td>
@@ -141,7 +147,7 @@
                     <td class="tb">
                         {moment(user.created_at).format("YY/MM/DD")}
                     </td>
-                    <td class="tb"> 25/7/15 13:40 </td>
+                    <td class="tb">{moment(user.connected_at).format("YY/MM/DD HH:mm:ss")}</td>
                 </tr>
             {/each}
         </tbody>

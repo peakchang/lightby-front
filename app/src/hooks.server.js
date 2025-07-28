@@ -1,6 +1,7 @@
 import { sql_con } from '$lib/server/db'
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '$env/static/private';
 import jwt from 'jsonwebtoken';
+import moment from 'moment-timezone';
 
 export async function handle({ event, resolve }) {
 
@@ -9,8 +10,8 @@ export async function handle({ event, resolve }) {
     }
     const accessToken = event.cookies.get('access_token');
     const refreshToken = event.cookies.get('refresh_token');
-    
-    
+
+
     // 기본 초기화~
     let userInfo = {}
     try {
@@ -33,6 +34,11 @@ export async function handle({ event, resolve }) {
             const refreshPayload = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
             const getUserInfoQuery = "SELECT * FROM users WHERE idx = ?";
             const [userInfoRow] = await sql_con.promise().query(getUserInfoQuery, [refreshPayload.userId]);
+
+            const now = moment().format('YYYY-MM-DD HH:mm:ss')
+            const updateLastConnectQuery = "UPDATE users SET connected_at = ? WHERE idx = ?"
+            await sql_con.promise().query(updateLastConnectQuery, [now, userInfoRow[0]['idx']]);
+            
 
             // userInfoRow.length 가 0 이면 아이디가 없는것 / 토큰 불일치 하면 다시 로그인 하라고 리턴처리
             if (userInfoRow.length == 0 || userInfoRow[0].refresh_token != refreshToken) {

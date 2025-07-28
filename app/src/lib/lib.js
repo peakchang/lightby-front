@@ -123,7 +123,10 @@ export function getPageList(currentPage, maxPage, displayCount = 7) {
     let endPage = 0
     let displayHalf = Number(displayCount / 2)
 
-    if (Number(currentPage) <= Math.round(displayCount / 2)) {
+    if (maxPage <= displayCount) {
+        startPage = 1
+        endPage = maxPage
+    } else if (Number(currentPage) <= Math.round(displayCount / 2)) {
         startPage = 1
         endPage = displayCount
     } else if (currentPage > maxPage - displayHalf) {

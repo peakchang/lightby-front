@@ -146,12 +146,13 @@
             userInfo.nickname = nickname;
         }
 
-        console.log(userInfo);
 
         try {
             const res = await axios.post("/auth/kakao-callback", {
                 userInfo,
             });
+
+            $user_info["idx"] = res.data.userId;
 
             successMessage = "로그인 성공! 메인으로 이동합니다.";
             successModal = true;
@@ -159,6 +160,7 @@
             setTimeout(() => {
                 successModal = false;
                 modalLoading = false;
+
                 goto("/");
             }, 1800);
         } catch (error) {
@@ -401,7 +403,6 @@
                 <div class="pl-1 text-xs mt-1 text-blue-500">
                     <p>구인글 작성을 원하시면 입력해주세요.</p>
                     <p>사업자가 없을경우 로그인하기를 클릭해주세요</p>
-                     
                 </div>
 
                 <div class="mt-5">

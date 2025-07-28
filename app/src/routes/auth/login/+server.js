@@ -4,6 +4,8 @@ import { getQueryStr } from "$lib/server/lib";
 import jwt from 'jsonwebtoken';
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '$env/static/private';
 import bcrypt from 'bcrypt';
+import moment from "moment-timezone";
+
 /*
 >> 프론트에서 가져온 추가 정보들로 DB 입력 / JWT토큰 생성해서 아이디 값 저장 / 다시 DB에 토큰 값 저장하기!
 >> 이후 리턴 한 다음에 프론트에서 메인페이지로 refresh 하기!!
@@ -15,24 +17,26 @@ export async function POST({ request, cookies }) {
         const getUserInfoQuery = "SELECT * FROM users WHERE id = ?";
         const [getUserInfo] = await sql_con.promise().query(getUserInfoQuery, [id]);
         console.log(getUserInfo);
-        
+
         if (getUserInfo.length === 0) {
             return json({ message: '아이디가 존재하지 않습니다.' }, { status: 400 })
         }
         const isMatch = await bcrypt.compare(password, getUserInfo[0].password);
         console.log(isMatch);
-        
+
         if (isMatch) {
             const payload = {
                 userId: getUserInfo[0].idx
             }
 
             const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
-
             const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET, { expiresIn: '14d' });
 
-            const refreshTokenUpdateQuery = `UPDATE users SET refresh_token = ? WHERE idx = ?`;
-            await sql_con.promise().query(refreshTokenUpdateQuery, [refreshToken, getUserInfo[0].idx]);
+            const now = moment().format('YYYY-MM-DD HH:mm:ss')
+
+            // 리프레쉬 토큰 / 마지막 접속 시간 업데이트
+            const refreshTokenUpdateQuery = `UPDATE users SET refresh_token = ?, connected_at = ? WHERE idx = ?`;
+            await sql_con.promise().query(refreshTokenUpdateQuery, [refreshToken, now, getUserInfo[0].idx]);
 
             cookies.set('access_token', accessToken, {
                 httpOnly: true,

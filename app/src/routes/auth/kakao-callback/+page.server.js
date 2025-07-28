@@ -3,7 +3,7 @@ import axios from 'axios';
 import jwt from 'jsonwebtoken';
 import { sql_con } from "$lib/server/db";
 import { KAKAO_RESTAPI, KAKAO_REDIRECT_URI, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '$env/static/private';
-
+import moment from 'moment-timezone';
 
 // KAKAO 콜백 처리될때 아이디 있으면 쿠키에 JWT 인증 넣고 리턴~ (JWT 값에는 DB ID 값만 넣기)
 
@@ -64,10 +64,6 @@ export async function load({ params, url, cookies }) {
         // 유저 정보 얻기 완료!
         const kakaoUserInfo = userResponse.data;
 
-        console.log('kakaoUserInfo 여기~~~~~~~~~~~~');
-
-        console.log(kakaoUserInfo);
-
 
         // 해당 유저 정보로 DB에 있는지 (기존 가입 유저인지) 체크
         const getUserInfoQuery = "SELECT * FROM users WHERE sns_id = ?";
@@ -86,7 +82,7 @@ export async function load({ params, url, cookies }) {
                 const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
                 const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET, { expiresIn: '14d' });
 
-                
+
 
                 data.loginStatus = true;
 
@@ -94,8 +90,10 @@ export async function load({ params, url, cookies }) {
                     expiresIn: '7d',
                 }
 
-                const tokenUpdateQuery = `UPDATE users SET refresh_token = ? WHERE idx = ?`;
-                await sql_con.promise().query(tokenUpdateQuery, [refreshToken, userInfo.idx]);
+                const now = moment().format('YYYY-MM-DD HH:mm:ss')
+
+                const tokenUpdateQuery = `UPDATE users SET refresh_token = ?, connected_at = ? WHERE idx = ?`;
+                await sql_con.promise().query(tokenUpdateQuery, [refreshToken, now, userInfo.idx]);
 
                 cookies.set('access_token', accessToken, {
                     httpOnly: true,
@@ -112,10 +110,18 @@ export async function load({ params, url, cookies }) {
                 });
             } catch (error) {
                 console.error(error.message);
-                console.log('카카오 로그인 에러!!!');
             }
 
         } else {
+
+
+            // 닉네임 중복 체크
+            const nickChkQuery = "SELECT * FROM users WHERE nickname = ?";
+            const [nickChk] = await sql_con.promise().query(nickChkQuery, [kakaoUserInfo.kakao_account.profile.nickname]);
+            if (nickChk.length == 0) {
+                data.userInfo.nickname = kakaoUserInfo.kakao_account.profile.nickname
+            }
+
             // 기존 유저 아니면 아래 데이터들 체크! 모두 충족하면 넘어가기~
             // 어쨌든 닉네임 때문에 다시 하긴 해야할거 같은데?
             data.loginStatus = false;
@@ -123,24 +129,14 @@ export async function load({ params, url, cookies }) {
             data.userInfo.profile_image = kakaoUserInfo.kakao_account.profile.profile_image_url
             data.userInfo.profile_thumbnail = kakaoUserInfo.kakao_account.profile.thumbnail_image_url
             data.userInfo.name = kakaoUserInfo.kakao_account.profile.nickname
-            data.userInfo.nickname = kakaoUserInfo.kakao_account.profile.nickname
             data.userInfo.phone = kakaoUserInfo.properties.phone // 휴대폰 부분은 넘어온게 없으니까 추후 확인
 
             // name / nickname / phone 다 있으면 insert 시키고 없으면 바로 loginStatus = false 하고 리턴 시키기!
             // 다 있어도 닉네임 / 휴대폰 번호 중복이 있을수 있으니까 에러나면 (unique) loginStatus = false 하고 리턴 시키기!
 
-
-
-            console.log('userInfo 확인!!!!');
-            console.log(data.userInfo);
-
-
-            console.log('여기가 신규 가입!!');
-
         }
 
     } catch (error) {
-        console.log('여기서 에러인거야?!?!');
         console.error(error.message);
     }
 
