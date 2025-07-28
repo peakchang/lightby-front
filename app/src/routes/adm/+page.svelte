@@ -9,7 +9,7 @@
 
     let searchVal = $state("");
     let searchType = $state("");
-    let nowPage = $state(6);
+    let nowPage = $state(1);
 
     let pageList = $state([]);
 
@@ -28,25 +28,26 @@
     }
 
     async function chagePage() {
-        console.log(this.value);
-
         if (this.value == "prev") {
-            console.log("안들어오니?!");
             if (nowPage - 1 == 0) {
                 alert("첫번째 페이지 입니다.");
+                return;
             } else {
-                nowPage = nowPage - 1;
+                nowPage = Number(nowPage) - 1;
             }
         } else if (this.value == "next") {
-            console.log(nowPage);
-            
-            if (nowPage + 1 > 30) {
+            if (Number(nowPage) + 1 > 30) {
                 alert("마지막 페이지 입니다.");
+                return;
             } else {
-                nowPage = nowPage + 1;
+                nowPage = Number(nowPage) + 1;
             }
+        } else if (this.value == "first") {
+            nowPage = 1;
+        } else if (this.value == "last") {
+            nowPage = 30;
         } else {
-            nowPage = this.value;
+            nowPage = Number(this.value);
         }
 
         setParams({ page: nowPage });
