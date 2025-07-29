@@ -108,9 +108,6 @@
         }
 
         postNum = data.postNum;
-        if (postNum === 0) {
-            paymentStatus = true;
-        }
 
         console.log(`paymentStatus : ${paymentStatus}`);
 
@@ -167,13 +164,6 @@
         // 직종분류 값 있을경우 occupationArr 에 값 넣기
         if ($all_data["occupation"]) {
             occupationArr = $all_data["occupation"].split(",");
-        }
-
-        // 상품 값 없을경우 기본값 free // 먄약 첫 글일 경우 premium
-        if (!$all_data["product"] && postNum === 0) {
-            $all_data["product"] = "premium";
-        } else if (!$all_data["product"]) {
-            $all_data["product"] = "free";
         }
     });
 
@@ -280,7 +270,9 @@
             $loadingStore = false;
             $all_data["payment_key"] = e.data.paymentInfo.payment_key;
             const today = moment().format("YYYY-MM-DD");
+            const tenDaysLater = moment().add(10, "days").format("YYYY-MM-DD");
             $all_data["ad_start_date"] = today;
+            $all_data["ad_end_date"] = tenDaysLater;
             paymentStatus = true;
             try {
                 const res = await axios.post(`${back_api}/regist/upload`, {
@@ -306,6 +298,18 @@
     // 상품 업로드 함수!!!
     async function uploadRegist() {
         $all_data["icons"] = icons.join(",");
+
+        if (postNum === 0) {
+            paymentStatus = true;
+            if ($all_data["product"] == "premium") {
+                const today = moment().format("YYYY-MM-DD");
+                const tenDaysLater = moment()
+                    .add(10, "days")
+                    .format("YYYY-MM-DD");
+                $all_data["ad_start_date"] = today;
+                $all_data["ad_end_date"] = tenDaysLater;
+            }
+        }
 
         // 유료 상품이면 팝업 열고 리턴 처리!!
         if ($all_data["product"] != "free" && paymentStatus == false) {
@@ -409,6 +413,16 @@
 
         if (!chkBool) {
             return;
+        }
+
+        console.log("여기야아아아아아ㅏㅇ?!?!?!?!?!?");
+
+        // 상품 값 없을경우 기본값 free // 먄약 첫 글일 경우 premium
+        if (postNum === 0) {
+            $all_data["product"] = "premium";
+            iconsShow = true;
+        } else {
+            $all_data["product"] = "free";
         }
 
         submitPrevModal = true;
@@ -914,9 +928,25 @@
                 class="flex justify-between items-center py-2 border-b border-gray-100"
             >
                 <span class="text-gray-600">합계</span>
-                <span class="font-medium">
-                    {$all_data["sum"] ? $all_data["sum"].toLocaleString() : 0}원
-                </span>
+
+                {#if postNum === 0}
+                    <span class="font-medium">
+                        <span class="line-through text-gray-400">
+                            {$all_data["sum"]
+                                ? $all_data["sum"].toLocaleString()
+                                : 0}
+                        </span>
+                        >>
+                        <span>0</span>
+                        원
+                    </span>
+                {:else}
+                    <span class="font-medium">
+                        {$all_data["sum"]
+                            ? $all_data["sum"].toLocaleString()
+                            : 0}원
+                    </span>
+                {/if}
             </div>
         </div>
 

@@ -15,9 +15,6 @@
     let pageList = $state([]);
     let maxPage = $state(0);
 
-    const tempData = data.userList.filter((v) => Number(v.rate) < 5);
-    console.log(tempData);
-
     onMount(() => {
         maxPage = data.maxPage;
     });
