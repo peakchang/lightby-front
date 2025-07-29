@@ -4,7 +4,11 @@
     import axios from "axios";
     import moment from "moment-timezone";
     import { prev } from "$lib/stores/stores.js";
-    import { setParams, getRemainingDaysPlusOne } from "$lib/lib.js";
+    import {
+        setParams,
+        getRemainingDaysPlusOne,
+        formatPhoneNum,
+    } from "$lib/lib.js";
     import { onMount } from "svelte";
     import { page } from "$app/stores";
 
@@ -13,9 +17,11 @@
 
     let nowPage = $state(1);
     let pageList = $state([]);
+    let pageTopCount = $state(0);
 
     let searchVal = $state("");
     let searchType = $state("");
+    let adProduct = $state("all");
     let maxPage = $state(0);
 
     const productTypeMap = {
@@ -33,6 +39,8 @@
     });
 
     $effect(() => {
+        pageTopCount = data.allCount - (nowPage - 1) * 15;
+
         jobOfferList = data.jobOfferList;
         pageList = data.pageList;
     });
@@ -88,6 +96,12 @@
             invalidateAll();
         } catch (error) {}
     }
+
+    async function changeProduct() {
+        console.log(adProduct);
+        setParams({ product: adProduct }, true);
+        nowPage = 1;
+    }
 </script>
 
 <div class="mb-5">
@@ -108,6 +122,18 @@
         </select>
         <!-- svelte-ignore event_directive_deprecated -->
         <button class="btn btn-soft btn-sm" on:click={searchFunc}>검색</button>
+
+        <select
+            class="border border-gray-400 px-2 py-1 text-sm focus:outline-none focus:border-blue-500 rounded-md"
+            bind:value={adProduct}
+            on:change={changeProduct}
+        >
+            <option value="all">전체</option>
+            <option value="premium">프리미엄</option>
+            <option value="top">지역탑</option>
+            <option value="free">무료</option>
+        </select>
+        <span class="text-xs">광고 상품값 변경시 바로 적용</span>
     </div>
 </div>
 
@@ -118,8 +144,10 @@
     <table class="table">
         <thead>
             <tr class="text-center">
+                <th>번호</th>
                 <th>제목</th>
                 <th>아이디 / 닉네임</th>
+                <th>전화번호</th>
                 <th>등록일</th>
                 <th>광고</th>
                 <th>광고 상태</th>
@@ -131,6 +159,9 @@
         <tbody>
             {#each jobOfferList as val, idx}
                 <tr class="text-center">
+                    <td>
+                        {pageTopCount - idx}
+                    </td>
                     <td>
                         <span
                             class="cursor-pointer"
@@ -150,6 +181,9 @@
                         {:else}
                             {val.user_id} / {val.user_nickname}
                         {/if}
+                    </td>
+                    <td>
+                        {val.user_phone ? formatPhoneNum(val.user_phone) : ""}
                     </td>
                     <td>
                         {moment.utc(val.created_at).format("YY/MM/DD HH:mm")}

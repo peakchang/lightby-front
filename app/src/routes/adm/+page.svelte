@@ -11,7 +11,7 @@
     let searchVal = $state("");
     let searchType = $state("");
     let nowPage = $state(1);
-
+    let pageTopCount = $state(0);
     let pageList = $state([]);
     let maxPage = $state(0);
 
@@ -20,6 +20,7 @@
     });
 
     $effect(() => {
+        pageTopCount = data.allCount - (nowPage - 1) * 15;
         managerList = data.userList.filter((v) => v.rate == 5);
         userList = data.userList.filter((v) => v.rate < 5);
         pageList = data.pageList;
@@ -117,14 +118,18 @@
                     <td class="tb">
                         {moment(manager.created_at).format("YY/MM/DD")}
                     </td>
-                    <td class="tb">{moment(manager.connected_at).format("YY/MM/DD HH:mm:ss")}</td>
+                    <td class="tb"
+                        >{moment(manager.connected_at).format(
+                            "YY/MM/DD HH:mm:ss",
+                        )}</td
+                    >
                 </tr>
             {/each}
         </tfoot>
         <tbody>
             {#each userList as user, idx}
                 <tr class="text-center">
-                    <th class="tb">{data.allCount - idx}</th>
+                    <th class="tb">{pageTopCount - idx}</th>
                     <td class="tb">{user.id}</td>
                     <td class="tb">
                         <div class="flex gap-1">
@@ -144,7 +149,11 @@
                     <td class="tb">
                         {moment(user.created_at).format("YY/MM/DD")}
                     </td>
-                    <td class="tb">{moment(user.connected_at).format("YY/MM/DD HH:mm:ss")}</td>
+                    <td class="tb"
+                        >{moment(user.connected_at).format(
+                            "YY/MM/DD HH:mm:ss",
+                        )}</td
+                    >
                 </tr>
             {/each}
         </tbody>

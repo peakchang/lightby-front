@@ -14,6 +14,7 @@ export const load = async ({ params, url, data }) => {
     const nowPage = url.searchParams.get('page') || "";
     const searchVal = url.searchParams.get('search') || "";
     const searchType = url.searchParams.get('type') || "";
+    const product = url.searchParams.get('product') || "";
 
     let jobOfferList = []
     let allCount = 0
@@ -21,7 +22,7 @@ export const load = async ({ params, url, data }) => {
     let maxPage = 0
 
     try {
-        const res = await axios.post(`${back_api}/adm_manage/load_joboffer_list`, { nowPage, searchVal, searchType })
+        const res = await axios.post(`${back_api}/adm_manage/load_joboffer_list`, { nowPage, searchVal, searchType, product })
 
         console.log(res.data.jobOfferList);
 
@@ -33,7 +34,7 @@ export const load = async ({ params, url, data }) => {
         }));
 
         console.log(jobOfferList);
-        
+
         allCount = res.data.allCount
         maxPage = res.data.maxPage
         pageList = getPageList(nowPage, maxPage)
