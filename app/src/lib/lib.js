@@ -74,25 +74,39 @@ export function isWithin10Days(dateString) {
     };
 }
 
-// 광고 종료일 기준으로 남은날 리턴! 지났으면 0 리턴!
+// // 광고 종료일 기준으로 남은날 리턴! 지났으면 0 리턴!
+// export function getRemainingDaysPlusOne(dateStr) {
+//     // 입력이 'YYYY-MM-DD' 형식이면 time을 붙여서 Date로 변환
+//     const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
+//     const targetDate = isDateOnly
+//         ? new Date(`${dateStr}T00:00:00`)
+//         : new Date(dateStr);
+
+//     const now = new Date();
+
+//     // 시차 보정: 현재 날짜와 타겟 날짜를 자정 기준으로 맞춤
+//     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+//     const startOfTarget = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
+
+//     const diffTime = startOfTarget - startOfToday;
+//     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+//     return diffDays < 0 ? 0 : diffDays + 1;
+// }
+
+// 광고 종료일 기준으로 남은날 리턴! 지났으면 0 리턴! moment 로!!!
 export function getRemainingDaysPlusOne(dateStr) {
-    // 입력이 'YYYY-MM-DD' 형식이면 time을 붙여서 Date로 변환
-    const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
-    const targetDate = isDateOnly
-        ? new Date(`${dateStr}T00:00:00`)
-        : new Date(dateStr);
+    const momentDate = moment(dateStr, moment.ISO_8601, true);
+    if (!momentDate.isValid()) return 0;
 
-    const now = new Date();
+    const today = moment().startOf('day');
+    const target = momentDate.startOf('day');
 
-    // 시차 보정: 현재 날짜와 타겟 날짜를 자정 기준으로 맞춤
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const startOfTarget = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
-
-    const diffTime = startOfTarget - startOfToday;
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const diffDays = target.diff(today, 'days');
 
     return diffDays < 0 ? 0 : diffDays + 1;
 }
+
 
 
 
