@@ -18,7 +18,7 @@
     onMount(() => {
         // 로그인 되어 있는지 체크~
         console.log($user_info["idx"]);
-        
+
         if ($user_info["idx"]) {
             alertMessage = "이미 로그인 되어 있습니다.";
             alertModal = true;
@@ -51,7 +51,7 @@
     let timeLeft = $state(180); // 인증번호 카운트 다운 떨어지는 숫자!
     let interval = $state(null); // 인증번호 카운트 다운 시 setInerval 셋팅 변수
 
-    let businessNum = $state("")
+    let businessNum = $state("");
 
     let password = $state("");
     let passwordChk = $state("");
@@ -352,10 +352,10 @@
                 <img src="/logo.png" alt="" class=" max-w-[150px] mx-auto" />
             </a>
 
-            <div>회원가입</div>
+            <div class="mt-5 mb-1 text-2xl font-bold">회원가입</div>
         </div>
 
-        <div class="mt-12">
+        <div class="">
             <!-- svelte-ignore event_directive_deprecated -->
             <form on:submit={joinSubmit}>
                 <label class="input input-info mt-5 w-full">
@@ -475,8 +475,6 @@
                     </button>
                 </div>
 
-                
-
                 {#if authShowBool}
                     <div class="flex items-center mt-1.5 gap-2">
                         <label class="input input-info w-full">
@@ -516,8 +514,7 @@
                     />
                 </label>
                 <div class="pl-1 text-xs mt-1 text-blue-500">
-                    <p>구인글 작성을 원하시면 입력해주세요.</p>
-                    <p>사업자가 없을경우 공란!</p>
+                    <p>(선택) 사업자 번호가 있으실 경우 입력 해 주세요.</p>
                 </div>
 
                 <label class="input input-info mt-5 w-full">

@@ -115,6 +115,12 @@ export async function load({ params, url, cookies }) {
         } else {
 
 
+            console.log('loginStatus 가 false 고 정보 얻을 부분!!');
+            console.log(kakaoUserInfo);
+            
+            
+
+
             // 닉네임 중복 체크
             const nickChkQuery = "SELECT * FROM users WHERE nickname = ?";
             const [nickChk] = await sql_con.promise().query(nickChkQuery, [kakaoUserInfo.kakao_account.profile.nickname]);
