@@ -5,11 +5,12 @@
     import DetailMenu from "$lib/components/DetailMenu.svelte";
     import { user_info } from "$lib/stores/stores.js";
     import CustomModal from "$lib/components/CustomModal.svelte";
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import { toastStore } from "$lib/stores/stores.js";
     import { page } from "$app/stores";
     import { favorateBool } from "$lib/stores/stores.js";
     import axios from "axios";
+    import { browser } from "$app/environment";
 
     let headerShowBool = $state(true); // 스크롤 내릴시 상단 메뉴 보이게 하기 위한 변수!
     let showBool = $state(true); // 처음 페이지 로딩시 위로 올라가는 잔상 없애기 위해!
@@ -25,7 +26,22 @@
     let imgSwiper = $state({});
 
     let alertModalBool = $state(false);
+
+    let siteWrab = $state({});
+    if (browser) {
+        siteWrab = document.querySelector(".site-wrab");
+    }
+
+    function handleScroll() {
+        y = siteWrab.scrollTop;
+    }
+
     onMount(() => {
+        // 스크롤 이벤트 추가
+        if (browser) {
+            siteWrab.addEventListener("scroll", handleScroll);
+        }
+
         $favorateBool = data.favorateBool;
 
         if (detailContent.imgs) {
@@ -46,6 +62,13 @@
         });
     });
 
+    onDestroy(() => {
+        // 스크롤 이벤트 삭제
+        if (browser) {
+            siteWrab.removeEventListener("scroll", handleScroll);
+        }
+    });
+
     $effect(() => {
         if (y != 0) {
             // 스크롤 조금이라도 움직이면 hidden 해제!
@@ -64,37 +87,15 @@
         shareModal = true;
     }
 
-    function cliboardHref() {
-        navigator.clipboard
-            .writeText($page.url.href)
-            .then(() =>
-                toastStore.set({
-                    show: true,
-                    message: "주소가 복사되었습니다",
-                    color: "#53C14B",
-                }),
-            )
-            .catch((err) =>
-                toastStore.set({
-                    show: true,
-                    message: "주소 복사에 실패 했습니다.",
-                    color: "#53C14B",
-                }),
-            );
-    }
-
     // 포스트 삭제!!
 
     async function deletePost() {
-        
         try {
             const res = await axios.post(`${back_api}/regist/delete`, {
                 delImgs: detailContent.imgs,
                 delThumbnail: detailContent.thumbnail,
                 idx: detailContent.idx,
             });
-
-            console.log(res);
         } catch (error) {
             console.error(error.message);
         }
@@ -104,12 +105,10 @@
         } else {
             goto("/");
         }
-
-        console.log($page);
     }
 </script>
 
-<svelte:window bind:scrollY={y} />
+<!-- <svelte:window bind:scrollY={y} /> -->
 <div
     class="fixed top-0 left-0 w-full z-50 suit-font slide-menu"
     class:hidden={showBool}
@@ -164,7 +163,24 @@
     <div class="flex justify-center items-center gap-3">
         <button
             class="border border-gray-400 p-2 rounded-md text-gray-600 cursor-pointer"
-            on:click={cliboardHref}
+            on:click={() => {
+                navigator.clipboard
+                    .writeText($page.url.href)
+                    .then(() =>
+                        toastStore.set({
+                            show: true,
+                            message: "주소가 복사되었습니다",
+                            color: "#53C14B",
+                        }),
+                    )
+                    .catch((err) =>
+                        toastStore.set({
+                            show: true,
+                            message: "주소 복사에 실패 했습니다.",
+                            color: "#53C14B",
+                        }),
+                    );
+            }}
         >
             <div>
                 <i class="fa fa-link" aria-hidden="true"></i>

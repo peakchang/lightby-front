@@ -18,7 +18,7 @@
 
 	import CustomModal from "$lib/components/CustomModal.svelte";
 	import PdButton from "$lib/components/PdButton.svelte";
-    import { goto } from "$app/navigation";
+	import { goto } from "$app/navigation";
 
 	let { children } = $props();
 	onMount(() => {
@@ -228,6 +228,15 @@
 
 	:global(.site-wrab) {
 		background-color: #f3f6f6;
+		
+		max-height: 100vh;
+		overflow-y: scroll; /* 세로 스크롤 유지 */
+		scrollbar-width: none; /* Firefox 전용 */
+		-ms-overflow-style: none; /* IE & Edge 구버전 */
+	}
+
+	.site-wrab::-webkit-scrollbar {
+		display: none;
 	}
 
 	:global(#toast) {

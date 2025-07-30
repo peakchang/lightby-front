@@ -17,6 +17,8 @@
         businessCategorys,
         jobCategorys,
     } from "$lib/const";
+
+    import { formatPhoneNum, removeSpecialCharactersAndSpaces } from "$lib/lib";
     import axios from "axios";
     import { feeBases, iconList } from "./jopoffer";
     import { onDestroy, onMount, tick } from "svelte";
@@ -25,8 +27,6 @@
     import moment from "moment-timezone";
 
     let { data } = $props();
-
-    console.log(data);
 
     let postNum = $state(0);
 
@@ -101,15 +101,14 @@
             goto("/");
         }
 
-        // 수정시에 전체 변수에 불러온 수정 데이터 담기!!
         if (data.modifyIdx) {
             $all_data = data.modifyContent;
-            console.log($all_data);
+        } else {
+            $all_data["name"] = formatPhoneNum(data.userInfo.name);
+            $all_data["phone"] = formatPhoneNum(data.userInfo.phone);
         }
 
         postNum = data.postNum;
-
-        console.log(`paymentStatus : ${paymentStatus}`);
 
         // 삭제할 이미지 있으면 쿠키에서 값 가져와서 삭제하기! (글쓰는 페이지 적용!!)
         const refreshFlag = Cookies.get("del_img_list");
@@ -118,10 +117,11 @@
                 const res = await axios.post(`${back_api}/img/delete_many`, {
                     delImgList: refreshFlag.split(","),
                 });
+                Cookies.remove("del_img_list");
             } catch (err) {
+                Cookies.remove("del_img_list");
                 console.error(err);
             }
-            Cookies.remove("del_img_list");
         }
 
         $all_data["user_id"] = $user_info.idx;
@@ -189,6 +189,7 @@
     // 변화 감지
     $effect(() => {
         // delImgList 에 리스트 담기!! (글쓰는 페이지!)
+
         if (delImgList.length > 0) {
             const delImgListStr = delImgList.join(",");
             Cookies.set("del_img_list", delImgListStr, {
@@ -230,7 +231,6 @@
             $all_data = res.data.prevPost;
             imgModifyList = $all_data["imgs"];
 
-            console.log($all_data);
             $all_data["product"] = "free";
             $all_data["icons"] = "";
             getAddress = $all_data["addr"];
@@ -238,8 +238,6 @@
             delete $all_data.updated_at;
             delete $all_data.sum;
             delete $all_data.idx;
-
-            console.log($all_data);
 
             businessArr = $all_data["business"].split(",");
             occupationArr = $all_data["occupation"].split(",");
@@ -252,7 +250,6 @@
             const res = await axios.post(`${back_api}/regist/load_prev_list`, {
                 user_idx: $user_info.idx,
             });
-            console.log(res.data);
 
             prevPostList = res.data.prevPostList;
             prevPostListModal = true;
@@ -261,12 +258,7 @@
 
     // 결제 성공시 action! on:message 에 등록~
     async function paymentSuccess(e) {
-        // console.log(e.data);
-
         if (e.data.status) {
-            console.log("success 가 안되는거야?!?!?!?!?!??!?!");
-            console.log("진짜 좆같은새끼 끝까지 말썽이네?!?!?!");
-
             $loadingStore = false;
             $all_data["payment_key"] = e.data.paymentInfo.payment_key;
             const today = moment().format("YYYY-MM-DD");
@@ -298,6 +290,9 @@
     // 상품 업로드 함수!!!
     async function uploadRegist() {
         $all_data["icons"] = icons.join(",");
+        $all_data["phone"] = removeSpecialCharactersAndSpaces(
+            $all_data["phone"],
+        );
 
         if (postNum === 0) {
             paymentStatus = true;
@@ -313,8 +308,6 @@
 
         // 유료 상품이면 팝업 열고 리턴 처리!!
         if ($all_data["product"] != "free" && paymentStatus == false) {
-            console.log("유료 상품 결제 시 진입!!!!");
-
             const payProductName = `${productInfo.name} + 아이콘${iconNames.length}`;
             popup = window.open(
                 `/payments?user_id=${$user_info.idx}&order_name=${payProductName}&amount=${$all_data["sum"]}`,
@@ -363,8 +356,6 @@
 
     // 상품 업데이트 (수정) 함수!!!
     async function updateRegist() {
-        console.log($prev);
-
         $all_data["business"] = businessArr.join(",");
         $all_data["occupation"] = occupationArr.join(",");
 
@@ -373,8 +364,6 @@
         if (!chkBool) {
             return;
         }
-
-        console.log("수정하쟈!!!!!");
 
         try {
             const res = await axios.post(`${back_api}/regist/update`, {
@@ -415,8 +404,6 @@
             return;
         }
 
-        console.log("여기야아아아아아ㅏㅇ?!?!?!?!?!?");
-
         // 상품 값 없을경우 기본값 free // 먄약 첫 글일 경우 premium
         if (postNum === 0) {
             $all_data["product"] = "premium";
@@ -430,8 +417,6 @@
 
     // uploadChkRegist 함수 실행 시 필수 항목 체크하는 함수!
     function chkEssentialValue(objArr) {
-        console.log(objArr);
-
         for (let i = 0; i < objArr.length; i++) {
             const e = objArr[i];
             if (!$all_data[e.var]) {
@@ -534,8 +519,6 @@
 
         // 정상적으로 업로드 될 이미지 리스트 셋
         const imgArr = e.imgArr;
-
-        console.log(imgArr);
 
         let imgStr = "";
         for (let i = 0; i < imgArr.length; i++) {

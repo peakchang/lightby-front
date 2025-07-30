@@ -9,8 +9,6 @@
     } from "$lib/stores/stores.js";
     import { raiseViewCount } from "$lib/lib.js";
 
-    let sampleArr = $state([1, 2, 3, 4, 5]);
-
     let { data } = $props();
     console.log(data);
     let boardList = $state([]);

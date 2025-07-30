@@ -61,8 +61,6 @@
         localStorage.removeItem("search_val");
         goto("/", { invalidateAll: true });
     }
-
-    
 </script>
 
 <svelte:head>
@@ -208,7 +206,15 @@
     {@render children()}
 
     <div class="border-t border-gray-400 mt-8 pb-4"></div>
+
     <div class="pb-28 px-10">
+        <div class="text-sm mb-3">
+            <a href="/terms">
+                <span>개인정보처리방침</span>
+            </a>
+            <span>|</span>
+            <a href="/terms/service"><span>이용약관</span></a>
+        </div>
         <div class="text-xs leading-loose">
             <p>상호: 위드브릿지</p>
             <p>대표자: 박창용</p>

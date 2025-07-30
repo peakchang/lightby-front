@@ -71,7 +71,7 @@
 
 <!-- 관심지역 설정 모달 -->
 <CustomModal bind:visible={alertModalBool} closeBtn={false}>
-    ⏳ 현재 빠르게 준비 중입니다.
+    <div class="py-5 text-center">⏳ 현재 빠르게 준비 중입니다.</div>
 </CustomModal>
 
 <!-- 관심지역 설정 모달 -->

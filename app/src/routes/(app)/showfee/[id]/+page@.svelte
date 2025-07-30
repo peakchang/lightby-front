@@ -11,11 +11,19 @@
     import axios from "axios";
     import { page } from "$app/stores";
     import { getRandBet } from "$lib/lib.js";
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import DetailMenu from "$lib/components/DetailMenu.svelte";
     import Like from "$lib/components/Like.svelte";
+    import { browser } from "$app/environment";
 
     let { data } = $props();
+
+    let headerShowBool = $state(true); // 스크롤 내릴시 상단 메뉴 보이게 하기 위한 변수!
+    let showBool = $state(true); // 처음 페이지 로딩시 위로 올라가는 잔상 없애기 위해!
+    let y = $state(0);
+
+    let shareModal = $state(false);
+
     let postItem = $state({});
     let replyList = $state([]);
 
@@ -33,7 +41,16 @@
 
     let alertModalBool = $state(false); // 글 삭제시 먼저 물어보는 모달
 
+    let siteWrab = $state({});
+    if (browser) {
+        siteWrab = document.querySelector(".site-wrab");
+    }
+
     onMount(() => {
+        // 스크롤 이벤트 추가
+        if (browser) {
+            siteWrab.addEventListener("scroll", handleScroll);
+        }
         likeCount = data.likeCount;
         postItem = data.postItem;
         if (postItem.imgs) {
@@ -49,7 +66,30 @@
             replyList = data.replyList;
             replyCount = data.replyList.length;
         }
+
+        if (y != 0) {
+            // 스크롤 조금이라도 움직이면 hidden 해제!
+            showBool = false;
+        }
+
+        // 스크롤이 250 이상으로 내려가면 애니메이션 적용!
+        if (y > 250) {
+            headerShowBool = false;
+        } else {
+            headerShowBool = true;
+        }
     });
+
+    onDestroy(() => {
+        // 스크롤 이벤트 삭제
+        if (browser) {
+            siteWrab.removeEventListener("scroll", handleScroll);
+        }
+    });
+
+    function handleScroll() {
+        y = siteWrab.scrollTop;
+    }
 
     async function uploadReply() {
         loopStop = false;
@@ -90,7 +130,63 @@
             alertModalBool = true;
         }
     }
+
+    function openShareModal(e) {
+        shareModal = true;
+    }
 </script>
+
+<!-- <svelte:window on:scroll={handleScroll} /> -->
+<div
+    class="fixed top-0 left-0 w-full z-50 suit-font slide-menu"
+    class:hidden={showBool}
+    class:show={!headerShowBool}
+>
+    <div class="max-w-[530px] mx-auto bg-white">
+        <DetailMenu {openShareModal} favorateShow={false} />
+    </div>
+</div>
+
+<!-- svelte-ignore event_directive_deprecated -->
+<CustomModal bind:visible={shareModal}>
+    <div class="flex justify-center items-center gap-3">
+        <button
+            class="border border-gray-400 p-2 rounded-md text-gray-600 cursor-pointer"
+            on:click={() => {
+                navigator.clipboard
+                    .writeText($page.url.href)
+                    .then(() =>
+                        toastStore.set({
+                            show: true,
+                            message: "주소가 복사되었습니다",
+                            color: "#53C14B",
+                        }),
+                    )
+                    .catch((err) =>
+                        toastStore.set({
+                            show: true,
+                            message: "주소 복사에 실패 했습니다.",
+                            color: "#53C14B",
+                        }),
+                    );
+            }}
+        >
+            <div>
+                <i class="fa fa-link" aria-hidden="true"></i>
+            </div>
+            <div class="text-xs md:text-sm">주소복사</div>
+        </button>
+
+        <!-- <button
+            class="border border-gray-400 p-2 rounded-md text-gray-600 cursor-pointer bg-yellow-400"
+        >
+            <div class="flex justify-center items-center">
+                <img src="/kakao_logo.png" alt="" width="23" height="23" />
+            </div>
+            <div class="text-xs md:text-sm">카카오톡</div>
+        </button> -->
+    </div>
+</CustomModal>
 
 <CustomModal bind:visible={loginAlertModalShow} closeBtn={false}>
     <div class="text-center">
@@ -152,12 +248,14 @@
     </div>
 </CustomModal>
 
-<DetailMenu favorateShow={false}></DetailMenu>
+<div class="max-w-[530px] mx-auto bg-white">
+    <DetailMenu {openShareModal} favorateShow={false}></DetailMenu>
+</div>
 
 <!-- svelte-ignore event_directive_deprecated -->
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="bg-white relative min-h-screen px-3">
+<div class="bg-white relative min-h-screen px-3 content-wrab">
     <div class="max-w-[530px] mx-auto pretendard pt-10 pb-24">
         <div class="content-area border-b border-gray-300 pb-5">
             {#if postItem.user_id == $user_info.idx}
@@ -307,3 +405,14 @@
         {/each}
     </div>
 </div>
+
+<style>
+    .slide-menu {
+        transform: translateY(-100%);
+        transition: transform 0.3s ease;
+    }
+
+    .slide-menu.show {
+        transform: translateY(0);
+    }
+</style>
