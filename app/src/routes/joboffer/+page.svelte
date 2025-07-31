@@ -394,8 +394,6 @@
     // 최종 업로드 (결제 및 아이콘 선택하는 모달) 모달 열기! / 결제 창 떠있는지도
     function uploadChkRegist(e) {
 
-        console.log(icons);
-        
         if (popup) {
             alertModalShow = true;
             alertModalMessage = "현재 결제창이 열려 있습니다.";

@@ -243,7 +243,9 @@
 		transition: opacity 0.5s ease-in-out;
 	}
 
-	input {
+	input,
+	label,
+	textarea {
 		background-color: white;
 	}
 </style>
