@@ -16,9 +16,6 @@
     import { onMount } from "svelte";
 
     onMount(() => {
-        // 로그인 되어 있는지 체크~
-        console.log($user_info["idx"]);
-
         if ($user_info["idx"]) {
             alertMessage = "이미 로그인 되어 있습니다.";
             alertModal = true;
@@ -66,7 +63,6 @@
 
     // ID / 닉네임 / 휴대폰번호 input 창에서 벗어날시 기존 DB와 중복 체크 부분!
     async function duplicate_chk(e) {
-        console.log("여기는??");
 
         const type = e.target.getAttribute("data-type");
         if (type == "id") {
@@ -76,7 +72,6 @@
             } else {
                 idStatusErrBool = false;
             }
-            console.log(idChk);
 
             if (id) {
                 try {
@@ -84,8 +79,6 @@
                         type,
                         value: id,
                     });
-
-                    console.log(res);
 
                     idErrBool = false;
                     idSuccessBool = true;
@@ -138,14 +131,9 @@
             alertModal = true;
             return;
         }
-
         authShowBool = true;
-        console.log(authShowBool);
-
         authNumber = generateRandomNumber();
-
         try {
-            console.log(authNumber);
 
             // const res = await axios.post(`${back_api}/send-sms`, {
             //     phone,
@@ -170,7 +158,6 @@
 
             if (!interval) {
                 interval = setInterval(() => {
-                    console.log("반복 실행 중...");
                     if (timeLeft > 0) {
                         timeLeft -= 1;
                     } else {
@@ -464,7 +451,6 @@
                         disabled={authShowBool || authBool}
                         on:click={async (e) => {
                             const phoneBool = await duplicate_chk(e);
-                            console.log(phoneBool);
 
                             if (phoneBool) {
                                 startAuth();

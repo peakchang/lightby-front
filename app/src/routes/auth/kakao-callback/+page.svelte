@@ -13,7 +13,6 @@
     import axios from "axios";
 
     let { data } = $props();
-    console.log(data);
 
     let userInfo = $state({});
     userInfo = data.userInfo;
@@ -63,7 +62,6 @@
         }
         // 빈 객체가 아닐경우 유저 정보가 있으므로 store userInfo 에 정보 넣고 메인 페이지로 이동!
         if (data.loginStatus == true) {
-            $user_info = data;
             successMessage = "메인으로 이동중입니다.";
             successModal = true;
             modalLoading = true;
@@ -146,11 +144,13 @@
             userInfo.nickname = nickname;
         }
 
-
         try {
             const res = await axios.post("/auth/kakao-callback", {
                 userInfo,
             });
+
+            console.log("카카오 콜백 정보!!");
+            console.log(res.data);
 
             $user_info["idx"] = res.data.userId;
 
@@ -170,8 +170,6 @@
     }
 
     async function startAuth() {
-        console.log(phone.length);
-
         if (phone.length < 12) {
             alertMessage = "휴대폰 번호를 확인해주세요";
             alertModal = true;
@@ -179,9 +177,11 @@
         }
         authShowBool = true;
         authNumber = generateRandomNumber();
-        console.log(authNumber);
 
         try {
+
+
+
             // const res = await axios.post(`${back_api}/send-sms`, {
             //     phone,
             //     message: `분양가이드 인증번호 ${authNumber}`,
@@ -351,7 +351,6 @@
                             disabled={authShowBool || authBool}
                             on:click={async (e) => {
                                 const phoneBool = await duplicate_chk(e);
-                                console.log(phoneBool);
 
                                 if (phoneBool) {
                                     startAuth();

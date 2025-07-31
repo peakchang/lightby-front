@@ -10,9 +10,9 @@ export const load = async ({ params, url, data }) => {
 
     try {
         if (data.user) {
-            user_info.set({ idx: data.user.idx })
+            user_info.set({ idx: data.user.idx, rate: data.user.rate })
         } else {
-            user_info.set({ idx: undefined })
+            user_info.set({ idx: undefined, rate: 1 })
         }
     } catch (error) {
 

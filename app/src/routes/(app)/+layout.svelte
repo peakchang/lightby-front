@@ -61,6 +61,10 @@
         localStorage.removeItem("search_val");
         goto("/", { invalidateAll: true });
     }
+
+    $effect(() => {
+        console.log($user_info);
+    });
 </script>
 
 <svelte:head>

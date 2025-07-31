@@ -62,8 +62,12 @@
         if (data) {
             likeCount = data.likeCount;
         }
+
+        console.log(data.replyList);
+
         if (data.replyList) {
             replyList = data.replyList;
+
             replyCount = data.replyList.length;
         }
 
@@ -394,12 +398,21 @@
                 <div class="whitespace-pre-line">
                     {reply.content}
                 </div>
-                <div class="mt-3 flex justify-end text-sm">
+                <div class="mt-3 flex justify-end items-center text-sm gap-1.5">
                     <span>{reply.nickname}</span>
-                    <span class="mx-2">|</span>
+                    <span>|</span>
                     <span>
                         {moment(reply.created_at).format("YY/MM/DD HH:mm")}
                     </span>
+
+                    {#if $user_info.rate > 3 || $user_info.idx == reply.user_id}
+                        <button class="btn btn-success btn-xs text-white">
+                            수정
+                        </button>
+                        <button class="btn btn-error btn-xs text-white">
+                            삭제
+                        </button>
+                    {/if}
                 </div>
             </div>
         {/each}

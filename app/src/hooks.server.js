@@ -14,10 +14,14 @@ export async function handle({ event, resolve }) {
 
     // 기본 초기화~
     let userInfo = {}
+
+
     try {
         if (accessToken) {
             const payload = jwt.verify(accessToken, ACCESS_TOKEN_SECRET)
-            userInfo = { idx: payload.userId };
+            console.log(payload);
+
+            userInfo = { idx: payload.userId, rate: payload.rate };
             // 액세스 토큰 정상이면 바로 리턴 처리~
             event.locals.userInfo = userInfo;
             const res = await resolve(event); // 요청 처리
@@ -38,7 +42,7 @@ export async function handle({ event, resolve }) {
             const now = moment().format('YYYY-MM-DD HH:mm:ss')
             const updateLastConnectQuery = "UPDATE users SET connected_at = ? WHERE idx = ?"
             await sql_con.promise().query(updateLastConnectQuery, [now, userInfoRow[0]['idx']]);
-            
+
 
             // userInfoRow.length 가 0 이면 아이디가 없는것 / 토큰 불일치 하면 다시 로그인 하라고 리턴처리
             if (userInfoRow.length == 0 || userInfoRow[0].refresh_token != refreshToken) {
@@ -49,7 +53,7 @@ export async function handle({ event, resolve }) {
                 event.locals.userInfo = {};
                 return await resolve(event);
             }
-            const newAccessToken = jwt.sign({ userId: userInfoRow[0].idx }, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+            const newAccessToken = jwt.sign({ userId: userInfoRow[0].idx, rate: userInfoRow[0].rate }, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
 
             event.cookies.set('access_token', newAccessToken, {
                 httpOnly: true,
@@ -59,7 +63,7 @@ export async function handle({ event, resolve }) {
                 // maxAge: 5
             });
 
-            userInfo = { idx: userInfoRow[0].idx };
+            userInfo = { idx: userInfoRow[0].idx, rate: userInfoRow[0].rate };
             event.locals.userInfo = userInfo;
         } catch (err) {
             // console.error(err.message);

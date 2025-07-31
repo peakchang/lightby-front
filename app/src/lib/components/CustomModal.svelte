@@ -4,6 +4,7 @@
     import PdButton from "./PdButton.svelte";
 
     export let width = 512;
+    export let maxHeight = 500;
     export let closeOnBackground = true;
     export let closeBtn = false;
     export let xBtn = true;
@@ -17,9 +18,8 @@
 
     function focusInp() {
         if (mainArea && focusInput) {
-            const inputArea = mainArea.querySelector('input')
+            const inputArea = mainArea.querySelector("input");
             inputArea.focus();
-            
         }
     }
 
@@ -66,8 +66,8 @@
                 {/if}
 
                 <div
-                    class="overflow-auto"
-                    style="max-height: 500px;"
+                    class="modal-content-area"
+                    style="max-height: {maxHeight}px;"
                     bind:this={mainArea}
                 >
                     <slot></slot>
@@ -88,6 +88,11 @@
 {/if}
 
 <style>
+    .modal-content-area {
+        overflow-y: scroll; /* 세로 스크롤 유지 */
+        scrollbar-width: none; /* Firefox 전용 */
+        -ms-overflow-style: none; /* IE & Edge 구버전 */
+    }
     .close {
         background-color: red;
         position: absolute;

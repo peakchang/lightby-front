@@ -11,11 +11,9 @@ import bcrypt from 'bcrypt';
 export async function POST({ request, cookies }) {
 
     const body = await request.json();
-    console.log(body);
     try {
         const deleteTokenQuery = "UPDATE users SET refresh_token = '' WHERE idx = ?";
         await sql_con.promise().query(deleteTokenQuery, [body.idx]);
-        console.log(cookies);
         cookies.delete('access_token', { path: '/' })
         cookies.delete('refresh_token', { path: '/' })
 

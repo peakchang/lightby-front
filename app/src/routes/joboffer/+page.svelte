@@ -289,6 +289,10 @@
 
     // 상품 업로드 함수!!!
     async function uploadRegist() {
+        if (icons.length > 2) {
+            icons = icons.slice(0, 2);
+        }
+
         $all_data["icons"] = icons.join(",");
         $all_data["phone"] = removeSpecialCharactersAndSpaces(
             $all_data["phone"],

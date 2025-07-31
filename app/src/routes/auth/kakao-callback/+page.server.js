@@ -75,12 +75,17 @@ export async function load({ params, url, cookies }) {
                 // 기존 가입 유저면 액세스 토큰 / 리프레쉬 토큰 설정 하고 메인으로!
 
                 const userInfo = getUserInfo[0];
-                const payload = {
+                const accessPayload = {
+                    userId: userInfo.idx,
+                    rate: userInfo.rate
+                }
+
+                const refreshPayload = {
                     userId: userInfo.idx
                 }
 
-                const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
-                const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET, { expiresIn: '14d' });
+                const accessToken = jwt.sign(accessPayload, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+                const refreshToken = jwt.sign(refreshPayload, REFRESH_TOKEN_SECRET, { expiresIn: '14d' });
 
 
 
@@ -115,10 +120,8 @@ export async function load({ params, url, cookies }) {
         } else {
 
 
-            console.log('loginStatus 가 false 고 정보 얻을 부분!!');
-            console.log(kakaoUserInfo);
-            
-            
+
+
 
 
             // 닉네임 중복 체크
