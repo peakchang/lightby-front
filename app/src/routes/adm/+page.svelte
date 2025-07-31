@@ -3,6 +3,10 @@
     import { setParams } from "$lib/lib.js";
     import { onMount } from "svelte";
     import { formatPhoneNum } from "$lib/lib.js";
+    import axios from "axios";
+    import { back_api } from "$lib/const.js";
+    import { toastStore } from "$lib/stores/stores.js";
+    import { invalidateAll } from "$app/navigation";
     let { data } = $props();
 
     let userList = $state([]);
@@ -56,6 +60,30 @@
 
         setParams({ page: nowPage });
     }
+
+    async function deleteUser() {
+        console.log(this.value);
+
+        if (!confirm("정말 삭제하시겠습니까? 복구 불가능 합니당")) {
+            return;
+        }
+
+        try {
+            const res = await axios.post(`${back_api}/adm_users/delete_user`, {
+                userId: this.value,
+            });
+
+            toastStore.set({
+                show: true,
+                message: "회원 삭제가 완료 되었습니다.",
+                color: "red",
+            });
+
+            invalidateAll();
+        } catch (err) {
+            console.error(err.message);
+        }
+    }
 </script>
 
 <div class="mb-5">
@@ -92,6 +120,7 @@
                 <th class="tb">프로필</th>
                 <th class="tb">가입일자</th>
                 <th class="tb">마지막접속</th>
+                <th class="tb">etc</th>
             </tr>
         </thead>
 
@@ -123,6 +152,8 @@
                             "YY/MM/DD HH:mm:ss",
                         )}</td
                     >
+
+                    <td class="tb"> - </td>
                 </tr>
             {/each}
         </tfoot>
@@ -154,6 +185,15 @@
                             "YY/MM/DD HH:mm:ss",
                         )}</td
                     >
+                    <td class="tb">
+                        <button
+                            class="btn btn-sm btn-error text-white"
+                            value={user.idx}
+                            on:click={deleteUser}
+                        >
+                            삭제
+                        </button>
+                    </td>
                 </tr>
             {/each}
         </tbody>
