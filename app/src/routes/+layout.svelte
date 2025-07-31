@@ -228,7 +228,7 @@
 
 	:global(.site-wrab) {
 		background-color: #f3f6f6;
-		
+
 		max-height: 100vh;
 		overflow-y: scroll; /* 세로 스크롤 유지 */
 		scrollbar-width: none; /* Firefox 전용 */
@@ -241,5 +241,9 @@
 
 	:global(#toast) {
 		transition: opacity 0.5s ease-in-out;
+	}
+
+	input {
+		background-color: white;
 	}
 </style>
