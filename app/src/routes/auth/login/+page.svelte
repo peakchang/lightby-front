@@ -113,7 +113,7 @@
 
         <div class="mt-12">
             <form on:submit={loginSubmit}>
-                <label class="input input-info mt-5 w-full">
+                <label class="input input-info mt-5 w-full bg-white">
                     <span class="min-w-4 flex justify-center">
                         <i class="fa fa-id-card-o opacity-70" aria-hidden="true"
                         ></i>
@@ -127,7 +127,7 @@
                     />
                 </label>
 
-                <label class="input input-info mt-5 w-full">
+                <label class="input input-info mt-5 w-full bg-white">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 16 16"

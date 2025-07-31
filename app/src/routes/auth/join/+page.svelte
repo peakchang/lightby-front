@@ -351,7 +351,7 @@
         <div class="">
             <!-- svelte-ignore event_directive_deprecated -->
             <form on:submit={joinSubmit}>
-                <label class="input input-info mt-5 w-full">
+                <label class="input input-info mt-5 w-full bg-white">
                     <span class="min-w-4 flex justify-center">
                         <i class="fa fa-id-card-o opacity-70" aria-hidden="true"
                         ></i>
@@ -386,7 +386,7 @@
                     </div>
                 {/if}
 
-                <label class="input input-info mt-5 w-full">
+                <label class="input input-info mt-5 w-full bg-white">
                     <span class="min-w-4 flex justify-center">
                         <i class="fa fa-user opacity-70" aria-hidden="true"></i>
                     </span>
@@ -398,7 +398,7 @@
                     />
                 </label>
 
-                <label class="input input-info mt-5 w-full">
+                <label class="input input-info mt-5 w-full bg-white">
                     <span class="min-w-4 flex justify-center">
                         <i
                             class="fa fa-user-circle opacity-70"
@@ -431,7 +431,7 @@
                 {/if}
 
                 <div class="flex items-center mt-5 gap-2">
-                    <label class="input input-info w-full">
+                    <label class="input input-info w-full bg-white">
                         <span class="min-w-4 flex justify-center">
                             <i
                                 class="fa fa-mobile text-lg opacity-70"
@@ -469,7 +469,7 @@
 
                 {#if authShowBool}
                     <div class="flex items-center mt-1.5 gap-2">
-                        <label class="input input-info w-full">
+                        <label class="input input-info w-full bg-white">
                             <span
                                 class="min-w-4 flex justify-center text-red-400"
                             >
@@ -494,7 +494,7 @@
                     </div>
                 {/if}
 
-                <label class="input input-info mt-5 w-full">
+                <label class="input input-info mt-5 w-full bg-white">
                     <span class="min-w-4 flex justify-center">
                         <i class="fa fa-user opacity-70" aria-hidden="true"></i>
                     </span>
@@ -509,7 +509,7 @@
                     <p>(선택) 사업자 번호가 있으실 경우 입력 해 주세요.</p>
                 </div>
 
-                <label class="input input-info mt-5 w-full">
+                <label class="input input-info mt-5 w-full bg-white">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 16 16"
@@ -531,7 +531,7 @@
                     />
                 </label>
 
-                <label class="input input-info mt-5 w-full">
+                <label class="input input-info mt-5 w-full bg-white">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 16 16"
