@@ -44,7 +44,7 @@
             setTimeout(() => {
                 successModal = false;
             }, 800);
-            $user_info = { idx: undefined };
+            $user_info = { idx: undefined, rate: 0 };
         }
     }
 

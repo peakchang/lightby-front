@@ -2,7 +2,7 @@
     import CustomModal from "$lib/components/CustomModal.svelte";
     import { page } from "$app/stores";
     import { goto } from "$app/navigation";
-    import { user_info } from "$lib/stores/stores";
+    import { user_info, joinStatus } from "$lib/stores/stores";
     import { back_api } from "$lib/const";
     import {
         formatTime,
@@ -11,6 +11,7 @@
         fetchRequest,
     } from "$lib/lib";
     import axios from "axios";
+    import { onMount } from "svelte";
 
     let { data } = $props();
 
@@ -49,7 +50,7 @@
     3. 필수 정보 다 채워지면 +server.js 를 통해 DB에 입력 / JWT 토큰 생성 및 쿠키 저장 / 메인페이지로 refresh! (hook 으로 처리)
     */
 
-    $effect(() => {
+    onMount(() => {
         if (data.loginStatus == undefined) {
             alertMessage = "오류입니다. 다시 시도해주세요";
             alertModal = true;
@@ -150,19 +151,25 @@
             });
 
             console.log("카카오 콜백 정보!!");
-            console.log(res.data);
+            console.log(res);
 
             $user_info["idx"] = res.data.userId;
+            $user_info['rate'] = 1;
 
-            successMessage = "로그인 성공! 메인으로 이동합니다.";
-            successModal = true;
-            modalLoading = true;
-            setTimeout(() => {
-                successModal = false;
-                modalLoading = false;
+            // 카카오 로그인 시 user 의 idx 값을 보내기!!
+            $joinStatus["type"] = "kakao";
+            $joinStatus["idx"] = res.data.userId;
+            goto("/auth/interest_set");
 
-                goto("/");
-            }, 1800);
+            // successMessage = "로그인 성공! 메인으로 이동합니다.";
+            // successModal = true;
+            // modalLoading = true;
+            // setTimeout(() => {
+            //     successModal = false;
+            //     modalLoading = false;
+
+            //     goto("/");
+            // }, 1800);
         } catch (error) {
             alertMessage = "회원가입 실패 다시 시도해주세요";
             alertModal = true;
@@ -179,45 +186,42 @@
         authNumber = generateRandomNumber();
 
         try {
-
-
-
-            // const res = await axios.post(`${back_api}/send-sms`, {
-            //     phone,
-            //     message: `분양가이드 인증번호 ${authNumber}`,
-            // });
-            // if (res.status == 200) {
-            //     if (!interval) {
-            //         interval = setInterval(() => {
-            //             if (timeLeft > 0) {
-            //                 timeLeft -= 1;
-            //             } else {
-            //                 authNumber = "";
-            //                 authShowBool = false;
-            //                 clearInterval(interval);
-            //                 interval = null;
-            //                 timeLeft = 180;
-            //                 alert("시간이 만료 되었습니다. 다시 시도해주세요.");
-            //             }
-            //         }, 1000);
-            //     }
-            // }
-
-            if (!interval) {
-                interval = setInterval(() => {
-                    console.log("반복 실행 중...");
-                    if (timeLeft > 0) {
-                        timeLeft -= 1;
-                    } else {
-                        authNumber = "";
-                        authShowBool = false;
-                        clearInterval(interval);
-                        interval = null;
-                        timeLeft = 180;
-                        alert("시간이 만료 되었습니다. 다시 시도해주세요.");
-                    }
-                }, 1000);
+            const res = await axios.post(`${back_api}/send_sms`, {
+                phone,
+                message: `번개분양 인증번호 ${authNumber}`,
+            });
+            if (res.status == 200) {
+                if (!interval) {
+                    interval = setInterval(() => {
+                        if (timeLeft > 0) {
+                            timeLeft -= 1;
+                        } else {
+                            authNumber = "";
+                            authShowBool = false;
+                            clearInterval(interval);
+                            interval = null;
+                            timeLeft = 180;
+                            alert("시간이 만료 되었습니다. 다시 시도해주세요.");
+                        }
+                    }, 1000);
+                }
             }
+
+            // if (!interval) {
+            //     interval = setInterval(() => {
+            //         console.log("반복 실행 중...");
+            //         if (timeLeft > 0) {
+            //             timeLeft -= 1;
+            //         } else {
+            //             authNumber = "";
+            //             authShowBool = false;
+            //             clearInterval(interval);
+            //             interval = null;
+            //             timeLeft = 180;
+            //             alert("시간이 만료 되었습니다. 다시 시도해주세요.");
+            //         }
+            //     }, 1000);
+            // }
         } catch (error) {}
     }
 
@@ -389,24 +393,26 @@
                     </div>
                 {/if}
 
-                <label class="input input-info mt-5 w-full">
-                    <span class="min-w-4 flex justify-center">
-                        <i class="fa fa-user opacity-70" aria-hidden="true"></i>
-                    </span>
-                    <input
-                        type="text"
-                        class="grow"
-                        placeholder="사업자 번호를 입력하세요"
-                    />
-                </label>
-                <div class="pl-1 text-xs mt-1 text-blue-500">
-                    <p>구인글 작성을 원하시면 입력해주세요.</p>
-                    <p>사업자가 없을경우 로그인하기를 클릭해주세요</p>
-                </div>
+                {#if data.loginStatus != true}
+                    <label class="input input-info mt-5 w-full">
+                        <span class="min-w-4 flex justify-center">
+                            <i class="fa fa-user opacity-70" aria-hidden="true"
+                            ></i>
+                        </span>
+                        <input
+                            type="text"
+                            class="grow"
+                            placeholder="사업자 번호를 입력하세요"
+                        />
+                    </label>
+                    <div class="pl-1 text-xs mt-1 text-blue-500">
+                        <p>(선택) 사업자 번호가 있으실 경우 입력 해 주세요.</p>
+                    </div>
+                {/if}
 
                 <div class="mt-5">
-                    <button class="btn btn-info w-full text-white">
-                        로그인하기
+                    <button class="btn btn-info btn-lg w-full text-white">
+                        가입하기
                     </button>
                 </div>
             </form>

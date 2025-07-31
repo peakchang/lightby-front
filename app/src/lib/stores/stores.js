@@ -18,6 +18,14 @@ export const prev = writable("/")
 export const nonMemberViewLimitNum = writable(0);
 export const viewLimitAlertModal = writable(false)
 
+export const joinStatus = writable(
+    {
+        type: undefined,
+        idx: undefined,
+        info: { id: undefined, password: undefined }
+    }
+);
+
 
 // 이 아래건 나중에 데이터 많아지면 쓰기!!
 export const main_list = writable({ premium: [], top: [], free: [] });

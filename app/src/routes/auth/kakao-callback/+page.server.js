@@ -138,7 +138,9 @@ export async function load({ params, url, cookies }) {
             data.userInfo.profile_image = kakaoUserInfo.kakao_account.profile.profile_image_url
             data.userInfo.profile_thumbnail = kakaoUserInfo.kakao_account.profile.thumbnail_image_url
             data.userInfo.name = kakaoUserInfo.kakao_account.profile.nickname
-            data.userInfo.phone = kakaoUserInfo.properties.phone // 휴대폰 부분은 넘어온게 없으니까 추후 확인
+
+            data.userInfo.phone = undefined
+            // data.userInfo.phone = kakaoUserInfo.properties.phone // 휴대폰 부분은 넘어온게 없으니까 추후 확인
 
             // name / nickname / phone 다 있으면 insert 시키고 없으면 바로 loginStatus = false 하고 리턴 시키기!
             // 다 있어도 닉네임 / 휴대폰 번호 중복이 있을수 있으니까 에러나면 (unique) loginStatus = false 하고 리턴 시키기!

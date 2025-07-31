@@ -12,7 +12,7 @@ export const load = async ({ params, url, data }) => {
         if (data.user) {
             user_info.set({ idx: data.user.idx, rate: data.user.rate })
         } else {
-            user_info.set({ idx: undefined, rate: 1 })
+            user_info.set({ idx: undefined, rate: 0 })
         }
     } catch (error) {
 

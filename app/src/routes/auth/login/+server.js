@@ -13,6 +13,8 @@ import moment from "moment-timezone";
 export async function POST({ request, cookies }) {
 
     const { id, password } = await request.json();
+
+    let userInfo = {}
     try {
         const getUserInfoQuery = "SELECT * FROM users WHERE id = ?";
         const [getUserInfo] = await sql_con.promise().query(getUserInfoQuery, [id]);
@@ -20,15 +22,23 @@ export async function POST({ request, cookies }) {
         if (getUserInfo.length === 0) {
             return json({ message: '아이디가 존재하지 않습니다.' }, { status: 400 })
         }
+
+        userInfo = getUserInfo[0]
         const isMatch = await bcrypt.compare(password, getUserInfo[0].password);
 
         if (isMatch) {
-            const payload = {
-                userId: getUserInfo[0].idx
+
+            const accessPayload = {
+                userId: userInfo.idx,
+                rate: userInfo.rate
             }
 
-            const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
-            const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET, { expiresIn: '14d' });
+            const refreshPayload = {
+                userId: userInfo.idx
+            }
+
+            const accessToken = jwt.sign(accessPayload, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+            const refreshToken = jwt.sign(refreshPayload, REFRESH_TOKEN_SECRET, { expiresIn: '14d' });
 
             const now = moment().format('YYYY-MM-DD HH:mm:ss')
 
@@ -58,7 +68,7 @@ export async function POST({ request, cookies }) {
         console.error(error.message);
 
     }
-    return json({})
+    return json({ userInfo })
 }
 
 

@@ -2,7 +2,7 @@
     import CustomModal from "$lib/components/CustomModal.svelte";
     import { goto } from "$app/navigation";
     import { back_api } from "$lib/const";
-    import { user_info } from "$lib/stores/stores";
+    import { user_info, joinStatus } from "$lib/stores/stores";
 
     import {
         formatTime,
@@ -63,7 +63,6 @@
 
     // ID / 닉네임 / 휴대폰번호 input 창에서 벗어날시 기존 DB와 중복 체크 부분!
     async function duplicate_chk(e) {
-
         const type = e.target.getAttribute("data-type");
         if (type == "id") {
             const idChk = isAlphanumeric(id);
@@ -134,44 +133,43 @@
         authShowBool = true;
         authNumber = generateRandomNumber();
         try {
-
-            // const res = await axios.post(`${back_api}/send-sms`, {
-            //     phone,
-            //     message: `분양가이드 인증번호 ${authNumber}`,
-            // });
-            // if (res.status == 200) {
-            //     if (!interval) {
-            //         interval = setInterval(() => {
-            //             if (timeLeft > 0) {
-            //                 timeLeft -= 1;
-            //             } else {
-            //                 authNumber = "";
-            //                 authShowBool = false;
-            //                 clearInterval(interval);
-            //                 interval = null;
-            //                 timeLeft = 180;
-            //                 alert("시간이 만료 되었습니다. 다시 시도해주세요.");
-            //             }
-            //         }, 1000);
-            //     }
-            // }
-
-            if (!interval) {
-                interval = setInterval(() => {
-                    if (timeLeft > 0) {
-                        timeLeft -= 1;
-                    } else {
-                        authNumber = "";
-                        authShowBool = false;
-                        clearInterval(interval);
-                        interval = null;
-                        timeLeft = 180;
-                        alertMessage =
-                            "시간이 만료 되었습니다. 다시 시도해주세요.";
-                        alertModal = true;
-                    }
-                }, 1000);
+            const res = await axios.post(`${back_api}/send_sms`, {
+                phone,
+                message: `번개분양 인증번호 ${authNumber}`,
+            });
+            if (res.status == 200) {
+                if (!interval) {
+                    interval = setInterval(() => {
+                        if (timeLeft > 0) {
+                            timeLeft -= 1;
+                        } else {
+                            authNumber = "";
+                            authShowBool = false;
+                            clearInterval(interval);
+                            interval = null;
+                            timeLeft = 180;
+                            alert("시간이 만료 되었습니다. 다시 시도해주세요.");
+                        }
+                    }, 1000);
+                }
             }
+
+            // if (!interval) {
+            //     interval = setInterval(() => {
+            //         if (timeLeft > 0) {
+            //             timeLeft -= 1;
+            //         } else {
+            //             authNumber = "";
+            //             authShowBool = false;
+            //             clearInterval(interval);
+            //             interval = null;
+            //             timeLeft = 180;
+            //             alertMessage =
+            //                 "시간이 만료 되었습니다. 다시 시도해주세요.";
+            //             alertModal = true;
+            //         }
+            //     }, 1000);
+            // }
         } catch (error) {}
     }
 
@@ -274,15 +272,23 @@
                 password,
             });
 
-            successMessage = "회원가입 성공! 로그인 해주세요.";
-            successModal = true;
-            modalLoading = true;
-            setTimeout(() => {
-                successModal = false;
-                modalLoading = false;
-                goto("/auth/login");
-            }, 1800);
-        } catch (error) {
+            joinStatus.set({
+                type: 'general',
+                info: { id: id, password: password },
+            });
+
+            goto("/auth/interest_set");
+
+            // successMessage = "회원가입 성공! 로그인 해주세요.";
+            // successModal = true;
+            // modalLoading = true;
+            // setTimeout(() => {
+            //     successModal = false;
+            //     modalLoading = false;
+            //     goto("/auth/login");
+            // }, 1800);
+        } catch (err) {
+            console.error(err.message);
             alertMessage = "회원가입 실패 다시 시도해주세요";
             alertModal = true;
         }
@@ -557,8 +563,8 @@
                 {/if}
 
                 <div class="mt-5">
-                    <button class="btn btn-info w-full text-white">
-                        회원가입하기
+                    <button class="btn btn-info btn-lg w-full text-white">
+                        가입하기
                     </button>
                 </div>
             </form>
