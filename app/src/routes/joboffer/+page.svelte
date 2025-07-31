@@ -1035,7 +1035,7 @@
                     type="text"
                     placeholder="공고 제목(현장명을 입력하세요)(필수)"
                     bind:value={$all_data["subject"]}
-                    class="input input-bordered input-info w-full"
+                    class="input input-bordered input-info w-full bg-white"
                 />
             </div>
 
@@ -1043,7 +1043,7 @@
             <div class="mt-1.5">
                 <input
                     type="text"
-                    class="input input-bordered input-info w-full"
+                    class="input input-bordered input-info w-full bg-white"
                     placeholder="현장 한마디를 입력해주세요(필수)"
                     bind:value={$all_data["point"]}
                 />
@@ -1054,7 +1054,7 @@
             <div class="mt-1.5 flex w-full items-center gap-1">
                 <input
                     type="text"
-                    class="input input-bordered input-info input-sm w-full"
+                    class="input input-bordered input-info input-sm w-full bg-white"
                     bind:value={$all_data["addr"]}
                 />
                 <!-- {#if $all_data["res_addr"]}
@@ -1247,7 +1247,7 @@
                             type="text"
                             bind:value={$all_data["fee"]}
                             placeholder="숫자만 입력해주세요"
-                            class="input input-bordered input-info w-full"
+                            class="input input-bordered input-info w-full bg-white"
                         />
                         <div class=" w-12">만 원</div>
                     </div>
@@ -1289,7 +1289,7 @@
             <div class="font-semibold">상세내용</div>
             <div class="mt-1.5">
                 <textarea
-                    class="textarea textarea-info w-full p-2 text-base"
+                    class="textarea textarea-info w-full p-2 text-base bg-white"
                     placeholder="현장에 대한 상세 내용을 입력해주세요"
                     rows="8"
                     bind:value={$all_data["detail_content"]}

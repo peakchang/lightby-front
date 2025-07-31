@@ -60,7 +60,7 @@
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <!-- svelte-ignore event_directive_deprecated -->
             <div
-                class=" py-3 px-4 transition-colors flex justify-between items-center cursor-pointer"
+                class=" py-3 px-4 transition-colors flex justify-between items-center cursor-pointer bg-white"
                 on:click={() => toggleItem(item.idx)}
             >
                 <span class="font-semibold">{item.question}</span>
