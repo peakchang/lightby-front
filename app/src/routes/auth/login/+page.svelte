@@ -157,11 +157,11 @@
 
             <div class="mt-3">
                 <button
-                    class=" bg-[#ffe500] font-semibold w-full p-3 rounded-lg flex justify-center items-center gap-2"
+                    class=" bg-[#ffe500] font-semibold w-full p-3 rounded-lg flex justify-center items-center gap-2 cursor-pointer"
                     on:click={kakao_login}
                 >
                     <img src="/kakao_logo.png" alt="" width="24" height="24" />
-                    카카오로 3초만에 로그인
+                    카카오 간편 로그인
                 </button>
             </div>
 

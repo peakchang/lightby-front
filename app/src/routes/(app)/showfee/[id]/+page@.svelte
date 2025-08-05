@@ -24,22 +24,26 @@
 
     let shareModal = $state(false);
 
-    let postItem = $state({});
-    let replyList = $state([]);
+    let postItem = $state({}); // 전체 본문 정보
+    let imgList = $state([]); // 본문 내 이미지
 
-    let loginAlertModalShow = $state(false);
-    let replyAreaShow = $state(false);
-    let imgList = $state([]);
-    let tempArr = [1, 2, 3, 4, 5, 6, 7];
-    let replyInpBorder = $state(false);
-    let replyInpArea = $derived({});
-    let replyContent = $state("");
-    let likeCount = $state(0);
-    let replyCount = $state(0);
+    let replyList = $state([]); // 댓글 리스트
 
-    let loopStop = $state(false);
+    let loginAlertModalShow = $state(false); // 댓글 작성시 로그인이 안되어 있을때 경고 modal
+    let replyAreaShow = $state(false); // 댓글 작성 영역 열고 닫기
+    let replyInpBorder = $state(false); // 댓글 작성 열었을때 border 값
+    let replyInpArea = $derived({}); // 댓글 작성 열었을때 area 값
+    let replyContent = $state(""); // 댓글 컨텐츠
+
+    let likeCount = $state(0); // 좋아요 갯수
+    let replyCount = $state(0); // 댓글 갯수
 
     let alertModalBool = $state(false); // 글 삭제시 먼저 물어보는 모달
+
+    let re_replayAreaShow = $state(false);
+    let re_replayChoiceNum = $state(0);
+    let replyDeleteAlertModalShow = $state(false);
+    let replyDeleteIdx = $state("");
 
     let siteWrab = $state({});
     if (browser) {
@@ -62,8 +66,6 @@
         if (data) {
             likeCount = data.likeCount;
         }
-
-        console.log(data.replyList);
 
         if (data.replyList) {
             replyList = data.replyList;
@@ -96,12 +98,33 @@
     }
 
     async function uploadReply() {
-        loopStop = false;
+        console.log(this.value);
+
         $loadingStore = true;
+        let toastMessage = "";
         try {
-            const res = await axios.post(`${back_api}/board/upload_reply`, {
-                bo_id: $page.params.id,
-                user_id: $user_info.idx,
+            let bo_id = "";
+            let user_id = "";
+            let path = "";
+            
+            if (this.value == "upload") {
+                bo_id = $page.params.id;
+                user_id: $user_info.idx;
+                path = "upload_reply";
+                toastMessage = "댓글이 등록 되었습니다.";
+            } else if (this.value == "update") {
+                bo_id = replyList[re_replayChoiceNum]["idx"];
+                path = "update_reply";
+                toastMessage = "댓글 수정이 완료 되었습니다.";
+            } else {
+                bo_id = replyDeleteIdx;
+                path = "delete_reply";
+                toastMessage = "댓글 삭제 되었습니다.";
+            }
+
+            const res = await axios.post(`${back_api}/board/${path}`, {
+                bo_id,
+                user_id,
                 replyContent,
             });
         } catch (error) {
@@ -115,12 +138,13 @@
 
                 toastStore.set({
                     show: true,
-                    message: "댓글이 등록 되었습니다.",
+                    message: toastMessage,
                     // color: "#FF3636",
                     color: "#2478FF",
                 });
                 replyContent = "";
                 replyAreaShow = false;
+                re_replayAreaShow = false;
             }, ranVal);
         }
     }
@@ -217,6 +241,30 @@
             >
                 닫기
             </PdButton>
+        </div>
+    </div>
+</CustomModal>
+
+<CustomModal bind:visible={replyDeleteAlertModalShow}>
+    <div class="text-center">
+        <div class=" text-red-500 text-3xl mb-5">
+            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+        </div>
+
+        <div class="mb-5">
+            <p>삭제 된 댓글은 복구가 불가능합니다.</p>
+            <p>진행 하시겠습니까?</p>
+        </div>
+
+        <div class="flex justify-center items-center gap-3">
+            <button
+                class="btn btn-error w-1/3 text-white"
+                value="delete"
+                on:click={uploadReply}
+            >
+                삭제
+            </button>
+            <button class="btn btn-active w-1/3">취소</button>
         </div>
     </div>
 </CustomModal>
@@ -349,6 +397,8 @@
                         loginAlertModalShow = true;
                         return;
                     }
+                    replyContent = "";
+                    re_replayAreaShow = false;
                     replyAreaShow = !replyAreaShow;
                 }}
             >
@@ -385,6 +435,7 @@
                 >
                     <button
                         class="btn btn-info btn-sm text-white"
+                        value="upload"
                         on:click={uploadReply}
                     >
                         댓글 등록
@@ -393,7 +444,7 @@
             </div>
         {/if}
 
-        {#each replyList as reply}
+        {#each replyList as reply, idx}
             <div class="reply-area border-b border-gray-300 pb-5 mb-5">
                 <div class="whitespace-pre-line">
                     {reply.content}
@@ -406,14 +457,67 @@
                     </span>
 
                     {#if $user_info.rate > 3 || $user_info.idx == reply.user_id}
-                        <button class="btn btn-success btn-xs text-white">
+                        <button
+                            class="btn btn-success btn-xs text-white"
+                            on:click={() => {
+                                replyAreaShow = false;
+                                re_replayAreaShow = !re_replayAreaShow;
+                                re_replayChoiceNum = idx;
+                                replyContent = replyList[idx]["content"];
+                            }}
+                        >
                             수정
                         </button>
-                        <button class="btn btn-error btn-xs text-white">
+                        <button
+                            class="btn btn-error btn-xs text-white"
+                            value={reply.idx}
+                            on:click={(e) => {
+                                replyDeleteAlertModalShow = true;
+                                replyDeleteIdx = e.target.value;
+                            }}
+                        >
                             삭제
                         </button>
                     {/if}
                 </div>
+
+                {#if re_replayAreaShow && re_replayChoiceNum == idx}
+                    <div
+                        class="border rounded-lg mt-3 mb-10 pt-3"
+                        class:border-gray-400={!replyInpBorder}
+                        class:border-blue-400={replyInpBorder}
+                    >
+                        <div>
+                            <textarea
+                                class="px-2 w-full focus:outline-none resize-none"
+                                rows="3"
+                                bind:this={replyInpArea}
+                                bind:value={replyContent}
+                                on:focusin={() => {
+                                    replyInpBorder = true;
+                                }}
+                                on:focusout={() => {
+                                    replyInpBorder = false;
+                                }}
+                            ></textarea>
+                        </div>
+
+                        <div
+                            class="text-right px-3 pb-3"
+                            on:click={() => {
+                                replyInpArea.focus();
+                            }}
+                        >
+                            <button
+                                class="btn btn-info btn-sm text-white"
+                                value="update"
+                                on:click={uploadReply}
+                            >
+                                댓글 등록
+                            </button>
+                        </div>
+                    </div>
+                {/if}
             </div>
         {/each}
     </div>

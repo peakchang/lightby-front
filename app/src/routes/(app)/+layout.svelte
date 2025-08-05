@@ -63,7 +63,7 @@
     }
 
     $effect(() => {
-        console.log($user_info);
+        console.log($page);
     });
 </script>
 
@@ -186,17 +186,19 @@
                 </a>
             {/if}
 
-            <!-- svelte-ignore event_directive_deprecated -->
-            <button
-                class="btn btn-outline btn-info btn-xs md:btn-sm hover:text-white"
-                on:click={() => {
-                    searchModal = true;
-                    console.log(searchArea);
-                }}
-            >
-                <i class="fa fa-search" aria-hidden="true"></i>
-                <span>검색</span>
-            </button>
+            {#if $page.url.pathname == "/"}
+                <!-- svelte-ignore event_directive_deprecated -->
+                <button
+                    class="btn btn-outline btn-info btn-xs md:btn-sm hover:text-white"
+                    on:click={() => {
+                        searchModal = true;
+                        console.log(searchArea);
+                    }}
+                >
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                    <span>검색</span>
+                </button>
+            {/if}
         </div>
     </div>
     <div class="text-xs text-right pt-2">
