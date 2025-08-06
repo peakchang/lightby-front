@@ -132,7 +132,7 @@
     {/if}
 
     <div class="my-3">
-        <div class="flex justify-around">
+        <div class="flex justify-around text-sm md:text-base">
             {#each locationList as location}
                 <span
                     class="text-center"
