@@ -151,7 +151,7 @@
 </CustomModal>
 
 <div
-    class="fixed top-0 left-1/2 max-w-[640px] w-full -translate-x-1/2 bg-white pt-3 px-3 shadow-bottom suit-font z-20"
+    class="fixed top-0 left-1/2 max-w-[640px] w-full -translate-x-1/2 bg-white pt-3 px-3 shadow-bottom paperlogy z-20"
 >
     <div class="flex justify-between items-center">
         <div>
@@ -201,14 +201,9 @@
             {/if}
         </div>
     </div>
-    <div class="text-xs text-right pt-2">
-        <span>TODAY : {data.todayCount}</span>
-        <span>/</span>
-        <span>신규현장 : {data.newSiteCount}</span>
-    </div>
 </div>
 
-<div class=" suit-font">
+<div class="paperlogy">
     {@render children()}
 
     <div class="border-t border-gray-400 mt-8 pb-4"></div>
@@ -231,7 +226,7 @@
     </div>
 </div>
 
-<div class="fixed left-0 bottom-0 w-full suit-font z-40">
+<div class="fixed left-0 bottom-0 w-full paperlogy z-40">
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
     <!-- svelte-ignore event_directive_deprecated -->

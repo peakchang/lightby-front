@@ -32,9 +32,9 @@
     let searchModal = $state(false);
     let locationList = $derived([
         "전국",
-        "서울/경기/인천",
-        "충청/전라",
-        "강원/경상/제주",
+        "서울·경기·인천",
+        "충청·전라",
+        "강원·경상·제주",
     ]);
 
     const businessReplaceDict = $derived({
@@ -112,7 +112,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <!-- svelte-ignore event_directive_deprecated -->
-<div class="pt-20 suit-font px-3">
+<div class="pt-20 paperlogy px-3">
     <!-- <button
         on:click={() => {
             invalidateAll();
@@ -132,7 +132,7 @@
     {/if}
 
     <div class="my-3">
-        <ul class="grid grid-cols-3 md:grid-cols-4 gap-x-5 md:gap-x-2 gap-y-1">
+        <ul class="grid grid-cols-4 gap-x-2 gap-y-1">
             {#each locationList as location}
                 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
                 <li

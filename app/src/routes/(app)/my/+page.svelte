@@ -275,6 +275,8 @@
             <div
                 class="mt-10 bg-yellow-400 p-3 rounded-lg grid grid-cols-2 gap-3"
             >
+
+
                 <div
                     class="flex gap-2 items-center cursor-pointer"
                     on:click={() => {

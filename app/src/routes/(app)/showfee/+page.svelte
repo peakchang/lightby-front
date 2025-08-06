@@ -18,7 +18,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <!-- svelte-ignore event_directive_deprecated -->
-<div class="pt-20 pb-32 suit-font px-3">
+<div class="pt-20 pb-32 paperlogy px-3">
     {#each boardList as boardData}
         <div
             class="border-b py-5 px-3 border-gray-300 cursor-pointer"
