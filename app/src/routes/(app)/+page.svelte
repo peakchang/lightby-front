@@ -132,9 +132,25 @@
     {/if}
 
     <div class="my-3">
-        <ul class="grid grid-cols-4 gap-x-2 gap-y-1">
+        <div class="flex justify-around">
             {#each locationList as location}
-                <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+                <span
+                    class="text-center"
+                    on:click={(e) => {
+                        $main_location = e.target.dataset.location;
+                        localStorage.setItem("location", $main_location);
+                        invalidateAll();
+                        $loadingStore = true;
+                    }}
+                >
+                    {location}
+                </span>
+            {/each}
+        </div>
+
+        <ul class="grid grid-cols-4 gap-x-2 gap-y-1">
+            <!-- {#each locationList as location}
+
                 <li
                     class="text-center text-xs py-1.5 px-2 rounded-full border border-gray-500 text-gray-500 cursor-pointer"
                     class:bg-[#0669f8]={$main_location == location}
@@ -158,7 +174,7 @@
                 >
                     {location}
                 </li>
-            {/each}
+            {/each} -->
         </ul>
     </div>
 
