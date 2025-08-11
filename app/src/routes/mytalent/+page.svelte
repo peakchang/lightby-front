@@ -85,6 +85,7 @@
                     class="border w-full py-2 px-3 border-gray-300 rounded-md focus:outline-none focus:border-blue-500 text-sm"
                 />
 
+                <!-- svelte-ignore a11y_consider_explicit_label -->
                 <button class="cursor-pointer">
                     <svg
                         fill="#000000"

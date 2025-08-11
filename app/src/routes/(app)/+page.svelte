@@ -70,6 +70,9 @@
     });
 
     $effect(() => {
+        if (scrollElement) {
+            checkInitialPosition();
+        }
         // 추후 스크롤 내리면서 로딩 시 적용 시키기!!!
         // if (data.currentStatus == "premium") {
         //     $main_list["premium"] = data.mainList;
@@ -105,6 +108,110 @@
     }
 
     let searchFocus = $state(false);
+
+    // -------------------------------------- 스크롤
+
+    let locationListSample = $derived([
+        "전국",
+        "서울",
+        "경기남부",
+        "경기북부",
+        "인천",
+        "부산",
+        "울산",
+        "대구",
+        "경상도",
+        "대전",
+        "세종",
+        "충청도",
+        "광주",
+        "전라도",
+        "강원도",
+        "제주도",
+    ]);
+
+    let scrollBool = $state(false);
+    let startX = $state(0);
+    let scrollLeft = $state(0);
+    let scrollElement;
+
+    // 드래그 스크롤 처리 함수
+    function handleDragScroll(clientX) {
+        if (scrollBool && scrollElement) {
+            const walk = (clientX - startX) * 2; // 스크롤 속도 조절 (2배)
+            scrollElement.scrollLeft = scrollLeft - walk;
+        }
+    }
+
+    // 초기 위치 체크 함수
+    function checkInitialPosition() {
+        if (!scrollElement) return;
+
+        const { scrollLeft, scrollWidth, clientWidth } = scrollElement;
+
+        const isAtLeft = scrollLeft <= 1;
+        const isAtRight = scrollLeft + clientWidth >= scrollWidth - 1;
+
+        if (isAtLeft && isAtRight) {
+            console.log(
+                "페이지 시작: 스크롤 불가능 (콘텐츠가 화면에 모두 들어감)",
+            );
+        } else if (isAtLeft) {
+            console.log("페이지 시작: 왼쪽 끝");
+        } else if (isAtRight) {
+            console.log("페이지 시작: 오른쪽 끝");
+        } else {
+            console.log("페이지 시작: 중간 위치");
+        }
+    }
+
+    // 스크롤 끝 감지 함수
+    function checkScrollEnd() {
+        if (!scrollElement) return;
+
+        const { scrollLeft, scrollWidth, clientWidth } = scrollElement;
+
+        const isAtLeft = scrollLeft <= 1;
+        const isAtRight = scrollLeft + clientWidth >= scrollWidth - 1;
+
+        // 왼쪽 끝 도달 (scrollLeft가 0에 가까움)
+        if (isAtLeft) {
+            console.log("왼쪽 끝!");
+        }
+        // 오른쪽 끝 도달 (scrollLeft + clientWidth >= scrollWidth)
+        else if (isAtRight) {
+            console.log("오른쪽 끝!");
+        }
+        // 중간 위치
+        else {
+            console.log("중간 위치!");
+        }
+    }
+
+    // 화살표 클릭으로 스크롤 이동
+    function scrollToDirection(direction, distance = 100) {
+        if (!scrollElement) return;
+
+        const currentScrollLeft = scrollElement.scrollLeft;
+        let targetScrollLeft;
+
+        if (direction === "left") {
+            targetScrollLeft = Math.max(0, currentScrollLeft - distance);
+        } else if (direction === "right") {
+            const maxScrollLeft =
+                scrollElement.scrollWidth - scrollElement.clientWidth;
+            targetScrollLeft = Math.min(
+                maxScrollLeft,
+                currentScrollLeft + distance,
+            );
+        }
+
+        // 부드러운 스크롤
+        scrollElement.scrollTo({
+            left: targetScrollLeft,
+            behavior: "smooth",
+        });
+    }
 </script>
 
 <svelte:head>
@@ -138,6 +245,7 @@
                     searchFocus = false;
                 }}
             />
+            <!-- svelte-ignore a11y_consider_explicit_label -->
             <button class="cursor-pointer text-xl">
                 <svg
                     width="30px"
@@ -174,6 +282,107 @@
             </a>
         </div>
     {/if}
+
+    <div class="wrap max-w-[640px] border-y relative">
+        <div
+            bind:this={scrollElement}
+            class="scroll__wrap"
+            on:scroll={() => {
+                checkScrollEnd();
+            }}
+            on:mousedown={(e) => {
+                scrollBool = true;
+                startX = e.clientX;
+                scrollLeft = scrollElement.scrollLeft;
+                e.preventDefault(); // 텍스트 선택 방지
+            }}
+            on:mouseup={() => {
+                scrollBool = false;
+            }}
+            on:mouseleave={() => {
+                scrollBool = false; // 마우스가 요소를 벗어나면 드래그 종료
+            }}
+            on:touchstart={(e) => {
+                scrollBool = true;
+                startX = e.touches[0].clientX;
+                scrollLeft = scrollElement.scrollLeft;
+            }}
+            on:touchend={() => {
+                scrollBool = false;
+            }}
+            on:click={(e) => {
+                // 드래그 후에는 클릭 이벤트 방지
+                if (Math.abs(e.clientX - startX) > 5) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }}
+            on:mousemove={(e) => {
+                e.preventDefault();
+                handleDragScroll(e.clientX);
+            }}
+            on:touchmove={(e) => {
+                e.preventDefault();
+                handleDragScroll(e.touches[0].clientX);
+            }}
+        >
+            {#each locationListSample as location}
+                <div
+                    class="inline-block w-[80px] text-center"
+                    on:click={() => {
+                        console.log(`Clicked on ${location}`);
+                    }}
+                >
+                    {location}
+                </div>
+            {/each}
+        </div>
+
+        <div class="absolute left-0 top-0 h-full z-50 bg-white">
+            <div class="flex items-center h-full justify-center">
+                <div
+                    class="px-3 py-5"
+                    on:click={() => {
+                        console.log("Clicked left arrow");
+                        scrollToDirection("left", 100);
+                    }}
+                >
+                    <i class="fa fa-caret-left" aria-hidden="true"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="absolute right-0 top-0 h-full z-50 bg-white">
+            <div class="flex items-center h-full justify-center">
+                <div
+                    class="px-3 py-5"
+                    on:click={() => {
+                        console.log("Clicked right arrow");
+                        scrollToDirection("right", 100);
+                    }}
+                >
+                    <i class="fa fa-caret-right" aria-hidden="true"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- <div class="">
+        <div class="my-5 py-2 border-y border-gray-300">
+            <ul class="flex gap-5 overflow-hidden w-[1100px]">
+                {#each locationListSample as location}
+                    <li
+                        class=""
+                        on:click={() => {
+                            console.log(`Clicked on ${location}`);
+                        }}
+                    >
+                        {location}
+                    </li>
+                {/each}
+            </ul>
+        </div>
+    </div> -->
 
     <div class="my-5">
         <div class="flex justify-around text-sm md:text-base">
@@ -292,4 +501,14 @@
 </div>
 
 <style>
+    .scroll__wrap {
+        display: flex;
+        gap: 20px;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding: 10px 30px;
+        position: relative;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
 </style>
