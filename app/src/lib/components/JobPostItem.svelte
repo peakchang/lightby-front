@@ -110,17 +110,15 @@
                 <div>
                     <div>
                         <div class="mb-1">
-                            <span
-                                class=" bg-[#0a0078] text-xs md:text-sm px-2 py-0.5 text-white rounded-md font-bold"
-                            >
+                            <span class="font-semibold text-blue-500">
                                 {value.fee_type}
-                                {value.fee}
+                                {value.fee}0000원
                             </span>
                         </div>
 
                         <div class="text-[10px] md:text-xs flex flex-wrap">
                             <span
-                                class="bg-[#3a86ff] px-1.5 py-0.5 text-white rounded-md mr-1"
+                                class="bg-[#ff5c6a] px-1.5 py-0.5 text-white rounded-md mr-1"
                             >
                                 {multiReplace(
                                     value.business,
@@ -129,7 +127,7 @@
                             </span>
 
                             <span
-                                class="bg-[#3a86ff] px-2 py-0.5 text-white rounded-md mr-1"
+                                class="bg-[#6b6cff] px-2 py-0.5 text-white rounded-md mr-1"
                             >
                                 {value.occupation}
                             </span>

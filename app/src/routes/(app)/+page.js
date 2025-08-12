@@ -12,10 +12,9 @@ export const load = async ({ params, url, data }) => {
     let mainLocation = "" // 
     let searchVal = ""
     if (browser) {
-        mainLocation = localStorage.getItem("location");
-        searchVal = localStorage.getItem("search_val");
-
-
+        mainLocation = sessionStorage.getItem("location");
+        searchVal = sessionStorage.getItem("search_val");
+        
         // F5 할때를 대비해서!!!
         if (searchVal) {
             search_val.set(searchVal)

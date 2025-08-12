@@ -13,8 +13,6 @@ export const load = async ({ params, url, data }) => {
     } catch (error) {
 
     }
-
-    console.log(boardList);
     
     return { boardList }
 }

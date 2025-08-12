@@ -1,18 +1,63 @@
 <script>
-    import { goto } from "$app/navigation";
+    import { afterNavigate, beforeNavigate, goto } from "$app/navigation";
     import moment from "moment-timezone";
     import {
         prev,
         user_info,
         nonMemberViewLimitNum,
         viewLimitAlertModal,
+        scrollVal,
     } from "$lib/stores/stores.js";
     import { raiseViewCount } from "$lib/lib.js";
+    import { browser } from "$app/environment";
+    import { onMount, onDestroy } from "svelte";
 
     let { data } = $props();
-    console.log(data);
     let boardList = $state([]);
     boardList = data.boardList;
+
+    let siteWrab = $state({});
+    let scrollY = $state(0);
+
+    if (browser) {
+        siteWrab = document.querySelector(".site-wrab");
+    }
+
+    afterNavigate((e) => {
+        console.log(e.from);
+
+        if (!e.from || e.from.route.id.includes("/(app)")) {
+            if (!e.from.route.id.includes("showfee")) {
+                $scrollVal = 0;
+                siteWrab.scrollTo({ top: $scrollVal });
+            }
+        }
+    });
+
+    onMount((e) => {
+        console.log(e);
+
+        console.log("onMount called");
+
+        if (browser) {
+            if ($scrollVal != 0) {
+                siteWrab.scrollTo({ top: $scrollVal });
+            }
+            siteWrab.addEventListener("scroll", handleScroll);
+        }
+    });
+
+    onDestroy(() => {
+        // 스크롤 이벤트 삭제
+        if (browser) {
+            $scrollVal = scrollY;
+            siteWrab.removeEventListener("scroll", handleScroll);
+        }
+    });
+
+    function handleScroll() {
+        scrollY = siteWrab.scrollTop;
+    }
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->

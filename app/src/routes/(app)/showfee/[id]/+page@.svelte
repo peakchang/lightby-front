@@ -51,8 +51,10 @@
     }
 
     onMount(() => {
+
         // 스크롤 이벤트 추가
         if (browser) {
+            siteWrab.scrollTo(0, 0);
             siteWrab.addEventListener("scroll", handleScroll);
         }
         likeCount = data.likeCount;
@@ -257,6 +259,7 @@
         </div>
 
         <div class="flex justify-center items-center gap-3">
+            <!-- svelte-ignore event_directive_deprecated -->
             <button
                 class="btn btn-error w-1/3 text-white"
                 value="delete"
@@ -288,6 +291,7 @@
 
         <div class="flex justify-center items-center gap-3">
             {#if replyCount == 0}
+                <!-- svelte-ignore event_directive_deprecated -->
                 <button
                     class="btn btn-error w-1/3 text-white"
                     on:click={deletePost}

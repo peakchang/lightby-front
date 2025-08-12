@@ -39,6 +39,7 @@
     onMount(() => {
         // 스크롤 이벤트 추가
         if (browser) {
+            siteWrab.scrollTo(0, 0);
             siteWrab.addEventListener("scroll", handleScroll);
         }
 

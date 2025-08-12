@@ -33,7 +33,6 @@
 	let adminPage = $state(false);
 
 	$effect(() => {
-		console.log($viewLimitAlertModal);
 
 		if ($page.url.pathname.includes("adm")) {
 			adminPage = true;

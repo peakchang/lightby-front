@@ -63,7 +63,6 @@
     }
 
     $effect(() => {
-        console.log($page);
     });
 </script>
 
@@ -186,8 +185,8 @@
                 </a>
             {/if}
 
-            {#if $page.url.pathname == "/"}
-                <!-- svelte-ignore event_directive_deprecated -->
+            <!-- {#if $page.url.pathname == "/"}
+
                 <button
                     class="btn btn-outline btn-info btn-xs md:btn-sm hover:text-white"
                     on:click={() => {
@@ -198,7 +197,7 @@
                     <i class="fa fa-search" aria-hidden="true"></i>
                     <span>검색</span>
                 </button>
-            {/if}
+            {/if} -->
         </div>
     </div>
 </div>

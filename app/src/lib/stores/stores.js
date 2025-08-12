@@ -17,6 +17,7 @@ export const prev = writable("/")
 
 export const nonMemberViewLimitNum = writable(0);
 export const viewLimitAlertModal = writable(false)
+export const scrollVal = writable(0);
 
 export const joinStatus = writable(
     {

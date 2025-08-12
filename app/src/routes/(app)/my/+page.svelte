@@ -275,8 +275,6 @@
             <div
                 class="mt-10 bg-yellow-400 p-3 rounded-lg grid grid-cols-2 gap-3"
             >
-
-
                 <div
                     class="flex gap-2 items-center cursor-pointer"
                     on:click={() => {
@@ -322,7 +320,7 @@
                 <div
                     class="flex gap-2 items-center cursor-pointer"
                     on:click={() => {
-                        alertModalBool = true;
+                        goto("/mytalent");
                     }}
                 >
                     <div
@@ -330,10 +328,7 @@
                     >
                         <i class="fa fa-file-text-o" aria-hidden="true"></i>
                     </div>
-                    <div class="text-sm font-semibold">
-                        <p>내 인재 글 관리</p>
-                        <p class="text-xs">(준비중)</p>
-                    </div>
+                    <div class="text-sm font-semibold">내 인재 글 관리</div>
                 </div>
             </div>
         </div>
