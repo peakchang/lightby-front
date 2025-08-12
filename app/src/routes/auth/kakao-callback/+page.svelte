@@ -293,7 +293,7 @@
             <!-- svelte-ignore event_directive_deprecated -->
             <form on:submit={snsloginSubmit}>
                 {#if !userInfo.nickname & !data.loginStatus}
-                    <label class="input input-info mt-5 w-full">
+                    <label class="input input-info mt-5 w-full bg-white">
                         <span class="min-w-4 flex justify-center">
                             <i
                                 class="fa fa-user-circle opacity-70"
@@ -329,7 +329,7 @@
 
                 {#if !userInfo.phone & !data.loginStatus}
                     <div class="flex items-center mt-5 gap-2">
-                        <label class="input input-info w-full">
+                        <label class="input input-info w-full bg-white">
                             <span class="min-w-4 flex justify-center">
                                 <i
                                     class="fa fa-mobile text-lg opacity-70"
@@ -368,7 +368,7 @@
 
                 {#if authShowBool}
                     <div class="flex items-center mt-1.5 gap-2">
-                        <label class="input input-info w-full">
+                        <label class="input input-info w-full bg-white">
                             <span
                                 class="min-w-4 flex justify-center text-red-400"
                             >
@@ -394,7 +394,7 @@
                 {/if}
 
                 {#if data.loginStatus != true}
-                    <label class="input input-info mt-5 w-full">
+                    <label class="input input-info mt-5 w-full bg-white">
                         <span class="min-w-4 flex justify-center">
                             <i class="fa fa-user opacity-70" aria-hidden="true"
                             ></i>
