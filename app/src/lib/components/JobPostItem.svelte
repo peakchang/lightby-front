@@ -12,8 +12,9 @@
 
     console.log(value);
 
-    const feeValue = /^[0-9]+$/.test(value.fee) ? Number(value.fee).toLocaleString() : `${value.fee} 만`;
-    
+    const feeValue = /^[0-9]+$/.test(value.fee)
+        ? Number(value.fee).toLocaleString()
+        : `${value.fee} 만`;
 
     let imgError = $state(false);
 
@@ -62,12 +63,13 @@
     >
         <div class="absolute bottom-0 right-0 p-3">
             {#if value.icons}
-                <div class="w-full flex justify-end gap-1 min-w-[180px]">
-                    {#each value.icons.split(",") as icon}
-                        <div class="w-1/3 max-w-[50px] md:max-w-[90px]">
-                            <img src="/icons/icon-{icon}.png" alt="" />
-                        </div>
-                    {/each}
+                <div class="w-full flex justify-end gap-1 min-w-[170px]">
+                    <div class="w-1/3 max-w-[50px] md:max-w-[90px]">
+                        <img
+                            src="/icons/icon-{value.icons.split(',')[0]}.png"
+                            alt=""
+                        />
+                    </div>
                 </div>
             {/if}
         </div>
