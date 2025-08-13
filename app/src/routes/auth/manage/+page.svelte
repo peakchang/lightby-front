@@ -107,44 +107,48 @@
 
         authNumber = generateRandomNumber();
 
-        try {
-            // const res = await axios.post(`${back_api}/send-sms`, {
-            //     phone,
-            //     message: `분양가이드 인증번호 ${authNumber}`,
-            // });
-            // if (res.status == 200) {
-            //     if (!ahthInterval) {
-            //         ahthInterval = setInterval(() => {
-            //             if (timeLeft > 0) {
-            //                 timeLeft -= 1;
-            //             } else {
-            //                 authNumber = "";
-            //                 authShowBool = false;
-            //                 clearInterval(ahthInterval);
-            //                 ahthInterval = null;
-            //                 timeLeft = 180;
-            //                 alert("시간이 만료 되었습니다. 다시 시도해주세요.");
-            //             }
-            //         }, 1000);
-            //     }
-            // }
+        console.log(authNumber);
 
-            if (!ahthInterval) {
-                ahthInterval = setInterval(() => {
-                    if (timeLeft > 0) {
-                        timeLeft -= 1;
-                    } else {
-                        authNumber = "";
-                        authShowBool = false;
-                        clearInterval(ahthInterval);
-                        ahthInterval = null;
-                        timeLeft = 180;
-                        alertMessage =
-                            "시간이 만료 되었습니다. 다시 시도해주세요.";
-                        alertModal = true;
-                    }
-                }, 1000);
+        try {
+            const res = await axios.post(`${back_api}/send_sms`, {
+                phone,
+                message: `번개분양 인증번호 ${authNumber}`,
+            });
+            if (res.status == 200) {
+                if (!interval) {
+                    interval = setInterval(() => {
+                        if (timeLeft > 0) {
+                            timeLeft -= 1;
+                        } else {
+                            authNumber = "";
+                            authShowBool = false;
+                            clearInterval(interval);
+                            ahthInterval = null;
+                            timeLeft = 180;
+                            alertMessage =
+                                "시간이 만료 되었습니다. 다시 시도해주세요.";
+                            alertModal = true;
+                        }
+                    }, 1000);
+                }
             }
+
+            // if (!interval) {
+            //     interval = setInterval(() => {
+            //         if (timeLeft > 0) {
+            //             timeLeft -= 1;
+            //         } else {
+            //             authNumber = "";
+            //             authShowBool = false;
+            //             clearInterval(interval);
+            //             interval = null;
+            //             timeLeft = 180;
+            //             alertMessage =
+            //                 "시간이 만료 되었습니다. 다시 시도해주세요.";
+            //             alertModal = true;
+            //         }
+            //     }, 1000);
+            // }
         } catch (error) {}
     }
 
@@ -153,10 +157,11 @@
         if (authNumber == authNumChk) {
             clearInterval(ahthInterval);
 
+            const changePhone = removeSpecialCharactersAndSpaces(phone);
             try {
                 const res = await axios.post(`${back_api}/update_user_info`, {
                     idx: userInfo.idx,
-                    phone,
+                    phone: changePhone,
                     type: "phone",
                 });
 
@@ -287,6 +292,19 @@
             alertModal = true;
             alertMessage = m;
         }
+    }
+
+    // 전화번호 업로드시 숫자만 남기기
+    function formatPhoneNumber(event) {
+        let value = event.target.value.replace(/\D/g, ""); // 숫자만 남기기 (한글, 영어, 특수문자 제거)
+
+        if (value.length > 3 && value.length <= 7) {
+            value = value.replace(/(\d{3})(\d+)/, "$1-$2");
+        } else if (value.length > 7) {
+            value = value.replace(/(\d{3})(\d{4})(\d+)/, "$1-$2-$3");
+        }
+
+        phone = value;
     }
 </script>
 
@@ -450,6 +468,7 @@
                             class:hidden={!phoneChangeBool}
                             bind:this={phoneChangeInput}
                             bind:value={phone}
+                            on:input={formatPhoneNumber}
                         />
 
                         <span class="mt-1" class:hidden={phoneChangeBool}>
@@ -479,8 +498,10 @@
 
                             <button
                                 class="btn btn-success btn-sm text-white"
+                                disabled={authShowBool}
                                 on:click={() => {
                                     phoneChangeBool = !phoneChangeBool;
+                                    phone = formatPhoneNum(userInfo.phone);
                                     if (phoneChangeBool) {
                                         setTimeout(() => {
                                             phoneChangeInput.focus();
@@ -488,10 +509,10 @@
                                     }
                                 }}
                             >
-                                {#if phoneChangeBool}
-                                    취소
-                                {:else}
+                                {#if !phoneChangeBool}
                                     변경하기
+                                {:else}
+                                    취소
                                 {/if}
                             </button>
                         </div>

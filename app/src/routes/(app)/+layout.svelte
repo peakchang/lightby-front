@@ -62,8 +62,7 @@
         goto("/", { invalidateAll: true });
     }
 
-    $effect(() => {
-    });
+    $effect(() => {});
 </script>
 
 <svelte:head>
@@ -150,7 +149,8 @@
 </CustomModal>
 
 <div
-    class="fixed top-0 left-1/2 max-w-[640px] w-full -translate-x-1/2 bg-white pt-3 px-3 shadow-bottom paperlogy z-20"
+    class="fixed top-0 left-1/2 max-w-[640px] w-full -translate-x-1/2 bg-white py-3 px-3 paperlogy z-40 rounded-b-md"
+    style="box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);"
 >
     <div class="flex justify-between items-center">
         <div>

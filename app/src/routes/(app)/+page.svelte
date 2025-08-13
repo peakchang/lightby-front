@@ -193,7 +193,7 @@
 
     <div class="mb-2 text-center relative">
         {#if searchFocus && mainSearchHistory.length > 0}
-            <div class="absolute w-full z-50" style="top:38px">
+            <div class="absolute w-full z-20" style="top:38px">
                 <div
                     class="w-[90%] search-list bg-white mx-auto border-b border-x border-gray-300 rounded-b-lg text-left text-sm p-2"
                 >

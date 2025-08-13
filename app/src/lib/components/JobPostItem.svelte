@@ -10,6 +10,11 @@
     import { raiseViewCount } from "$lib/lib";
     let { value } = $props();
 
+    console.log(value);
+
+    const feeValue = /^[0-9]+$/.test(value.fee) ? Number(value.fee).toLocaleString() : `${value.fee} 만`;
+    
+
     let imgError = $state(false);
 
     const businessReplaceDict = $derived({
@@ -57,9 +62,9 @@
     >
         <div class="absolute bottom-0 right-0 p-3">
             {#if value.icons}
-                <div class="w-full flex justify-end gap-1 min-w-[114px]">
+                <div class="w-full flex justify-end gap-1 min-w-[180px]">
                     {#each value.icons.split(",") as icon}
-                        <div class="w-1/3 max-w-[35px] md:max-w-[60px]">
+                        <div class="w-1/3 max-w-[50px] md:max-w-[90px]">
                             <img src="/icons/icon-{icon}.png" alt="" />
                         </div>
                     {/each}
@@ -112,7 +117,7 @@
                         <div class="mb-1">
                             <span class="font-semibold text-blue-500">
                                 {value.fee_type}
-                                {value.fee}0000원
+                                {feeValue}원
                             </span>
                         </div>
 

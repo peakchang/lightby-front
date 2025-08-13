@@ -23,7 +23,7 @@
     import { feeBases, iconList } from "./jopoffer";
     import { onDestroy, onMount, tick } from "svelte";
     import Cookies from "js-cookie";
-    import { loadingStore, prev } from "$lib/stores/stores";
+    import { loadingStore, prev, toastStore } from "$lib/stores/stores";
     import moment from "moment-timezone";
 
     let { data } = $props();
@@ -202,6 +202,13 @@
         }
     });
 
+    function handleFeeInput(event) {
+        let value = event.target.value;
+        let numVal = value.replace(/[^0-9]/g, "");
+        let commaVal = numVal.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        $all_data["fee"] = commaVal;
+    }
+
     async function useChkPrevPost() {
         setPrevPostIdx = this.dataset.idx;
         const hasData = chkBoolList.some((item) => $all_data[item.var]);
@@ -289,14 +296,16 @@
 
     // 상품 업로드 함수!!!
     async function uploadRegist() {
-        if (icons.length > 2) {
-            icons = icons.slice(0, 2);
+        if (icons.length > 1) {
+            icons = icons.slice(0, 1);
         }
 
         $all_data["icons"] = icons.join(",");
         $all_data["phone"] = removeSpecialCharactersAndSpaces(
             $all_data["phone"],
         );
+
+        $all_data["fee"] = removeSpecialCharactersAndSpaces($all_data["fee"]);
 
         if (postNum === 0) {
             paymentStatus = true;
@@ -393,7 +402,6 @@
 
     // 최종 업로드 (결제 및 아이콘 선택하는 모달) 모달 열기! / 결제 창 떠있는지도
     function uploadChkRegist(e) {
-
         if (popup) {
             alertModalShow = true;
             alertModalMessage = "현재 결제창이 열려 있습니다.";
@@ -413,7 +421,7 @@
         if (postNum === 0) {
             $all_data["product"] = "premium";
             iconsShow = true;
-        } else if(!$all_data["product"]) {
+        } else if (!$all_data["product"]) {
             $all_data["product"] = "free";
         }
 
@@ -448,14 +456,21 @@
         if ($all_data["product"] == "free") {
             icons = [];
             this.checked = false;
-            toastShow = 1;
-            toastMessage = "아이콘 선택은 유료 상품에서만 가능합니다.";
+            toastStore.set({
+                show: true,
+                message: "아이콘 선택은 유료 상품에서만 가능합니다.",
+                color: "#3DB7CC",
+            });
             return;
         }
-        if (this.checked && icons.length > 2) {
+        if (this.checked && icons.length > 1) {
             this.checked = false;
-            toastShow = 1;
-            toastMessage = "아이콘 선택은 2개까지만 가능합니다.";
+
+            toastStore.set({
+                show: true,
+                message: "아이콘 선택은 1개만 가능합니다.",
+                color: "#3DB7CC",
+            });
             return;
         }
 
@@ -485,8 +500,12 @@
             if (icons && icons.length > 0) {
                 icons = [];
                 iconNames = [];
-                toastShow = 1;
-                toastMessage = "아이콘 선택은 유료 상품에서만 가능합니다.";
+
+                toastStore.set({
+                    show: true,
+                    message: "아이콘 선택은 유료 상품에서만 가능합니다.",
+                    color: "#3DB7CC",
+                });
                 iconSum = 0;
             }
         }
@@ -630,6 +649,19 @@
         // iframe을 넣은 element를 보이게 한다.
         postWrap.style.display = "block";
         my_modal_1.showModal();
+    }
+
+    // 전화번호 업로드시 숫자만 남기기
+    function formatPhoneNumber(event) {
+        let value = event.target.value.replace(/\D/g, ""); // 숫자만 남기기 (한글, 영어, 특수문자 제거)
+
+        if (value.length > 3 && value.length <= 7) {
+            value = value.replace(/(\d{3})(\d+)/, "$1-$2");
+        } else if (value.length > 7) {
+            value = value.replace(/(\d{3})(\d{4})(\d+)/, "$1-$2-$3");
+        }
+
+        $all_data["phone"] = value;
     }
 </script>
 
@@ -862,7 +894,7 @@
             <div class="">
                 <div class="">※ 아이콘 선택 (개당 2,200원)</div>
                 <div class="mt-1 mb-4 text-xs leading-relaxed">
-                    <p>아이콘은 2개까지 선택 가능하며,</p>
+                    <p>아이콘은 1개 선택 가능하며,</p>
                     <p>선택하신 아이콘은 메인페이지 우측 하단에 표시됩니다.</p>
                 </div>
                 <div class="grid grid-cols-4 md:gap-x-2 gap-y-2">
@@ -1161,11 +1193,24 @@
                 bind:iptVal={$all_data["name"]}
             />
 
-            <QuestionItem
+            <!-- <QuestionItem
                 sbj="담당자 연락처 *"
                 placeholder="필수입력"
                 bind:iptVal={$all_data["phone"]}
-            />
+            /> -->
+
+            <div class="mt-5 flex w-full items-center">
+                <div class="w-1/5 text-center text-sm">담당자 연락처 *</div>
+                <div class="w-4/5">
+                    <input
+                        bind:value={$all_data["phone"]}
+                        on:input={formatPhoneNumber}
+                        type="text"
+                        placeholder="ex) 010-1234-5678"
+                        class="input input-bordered input-info w-full bg-white"
+                    />
+                </div>
+            </div>
 
             <div class="mt-5">
                 <div class="pl-3 text-left text-sm">
@@ -1246,10 +1291,11 @@
                         <input
                             type="text"
                             bind:value={$all_data["fee"]}
+                            on:input={handleFeeInput}
                             placeholder="숫자만 입력해주세요"
                             class="input input-bordered input-info w-full bg-white"
                         />
-                        <div class=" w-12">만 원</div>
+                        <div class=" w-12">원</div>
                     </div>
                 </div>
 

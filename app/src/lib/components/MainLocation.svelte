@@ -2,24 +2,12 @@
     import { main_location, loadingStore } from "$lib/stores/stores.js";
     import { goto, invalidateAll } from "$app/navigation";
     import { onMount } from "svelte";
-    let locationListSample = $derived([
-        "전국",
-        "서울",
-        "경기남부",
-        "경기북부",
-        "인천",
-        "부산",
-        "울산",
-        "대구",
-        "경상도",
-        "대전",
-        "세종",
-        "충청도",
-        "광주",
-        "전라도",
-        "강원도",
-        "제주도",
-    ]);
+    import { regions } from "$lib/const";
+
+    let scrollBool = $state(false);
+    let startX = $state(0);
+    let scrollLeft = $state(0);
+    let scrollElement;
 
     onMount(() => {
         scrollToTab($main_location);
@@ -31,16 +19,11 @@
         }
     });
 
-    let scrollBool = $state(false);
-    let startX = $state(0);
-    let scrollLeft = $state(0);
-    let scrollElement;
-
     // 특정 탭으로 스크롤 이동
     function scrollToTab(targetTab) {
         if (!scrollElement) return;
 
-        const targetIndex = locationListSample.findIndex(
+        const targetIndex = regions.findIndex(
             (location) => location === targetTab,
         );
         if (targetIndex === -1) {
@@ -185,7 +168,7 @@
             handleDragScroll(e.touches[0].clientX);
         }}
     >
-        {#each locationListSample as location}
+        {#each regions as location}
             <div
                 class="inline-block w-[80px] text-center text-sm md:text-base cursor-pointer"
                 data-location={location}
@@ -204,7 +187,7 @@
         {/each}
     </div>
 
-    <div class="absolute left-0 top-0 h-full z-30 bg-white">
+    <div class="absolute left-0 top-0 h-full z-20 bg-white">
         <div class="flex items-center h-full justify-center">
             <div
                 class="px-3 py-5"
@@ -217,7 +200,7 @@
         </div>
     </div>
 
-    <div class="absolute right-0 top-0 h-full z-30 bg-white">
+    <div class="absolute right-0 top-0 h-full z-20 bg-white">
         <div class="flex items-center h-full justify-center">
             <div
                 class="px-3 py-5"

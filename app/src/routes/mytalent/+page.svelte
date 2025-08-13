@@ -66,16 +66,11 @@
 
             <table class="w-full mb-5">
                 <tbody>
-                    <tr>
+                    <!-- <tr>
                         <td class="border border-gray-300 p-2.5 text-sm">
                             경력1 어쩌구 저쩌구 쏼라쏼라
                         </td>
-                    </tr>
-                    <tr>
-                        <td class="border border-gray-300 p-2.5 text-sm">
-                            23.1~25.5 현대 대방 더코트리지 현장 참여 어쩌구
-                        </td>
-                    </tr>
+                    </tr> -->
                 </tbody>
             </table>
 
@@ -108,9 +103,14 @@
             <div>
                 <textarea
                     class="border w-full py-2 px-3 border-gray-300 rounded-md focus:outline-none focus:border-blue-500 text-sm"
-                    rows="8"
+                    rows="6"
                 ></textarea>
             </div>
+        </div>
+
+        <div class="text-center">
+            <button class="btn btn-info w-1/3 text-white">적용하기</button>
+            <button class="btn btn-error w-1/3 text-white">건너뛰기</button>
         </div>
     </div>
 </div>
