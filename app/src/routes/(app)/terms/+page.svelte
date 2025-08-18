@@ -1,3 +1,16 @@
+<script>
+    import {
+        scrollY,
+        scrollVal,
+        pageScrollStatus,
+    } from "$lib/stores/stores.js";
+    import { onMount } from "svelte";
+
+    onMount(() => {
+        $pageScrollStatus = false;
+    });
+</script>
+
 <div class="px-5">
     주)위드브릿지는 (이하 "회사"는) 「개인정보 보호법」 제30조에 따라 이용자의
     개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록

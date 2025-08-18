@@ -4,26 +4,26 @@
 	import { page } from "$app/stores";
 	import { fly } from "svelte/transition";
 	import { browser } from "$app/environment";
-
 	import { derived } from "svelte/store";
-
-	import { toastStore, viewLimitAlertModal } from "$lib/stores/stores";
 	import Toast from "$lib/components/Toast.svelte";
-
-	import { loadingStore } from "$lib/stores/stores";
 	import Loading from "$lib/components/Loading.svelte";
-
-	import { user_info } from "$lib/stores/stores";
 	import { onMount } from "svelte";
 
 	import CustomModal from "$lib/components/CustomModal.svelte";
 	import PdButton from "$lib/components/PdButton.svelte";
 	import { goto } from "$app/navigation";
 
+	import {
+		user_info,
+		toastStore,
+		viewLimitAlertModal,
+		loadingStore,
+		scrollY,
+		pageScrollStatus,
+		scrollVal,
+	} from "$lib/stores/stores";
+
 	let { children } = $props();
-	onMount(() => {
-		localStorage.removeItem("search_val");
-	});
 
 	// 현재 경로 감지용 key 생성
 	const key = derived(page, ($page) => $page.url.pathname);
@@ -32,7 +32,20 @@
 	let useAnimation = $state(false);
 	let adminPage = $state(false);
 
+	// 전체 wrapper!!! 스크롤 때문에!!
+	let siteWrab = $derived({});
+
+	onMount(() => {
+		console.log(siteWrab);
+		localStorage.removeItem("search_val");
+	});
+
 	$effect(() => {
+		if (!$pageScrollStatus) {
+			siteWrab.scrollTop = 0;
+		} else {
+			siteWrab.scrollTop = $scrollVal;
+		}
 
 		if ($page.url.pathname.includes("adm")) {
 			adminPage = true;
@@ -40,6 +53,10 @@
 			adminPage = false;
 		}
 	});
+
+	function handleScroll() {
+		$scrollY = siteWrab.scrollTop;
+	}
 
 	const animatedRoutes = [
 		"registjob",
@@ -146,7 +163,8 @@
 {#if adminPage}
 	{@render children()}
 {:else}
-	<div class="site-wrab">
+	<!-- svelte-ignore event_directive_deprecated -->
+	<div class="site-wrab" bind:this={siteWrab} on:scroll={handleScroll}>
 		<div
 			class="max-w-[640px] mx-auto bg-white min-h-screen text-black site-wrab-inner"
 		>

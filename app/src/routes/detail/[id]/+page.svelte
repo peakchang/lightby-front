@@ -1,20 +1,28 @@
 <script>
-    import { goto } from "$app/navigation";
-    import { public_img_bucket, img_bucket, back_api } from "$lib/const";
+    import axios from "axios";
+
     import KakaoMap from "$lib/components/kakaoMap.svelte";
     import DetailMenu from "$lib/components/DetailMenu.svelte";
-    import { user_info } from "$lib/stores/stores.js";
     import CustomModal from "$lib/components/CustomModal.svelte";
+
+    import { goto } from "$app/navigation";
     import { onDestroy, onMount } from "svelte";
-    import { toastStore } from "$lib/stores/stores.js";
     import { page } from "$app/stores";
-    import { favorateBool } from "$lib/stores/stores.js";
-    import axios from "axios";
     import { browser } from "$app/environment";
+
+    import {
+        favorateBool,
+        user_info,
+        pageScrollStatus,
+        toastStore,
+        scrollVal,
+        scrollY
+    } from "$lib/stores/stores.js";
+
+    import { public_img_bucket, img_bucket, back_api } from "$lib/const";
 
     let headerShowBool = $state(true); // 스크롤 내릴시 상단 메뉴 보이게 하기 위한 변수!
     let showBool = $state(true); // 처음 페이지 로딩시 위로 올라가는 잔상 없애기 위해!
-    let y = $state(0);
 
     let { data } = $props();
 
@@ -27,21 +35,10 @@
 
     let alertModalBool = $state(false);
 
-    let siteWrab = $state({});
-    if (browser) {
-        siteWrab = document.querySelector(".site-wrab");
-    }
-
-    function handleScroll() {
-        y = siteWrab.scrollTop;
-    }
-
     onMount(() => {
-        // 스크롤 이벤트 추가
-        if (browser) {
-            siteWrab.scrollTo(0, 0);
-            siteWrab.addEventListener("scroll", handleScroll);
-        }
+        console.log($scrollVal);
+
+        $pageScrollStatus = false; // 페이지 시작시 최상위
 
         $favorateBool = data.favorateBool;
 
@@ -63,21 +60,16 @@
         });
     });
 
-    onDestroy(() => {
-        // 스크롤 이벤트 삭제
-        if (browser) {
-            siteWrab.removeEventListener("scroll", handleScroll);
-        }
-    });
-
     $effect(() => {
-        if (y != 0) {
+        console.log($scrollY);
+        
+        
+        if ($scrollY != 0) {
             // 스크롤 조금이라도 움직이면 hidden 해제!
             showBool = false;
         }
-
         // 스크롤이 250 이상으로 내려가면 애니메이션 적용!
-        if (y > 250) {
+        if ($scrollY > 250) {
             headerShowBool = false;
         } else {
             headerShowBool = true;

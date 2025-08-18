@@ -2,12 +2,9 @@
     import PageHeader from "$lib/components/PageHeader.svelte";
     import moment from "moment-timezone";
     import { public_img_bucket, img_bucket, back_api } from "$lib/const";
-    import { user_info } from "$lib/stores/stores.js";
     import CustomModal from "$lib/components/CustomModal.svelte";
     import PdButton from "$lib/components/PdButton.svelte";
     import { goto, invalidateAll } from "$app/navigation";
-    import { toastStore } from "$lib/stores/stores.js";
-    import { loadingStore } from "$lib/stores/stores.js";
     import axios from "axios";
     import { page } from "$app/stores";
     import { getRandBet } from "$lib/lib.js";
@@ -15,6 +12,15 @@
     import DetailMenu from "$lib/components/DetailMenu.svelte";
     import Like from "$lib/components/Like.svelte";
     import { browser } from "$app/environment";
+
+    import {
+        user_info,
+        toastStore,
+        loadingStore,
+        scrollY,
+        scrollVal,
+        pageScrollStatus,
+    } from "$lib/stores/stores.js";
 
     let { data } = $props();
 
@@ -45,18 +51,11 @@
     let replyDeleteAlertModalShow = $state(false);
     let replyDeleteIdx = $state("");
 
-    let siteWrab = $state({});
-    if (browser) {
-        siteWrab = document.querySelector(".site-wrab");
-    }
-
     onMount(() => {
+        console.log(`onmount scrollVal : ${$scrollVal}`);
 
-        // 스크롤 이벤트 추가
-        if (browser) {
-            siteWrab.scrollTo(0, 0);
-            siteWrab.addEventListener("scroll", handleScroll);
-        }
+        $pageScrollStatus = false; // 페이지 진입시 false 면 최 상위로
+
         likeCount = data.likeCount;
         postItem = data.postItem;
         if (postItem.imgs) {
@@ -75,13 +74,17 @@
             replyCount = data.replyList.length;
         }
 
-        if (y != 0) {
+
+        console.log($scrollY);
+        
+
+        if ($scrollY != 0) {
             // 스크롤 조금이라도 움직이면 hidden 해제!
             showBool = false;
         }
 
         // 스크롤이 250 이상으로 내려가면 애니메이션 적용!
-        if (y > 250) {
+        if ($scrollY > 150) {
             headerShowBool = false;
         } else {
             headerShowBool = true;
@@ -89,15 +92,8 @@
     });
 
     onDestroy(() => {
-        // 스크롤 이벤트 삭제
-        if (browser) {
-            siteWrab.removeEventListener("scroll", handleScroll);
-        }
+        console.log(`onDestroy scrollVal : ${$scrollVal}`);
     });
-
-    function handleScroll() {
-        y = siteWrab.scrollTop;
-    }
 
     async function uploadReply() {
         console.log(this.value);
@@ -108,7 +104,7 @@
             let bo_id = "";
             let user_id = "";
             let path = "";
-            
+
             if (this.value == "upload") {
                 bo_id = $page.params.id;
                 user_id: $user_info.idx;

@@ -1,25 +1,33 @@
 <script>
     import { untrack } from "svelte";
     import CustomModal from "$lib/components/CustomModal.svelte";
-    import { afterNavigate, goto, invalidateAll } from "$app/navigation";
+    import {
+        afterNavigate,
+        beforeNavigate,
+        goto,
+        invalidateAll,
+    } from "$app/navigation";
     import { back_api, public_img_bucket } from "$lib/const.js";
     import PdButton from "$lib/components/PdButton.svelte";
     import MainLocation from "$lib/components/MainLocation.svelte";
-    import {
-        main_location,
-        loadingStore,
-        search_val,
-        // site_load_status,
-        // free_start_num,
-        main_list,
-        scrollVal,
-    } from "$lib/stores/stores.js";
+
     import { browser } from "$app/environment";
     import { navigating } from "$app/stores";
     import { onDestroy, onMount } from "svelte";
     import JobPostItem from "$lib/components/JobPostItem.svelte";
-    import { prev } from "$lib/stores/stores.js";
+
     import SeoMeta from "$lib/components/SeoMeta.svelte";
+
+    import {
+        main_location,
+        loadingStore,
+        search_val,
+        main_list,
+        prev,
+        scrollY,
+        scrollVal,
+        pageScrollStatus,
+    } from "$lib/stores/stores.js";
 
     const seoVal = {
         title: "번개분양 - 분양현장 구인/구직",
@@ -32,22 +40,18 @@
     };
 
     let { data } = $props();
-    let searchModal = $state(false);
-    let locationList = $derived([
-        "전국",
-        "서울·경기·인천",
-        "충청·전라",
-        "강원·경상·제주",
-    ]);
-
-    let mainSearchHistory = $state([]);
-    let searchInput;
+    let searchModal = $state(false); // 검색 모달
+    let mainSearchHistory = $state([]); // 메인 검색어 히스토리
+    let searchInput; // 검색창 input 요소
+    let searchFocus = $state(false); // 검색창 포커스 상태
+    let bannerInterval; // 배너 interval 함수 적용 변수
+    let nowBannerIdx = $state(0); // 현재 배너 인덱스
 
     const businessReplaceDict = $derived({
         도시형생활주택: "도생",
         지식산업센터: "지산",
         "상가/쇼핑몰": "상가",
-    });
+    }); // 키워드 대체 사전
 
     const bannerList = $state(
         data.baseEnv.banners ? data.baseEnv.banners.split(",") : [],
@@ -57,29 +61,18 @@
         data.baseEnv.banner_links ? data.baseEnv.banner_links.split(",") : [],
     );
 
-    let bannerInterval;
-    let nowBannerIdx = $state(0);
-    let siteWrab = $state({});
-    let scrollY = $state(0);
+    // 하단 메인 메뉴 내 페이지들 끼리는 무조건 최상단에 위치! ($scrollVal 을 0으로 초기화)
+    // afterNavigate((e) => {
+    //     if (e.from && e.from.route.id.includes("(app)")) {
+    //         console.log('혹시?');
 
-    if (browser) {
-        siteWrab = document.querySelector(".site-wrab");
-    }
-
-    afterNavigate((e) => {
-        if (!e.from || e.from.route.id.includes("/(app)")) {
-            $scrollVal = 0;
-            siteWrab.scrollTo({ top: $scrollVal });
-        }
-    });
-
+    //         $scrollVal = 0; // 페이지 진입시 스크롤 위치 초기화
+    //     }
+    // });
     onMount(() => {
-        if (browser) {
-            if ($scrollVal != 0) {
-                siteWrab.scrollTo({ top: $scrollVal });
-            }
-            siteWrab.addEventListener("scroll", handleScroll);
-        }
+        console.log($scrollVal);
+
+        $pageScrollStatus = true; // 페이지 진입시 저장된 스크롤로 이동
 
         if (bannerList.length > 0) {
             bannerInterval = setInterval(() => {
@@ -91,21 +84,10 @@
         }
     });
 
-    onDestroy(() => {
-        // 배너 자동 변경 interval 삭제
-        clearInterval(bannerInterval);
-        // 스크롤 이벤트 삭제
-        if (browser) {
-            $scrollVal = scrollY;
-            siteWrab.removeEventListener("scroll", handleScroll);
-        }
-    });
-
-    function handleScroll() {
-        scrollY = siteWrab.scrollTop;
-    }
-
     $effect(() => {
+        if ($scrollY) {
+            $scrollVal = $scrollY; // 현재 스크롤 위치 저장 (페이지 벗어 날 때 까지 유지)
+        }
 
         // 추후 스크롤 내리면서 로딩 시 적용 시키기!!!
         // if (data.currentStatus == "premium") {
@@ -136,12 +118,15 @@
         }
     });
 
+    onDestroy(() => {
+        // 배너 자동 변경 interval 삭제
+        clearInterval(bannerInterval);
+    });
+
     function multiReplace(str, map) {
         const regex = new RegExp(Object.keys(map).join("|"), "g");
         return str.replace(regex, (match) => map[match]);
     }
-
-    let searchFocus = $state(false);
 
     // -------------------------------------- 스크롤
 

@@ -1,10 +1,16 @@
 <script>
     import { user_info } from "$lib/stores/stores";
-    import { goto, invalidateAll } from "$app/navigation";
+    import { goto, invalidateAll, afterNavigate } from "$app/navigation";
     import { navigating, page } from "$app/stores";
-    import { interestTabNum } from "$lib/stores/stores";
     import { onMount } from "svelte";
     import InterestPostItem from "$lib/components/InterestPostItem.svelte";
+
+    import {
+        interestTabNum,
+        scrollY,
+        scrollVal,
+        pageScrollStatus,
+    } from "$lib/stores/stores.js";
 
     let { data } = $props();
 
@@ -12,10 +18,22 @@
     let postList = $state([]);
     let statusMessage = $state("");
 
-    $effect(() => {
-        interestStatus = data.interestStatus;
-        console.log(interestStatus);
+    // 하단 메인 메뉴 내 페이지들 끼리는 무조건 최상단에 위치! ($scrollVal 을 0으로 초기화)
+    afterNavigate((e) => {
+        if (e.from && e.from.route.id.includes("(app)")) {
+            $scrollVal = 0; // 페이지 진입시 스크롤 위치 초기화
+        }
+    });
 
+    onMount(() => {
+        $pageScrollStatus = true; // 페이지 진입시 저장된 스크롤로 이동
+    });
+
+    $effect(() => {
+        $scrollVal = $scrollY; // 현재 스크롤 위치 저장 (페이지 벗어 날 때 까지 유지)
+
+        // 관심 지역, 찜한 목록 상태 초기화
+        interestStatus = data.interestStatus;
         postList = data.postList;
         statusMessage = data.statusMessage;
     });

@@ -1,63 +1,44 @@
 <script>
     import { afterNavigate, beforeNavigate, goto } from "$app/navigation";
     import moment from "moment-timezone";
+    
+    import { raiseViewCount } from "$lib/lib.js";
+    import { browser } from "$app/environment";
+    import { onMount } from "svelte";
+
     import {
         prev,
         user_info,
         nonMemberViewLimitNum,
         viewLimitAlertModal,
+        scrollY,
         scrollVal,
+        pageScrollStatus,
     } from "$lib/stores/stores.js";
-    import { raiseViewCount } from "$lib/lib.js";
-    import { browser } from "$app/environment";
-    import { onMount, onDestroy } from "svelte";
 
     let { data } = $props();
     let boardList = $state([]);
     boardList = data.boardList;
 
-    let siteWrab = $state({});
-    let scrollY = $state(0);
 
-    if (browser) {
-        siteWrab = document.querySelector(".site-wrab");
-    }
-
+    // 하단 메인 메뉴 내 페이지들 끼리는 무조건 최상단에 위치! ($scrollVal 을 0으로 초기화)
     afterNavigate((e) => {
-        console.log(e.from);
-
-        if (!e.from || e.from.route.id.includes("/(app)")) {
+        if (e.from && e.from.route.id.includes("(app)")) {
             if (!e.from.route.id.includes("showfee")) {
                 $scrollVal = 0;
-                siteWrab.scrollTo({ top: $scrollVal });
             }
         }
     });
 
     onMount((e) => {
-        console.log(e);
-
-        console.log("onMount called");
-
-        if (browser) {
-            if ($scrollVal != 0) {
-                siteWrab.scrollTo({ top: $scrollVal });
-            }
-            siteWrab.addEventListener("scroll", handleScroll);
-        }
+        $pageScrollStatus = true; // 페이지 진입시 저장된 스크롤로 이동
     });
 
-    onDestroy(() => {
-        // 스크롤 이벤트 삭제
-        if (browser) {
-            $scrollVal = scrollY;
-            siteWrab.removeEventListener("scroll", handleScroll);
+    $effect(() => {
+        if ($scrollY) {
+            $scrollVal = $scrollY; // 현재 스크롤 위치 저장 (페이지 벗어 날 때 까지 유지)
         }
     });
-
-    function handleScroll() {
-        scrollY = siteWrab.scrollTop;
-    }
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->

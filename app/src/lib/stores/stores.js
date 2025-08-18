@@ -15,9 +15,17 @@ export const manageBoardTabNum = writable(0)
 export const favorateBool = writable(false)
 export const prev = writable("/")
 
+
+
+export const scrollY = writable(0);
+export const pageScrollStatus = writable(false); // false 면 무조건 탑, 아니면 위치 기억
+export const scrollVal = writable(0);
+
+
+
 export const nonMemberViewLimitNum = writable(0);
 export const viewLimitAlertModal = writable(false)
-export const scrollVal = writable(0);
+
 
 export const joinStatus = writable(
     {

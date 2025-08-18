@@ -1,15 +1,24 @@
 <script>
+    import Cookies from "js-cookie";
+    import axios from "axios";
+
     import PageHeader from "$lib/components/PageHeader.svelte";
     import SortableImg from "$lib/components/SortableImg.svelte";
-    import { user_info, main_location } from "$lib/stores/stores";
     import CustomModal from "$lib/components/CustomModal.svelte";
+
     import { goto, beforeNavigate } from "$app/navigation";
-    import { getCookieValue } from "$lib/lib";
-    import axios from "axios";
-    import { back_api } from "$lib/const";
-    import { toastStore, prev } from "$lib/stores/stores";
     import { onMount, tick } from "svelte";
-    import Cookies from "js-cookie";
+
+    import { getCookieValue } from "$lib/lib";
+    import { back_api } from "$lib/const";
+
+    import {
+        user_info,
+        main_location,
+        toastStore,
+        prev,
+        pageScrollStatus,
+    } from "$lib/stores/stores";
 
     let { data } = $props();
     console.log(data);
@@ -35,6 +44,7 @@
     let modifyIdx = $state(undefined);
 
     onMount(async () => {
+        $pageScrollStatus = false; // 페이지 시작시 최상위
         await tick();
 
         console.log($user_info);

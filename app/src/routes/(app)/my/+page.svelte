@@ -1,9 +1,10 @@
 <script>
     import CustomModal from "$lib/components/CustomModal.svelte";
-    import { user_info, toastStore } from "$lib/stores/stores";
     import { goto, invalidateAll } from "$app/navigation";
     import { navigating, page } from "$app/stores";
     import { onMount } from "svelte";
+    import axios from "axios";
+
     import {
         regions,
         businessCategorys,
@@ -11,7 +12,7 @@
         back_api,
     } from "$lib/const.js";
 
-    import axios from "axios";
+    import { user_info, toastStore, pageScrollStatus } from "$lib/stores/stores";
 
     let { data } = $props();
 
@@ -28,6 +29,8 @@
     let selectVal = $state("");
     let lastData = $state("");
     onMount(() => {
+        $pageScrollStatus = false; // 최상위 고정
+        
         userInfo = data.userInfo;
         if (userInfo.interest) {
             const interestJson = JSON.parse(userInfo.interest);

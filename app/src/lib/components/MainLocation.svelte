@@ -1,5 +1,8 @@
 <script>
-    import { main_location, loadingStore } from "$lib/stores/stores.js";
+    import {
+        main_location,
+        loadingStore,
+    } from "$lib/stores/stores.js";
     import { goto, invalidateAll } from "$app/navigation";
     import { onMount } from "svelte";
     import { regions } from "$lib/const";

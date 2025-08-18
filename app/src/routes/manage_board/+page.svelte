@@ -1,11 +1,19 @@
 <script>
-    import { goto, invalidateAll } from "$app/navigation";
-    import { manageBoardTabNum, loadingStore } from "$lib/stores/stores";
+    import moment from "moment-timezone";
 
     import CustomModal from "$lib/components/CustomModal.svelte";
     import MyPostItem from "$lib/components/MyPostItem.svelte";
 
-    import moment from "moment-timezone";
+    import { onMount } from "svelte";
+    import { goto, invalidateAll, afterNavigate } from "$app/navigation";
+
+    import {
+        manageBoardTabNum,
+        loadingStore,
+        pageScrollStatus,
+        scrollVal,
+        scrollY,
+    } from "$lib/stores/stores";
 
     let { data } = $props();
 
@@ -14,6 +22,17 @@
     let unableModifyBool = $state(false);
 
     console.log(data.post_list);
+
+    // 하단 메인 메뉴 내 페이지들 끼리는 무조건 최상단에 위치! ($scrollVal 을 0으로 초기화)
+    afterNavigate((e) => {
+        if (e.from && e.from.route.id.includes("(app)")) {
+            $scrollVal = 0; // 하부 메뉴에서 페이지 진입시 스크롤 위치 초기화
+        }
+    });
+
+    onMount(() => {
+        $pageScrollStatus = true; // 최상위 고정
+    });
 
     $effect(() => {
         post_list = data.post_list;

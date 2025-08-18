@@ -10,6 +10,7 @@
     import axios from "axios";
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
+    import { browser } from "$app/environment";
 
     // 관심 정보
     let location = $state([]);
@@ -18,11 +19,21 @@
 
     let alertModal = $state(false);
     let alertMessage = $state("");
-    let successModal = $state(false); // 무언가 성공시 모달! (2초 후 로그인 페이지로 이동)
-    let successMessage = $state("");
+
     let modalLoading = $state(false);
 
+    let siteWrab = $state({});
+    if (browser) {
+        siteWrab = document.querySelector(".site-wrab");
+    }
+
+
     onMount(() => {
+        // 스크롤 이벤트 추가
+        if (browser) {
+            siteWrab.scrollTo(0, 0);
+        }
+
         if ($joinStatus["type"] == undefined) {
             goto("/");
         }
@@ -74,31 +85,19 @@
             });
         } catch (error) {
         } finally {
-            successMessage = "가입 완료! 번개분양을 시작합니다!";
-            successModal = true;
-            modalLoading = true;
-            setTimeout(() => {
-                successModal = false;
-                modalLoading = false;
-                goto("/");
-            }, 1800);
+            goto("/mytalent");
+
+            // successMessage = "가입 완료! 번개분양을 시작합니다!";
+            // successModal = true;
+            // modalLoading = true;
+            // setTimeout(() => {
+            //     successModal = false;
+            //     modalLoading = false;
+            //     goto("/");
+            // }, 1800);
         }
     }
 </script>
-
-<CustomModal bind:visible={successModal} closeBtn={false}>
-    <div class="text-center">
-        <div class=" text-green-700 text-3xl mb-2">
-            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
-        </div>
-        <div>{successMessage}</div>
-        {#if modalLoading}
-            <div class="mt-2">
-                <span class="loading loading-ring loading-xl"></span>
-            </div>
-        {/if}
-    </div>
-</CustomModal>
 
 <CustomModal bind:visible={alertModal} closeBtn={false}>
     <div class="text-center">
@@ -235,7 +234,8 @@
             class="btn btn-lg btn-success w-1/2 text-white"
             on:click={setInterest}
         >
-            번개분양 시작하기
+            다음
+            <i class="fa fa-arrow-right" aria-hidden="true"></i>
         </button>
     </div>
 </div>

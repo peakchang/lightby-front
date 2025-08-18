@@ -15,14 +15,12 @@
         pageScrollStatus,
         loadingStore,
     } from "$lib/stores/stores";
-    import { afterNavigate, goto } from "$app/navigation";
+    import { goto } from "$app/navigation";
     import axios from "axios";
 
     let { data } = $props();
 
     console.log(data);
-
-    let authBool = $state(false);
 
     let profile = $state("");
     let name = $state("");
@@ -44,16 +42,6 @@
     let alertMessage = $state("");
     let successModal = $state(false); // 무언가 성공시 모달! (2초 후 로그인 페이지로 이동)
     let successMessage = $state("");
-    let modalLoading = $state(false);
-
-    let skipModal = $state(false);
-
-    afterNavigate((e) => {
-        console.log(e);
-        if (e.from && e.from.route.id.includes("auth")) {
-            authBool = true;
-        }
-    });
 
     onMount(() => {
         if (!data.userInfo) {
@@ -181,20 +169,8 @@
                 );
 
                 if (res.status) {
-                    if (authBool) {
-                        successMessage =
-                            "회원가입 성공! 번개분양을 시작합니다!";
-                        successModal = true;
-                        modalLoading = true;
-                        setTimeout(() => {
-                            successModal = false;
-                            modalLoading = false;
-                            goto("/");
-                        }, 1800);
-                    } else {
-                        successModal = true;
-                        successMessage = "내 인재 정보가 업데이트 되었습니다.";
-                    }
+                    successModal = true;
+                    successMessage = "내 인재 정보가 업데이트 되었습니다.";
                 }
             } catch (error) {}
         } else {
@@ -212,20 +188,8 @@
                 );
 
                 if (res.status) {
-                    if (authBool) {
-                        successMessage =
-                            "회원가입 성공! 번개분양을 시작합니다!";
-                        successModal = true;
-                        modalLoading = true;
-                        setTimeout(() => {
-                            successModal = false;
-                            modalLoading = false;
-                            goto("/");
-                        }, 1800);
-                    } else {
-                        successModal = true;
-                        successMessage = "내 인재 정보가 업데이트 되었습니다.";
-                    }
+                    successModal = true;
+                    successMessage = "내 인재 정보가 업데이트 되었습니다.";
                 }
             } catch (error) {}
             console.log("이미지 업로드 없음");
@@ -248,37 +212,9 @@
             <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
         </div>
         <div>{successMessage}</div>
-        {#if modalLoading}
-            <div class="mt-2">
-                <span class="loading loading-ring loading-xl"></span>
-            </div>
-        {/if}
     </div>
 </CustomModal>
-
-<CustomModal bind:visible={skipModal} closeBtn={false}>
-    <div class="text-center">
-        <div class=" text-green-700 text-3xl mb-2">
-            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
-        </div>
-        <div class="mb-8">
-            내 인재 정보는 마이 > 내 인재 글 관리에서 언제든 수정 가능합니다.
-        </div>
-        <button
-            class="btn btn-success w-1/3 text-white"
-            on:click={() => {
-                goto("/");
-            }}
-        >
-            번개분양 시작하기
-        </button>
-    </div>
-</CustomModal>
-
-
-{#if !authBool}
 <PageHeader />
-{/if}
 
 <!-- svelte-ignore a11y_consider_explicit_label -->
 <!-- svelte-ignore event_directive_deprecated -->
@@ -501,16 +437,11 @@
                 내 인재 정보 등록 하기
             </button>
 
-            {#if authBool}
-                <button
-                    class="btn btn-error w-1/3 text-white"
-                    on:click={() => {
-                        skipModal = true;
-                    }}
-                >
-                    건너뛰기
-                </button>
-            {/if}
+            <button class="btn btn-error w-1/3 text-white" on:click={() => {
+                
+            }}>
+                건너뛰기
+            </button>
         </div>
     </div>
 </div>

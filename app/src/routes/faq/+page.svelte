@@ -1,11 +1,18 @@
 <script>
+    import axios from "axios";
+
     import CustomAccodian from "$lib/components/CustomAccodian.svelte";
     import CustomModal from "$lib/components/CustomModal.svelte";
-    import { back_api } from "$lib/const";
-    import axios from "axios";
-    import { user_info, toastStore } from "$lib/stores/stores";
+
     import { onMount } from "svelte";
     import { invalidateAll } from "$app/navigation";
+
+    import { back_api } from "$lib/const";
+    import {
+        user_info,
+        toastStore,
+        pageScrollStatus,
+    } from "$lib/stores/stores";
 
     let { data } = $props();
 
@@ -13,6 +20,7 @@
     let qnaList = $state([]);
 
     onMount(() => {
+        $pageScrollStatus = true; // 페이지 진입시 저장된 스크롤로 이동
         faqList = data.faqList;
     });
     $effect(() => {

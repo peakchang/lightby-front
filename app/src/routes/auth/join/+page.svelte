@@ -132,6 +132,8 @@
         }
         authShowBool = true;
         authNumber = generateRandomNumber();
+        console.log(authNumber);
+        
         try {
             const res = await axios.post(`${back_api}/send_sms`, {
                 phone,
@@ -558,7 +560,7 @@
                     </div>
                 {:else if pwdSuccessShowBool == true}
                     <div class="text-right text-xs text-green-600 mt-1">
-                        비밀번화 확인이 일치합니다.
+                        비밀번호 확인이 일치합니다.
                     </div>
                 {/if}
 

@@ -1,30 +1,37 @@
 <script>
-    import { goto, beforeNavigate } from "$app/navigation";
+    import axios from "axios";
+    import Cookies from "js-cookie";
+    import moment from "moment-timezone";
+
     import PageHeader from "$lib/components/PageHeader.svelte";
     import QuestionItem from "$lib/components/QuestionItem.svelte";
     import SortableImg from "$lib/components/SortableImg.svelte";
     import KakaoMap from "$lib/components/kakaoMap.svelte";
     import CustomModal from "$lib/components/CustomModal.svelte";
+
+    import { onDestroy, onMount, tick } from "svelte";
+    import { goto, beforeNavigate } from "$app/navigation";
+    import { browser } from "$app/environment";
+
+    import { formatPhoneNum, removeSpecialCharactersAndSpaces } from "$lib/lib";
+
+    import { feeBases, iconList } from "./jopoffer";
     import {
         user_info,
         all_data,
         paymentActRegistered,
+        loadingStore,
+        prev,
+        toastStore,
+        pageScrollStatus,
     } from "$lib/stores/stores";
-    import { browser } from "$app/environment";
+
     import {
         back_api,
         regions,
         businessCategorys,
         jobCategorys,
     } from "$lib/const";
-
-    import { formatPhoneNum, removeSpecialCharactersAndSpaces } from "$lib/lib";
-    import axios from "axios";
-    import { feeBases, iconList } from "./jopoffer";
-    import { onDestroy, onMount, tick } from "svelte";
-    import Cookies from "js-cookie";
-    import { loadingStore, prev, toastStore } from "$lib/stores/stores";
-    import moment from "moment-timezone";
 
     let { data } = $props();
 
@@ -96,6 +103,11 @@
 
     // 시작 셋팅
     onMount(async () => {
+        
+        $pageScrollStatus = false; // 페이지 시작시 최상위
+        console.log($pageScrollStatus);
+        
+
         await tick();
         if (!$user_info.idx) {
             goto("/");

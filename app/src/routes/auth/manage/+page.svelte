@@ -324,6 +324,8 @@
 <div class="bg-white relative min-h-screen">
     <div class="max-w-[530px] mx-auto pretendard pt-14 pb-24">
         <div class="wrapper">
+
+            
             <div class="w-20 h-20 relative mx-auto">
                 <button
                     class="absolute bottom-[-10px] right-[-10px] w-7 h-7 border-2 rounded-full bg-white text-xs text-gray-500"
