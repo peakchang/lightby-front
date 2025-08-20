@@ -55,7 +55,7 @@
     }
 </script>
 
-<div class="suit-font pt-18 text-center">
+<div class="paperlogy pt-18 text-center">
 
     <div class=" text-3xl font-bold">결제가 완료 되었습니다.</div>
     <div class=" text-7xl mt-8 text-green-600">

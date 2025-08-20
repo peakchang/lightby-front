@@ -14,8 +14,8 @@
 <!-- svelte-ignore a11y_consider_explicit_label -->
 
 
-<div class="bg-white relative min-h-screen">
-    <div class="max-w-[530px] mx-auto pretendard pb-16">
+<div class="bg-white relative min-h-screen paperlogy">
+    <div class="max-w-[530px] mx-auto pb-16">
         {@render children()}
     </div>
 </div>

@@ -48,6 +48,7 @@ export const load = async ({ params, url, data }) => {
     try {
         const res = await axios.post(`${back_api}/sitelist/load_site_list`, { mainLocation, searchVal })
 
+        
         main_list.set({
             premium: shuffleArray(res.data.premiumList),
             top: shuffleArray(res.data.topList),

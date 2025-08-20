@@ -101,9 +101,9 @@
 </CustomModal>
 
 <!-- svelte-ignore event_directive_deprecated -->
-<div class="bg-green-50 relative min-h-screen">
+<div class="bg-green-50 relative min-h-screen paperlogy">
     <div
-        class="max-w-[530px] mx-auto suit-font pt-12 pb-10 bg-white p-14 min-h-screen"
+        class="max-w-[530px] mx-auto pt-12 pb-10 bg-white p-14 min-h-screen"
     >
         <div class="text-center bg-white">
             <a href="/">

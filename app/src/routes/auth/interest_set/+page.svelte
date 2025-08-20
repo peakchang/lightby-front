@@ -116,7 +116,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <!-- svelte-ignore event_directive_deprecated -->
-<div class="suit-font pt-10 pb-10 px-10">
+<div class="pt-10 pb-10 px-10 paperlogy">
     <div class="text-center mt-5 mb-10 text-lg font-bold">
         <p>아래 정보를 선택하시고</p>
         <p>회원님만을 위한 맞춤 알림을 받아보세요✨</p>

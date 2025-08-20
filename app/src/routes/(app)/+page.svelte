@@ -15,6 +15,7 @@
     import { navigating } from "$app/stores";
     import { onDestroy, onMount } from "svelte";
     import JobPostItem from "$lib/components/JobPostItem.svelte";
+    import JobPostItemList from "$lib/components/JobPostItemList.svelte";
 
     import SeoMeta from "$lib/components/SeoMeta.svelte";
 
@@ -71,6 +72,8 @@
     // });
     onMount(() => {
         console.log($scrollVal);
+
+        console.log($main_list["premium"]);
 
         $pageScrollStatus = true; // 페이지 진입시 저장된 스크롤로 이동
 
@@ -294,9 +297,12 @@
 
     <MainLocation></MainLocation>
 
-    {#if $main_list["premium"].length > 0}
+    <!-- 프리미엄 영역 -->
+
+    <JobPostItemList type="premium"></JobPostItemList>
+    <!-- {#if $main_list["premium"].length > 0}
         <div class="premium-area mt-5">
-            <!-- 프리미엄 영역 -->
+            
             <div
                 class="mb-3 ml-6 text-lg font-bold text-cyan-700 flex items-center"
             >
@@ -313,11 +319,12 @@
                 <JobPostItem {value}></JobPostItem>
             {/each}
         </div>
-    {/if}
+    {/if} -->
 
-    {#if $main_list["top"].length > 0}
+    <!-- 지역탑 영역 -->
+    <!-- {#if $main_list["top"].length > 0}
         <div class="top-area mt-5">
-            <!-- 지역탑 영역 -->
+            
             <div
                 class="mb-3 ml-6 text-lg font-bold text-cyan-700 flex items-center"
             >
@@ -334,11 +341,12 @@
                 <JobPostItem {value}></JobPostItem>
             {/each}
         </div>
-    {/if}
+    {/if} -->
 
-    {#if $main_list["free"].length > 0}
+    <!-- 일반 공고 영역 -->
+    <!-- {#if $main_list["free"].length > 0}
         <div class="free-area mt-5">
-            <!-- 일반 공고 영역 -->
+            
             <div
                 class="mb-3 ml-6 text-lg font-bold text-cyan-700 flex items-center"
             >
@@ -356,5 +364,5 @@
                 <JobPostItem {value}></JobPostItem>
             {/each}
         </div>
-    {/if}
+    {/if} -->
 </div>

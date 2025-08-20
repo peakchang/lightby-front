@@ -283,7 +283,7 @@
     </div>
 </CustomModal>
 
-<div class="bg-green-50 relative min-h-screen pretendard">
+<div class="bg-green-50 relative min-h-screen paperlogy">
     <div class="max-w-[530px] mx-auto pt-12 pb-10 bg-white p-14">
         <div class="text-center bg-white">
             <img src="/logo.png" alt="" class=" max-w-[150px] mx-auto" />

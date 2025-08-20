@@ -7,7 +7,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <!-- svelte-ignore event_directive_deprecated -->
-<div class="fixed top-0 left-0 w-full z-20 suit-font">
+<div class="fixed top-0 left-0 w-full z-20 paperlogy">
     <div class="max-w-[530px] mx-auto bg-white border-b border-gray-300">
         <div class="flex justify-between items-center">
             <div
@@ -26,7 +26,7 @@
 </div>
 
 <div class="bg-white relative min-h-screen">
-    <div class="max-w-[530px] mx-auto pretendard pt-14 pb-24">
+    <div class="max-w-[530px] mx-auto paperlogy pt-14 pb-24">
         {@render children()}
     </div>
 </div>

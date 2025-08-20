@@ -1020,8 +1020,8 @@
 <PageHeader />
 
 <!-- svelte-ignore event_directive_deprecated -->
-<div class="bg-white relative min-h-screen">
-    <div class="max-w-[530px] mx-auto pretendard pt-14 pb-24">
+<div class="bg-white relative min-h-screen paperlogy">
+    <div class="max-w-[530px] mx-auto pt-14 pb-24">
         <!-- <button on:click={testFunc}> testBtn </button> -->
         {#if postNum == 0}
             <div class="text-right text-blue-700">

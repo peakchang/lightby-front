@@ -274,9 +274,9 @@
 <PageHeader></PageHeader>
 
 <!-- svelte-ignore event_directive_deprecated -->
-<div class="pt-16 pb-32 suit-font px-3">
+<div class="pt-16 pb-32 paperlogy px-3">
     <div class="bg-white relative min-h-screen">
-        <div class="max-w-[530px] mx-auto pretendard pb-16">
+        <div class="max-w-[530px] mx-auto pb-16">
             <div class="border border-gray-300 p-2 rounded-lg">
                 <div class="mb-5">
                     <input

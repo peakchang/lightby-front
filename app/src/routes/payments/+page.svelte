@@ -69,7 +69,7 @@
 
 <!-- 결제 방법 영역-->
 
-<div class=" max-w-680 px-2 mt-5 suit-font">
+<div class=" max-w-680 px-2 mt-5 paperlogy">
     <div class="title">결제 방법</div>
     <div id="payment-method"></div>
     <div id="agreement"></div>

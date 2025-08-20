@@ -90,20 +90,20 @@
 
 {#if $manageBoardTabNum == 0}
     <!-- svelte-ignore event_directive_deprecated -->
-    <div class="z-50 suit-font px-3 mt-5" style="padding-bottom:70px">
+    <div class="z-50 paperlogy px-3 mt-5" style="padding-bottom:70px">
         {#each post_list as value}
             <MyPostItem {value}></MyPostItem>
         {/each}
     </div>
 {:else if $manageBoardTabNum == 1}
     <!-- svelte-ignore event_directive_deprecated -->
-    <div class="z-50 suit-font px-3 mt-5" style="padding-bottom:70px">
+    <div class="z-50 paperlogy px-3 mt-5" style="padding-bottom:70px">
         {#each post_list as value}
             <MyPostItem {value}></MyPostItem>
         {/each}
     </div>
 {:else}
-    <div class="z-50 suit-font px-3 mt-5" style="padding-bottom:70px">
+    <div class="z-50 paperlogy px-3 mt-5" style="padding-bottom:70px">
         준비중입니다....
     </div>
 {/if}
