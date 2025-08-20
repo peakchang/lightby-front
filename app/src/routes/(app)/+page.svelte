@@ -12,7 +12,7 @@
     import MainLocation from "$lib/components/MainLocation.svelte";
 
     import { browser } from "$app/environment";
-    import { navigating } from "$app/stores";
+    import { navigating, page } from "$app/stores";
     import { onDestroy, onMount } from "svelte";
     import JobPostItem from "$lib/components/JobPostItem.svelte";
     import JobPostItemList from "$lib/components/JobPostItemList.svelte";
@@ -286,20 +286,83 @@
 
     {#if bannerList.length > 0}
         <div class=" border border-gray-300 rounded-lg p-2">
-            <a href={bannerLinkList[nowBannerIdx]} target="_blank">
-                <img
-                    src={`${public_img_bucket}${bannerList[nowBannerIdx]}`}
-                    alt=""
-                />
-            </a>
+            <!-- $page -->
+            {#if bannerLinkList[nowBannerIdx].includes($page.url.hostname)}
+                <a href={bannerLinkList[nowBannerIdx]}>
+                    <img
+                        src={`${public_img_bucket}${bannerList[nowBannerIdx]}`}
+                        alt=""
+                    />
+                </a>
+            {:else}
+                <a href={bannerLinkList[nowBannerIdx]} target="_blank">
+                    <img
+                        src={`${public_img_bucket}${bannerList[nowBannerIdx]}`}
+                        alt=""
+                    />
+                </a>
+            {/if}
         </div>
     {/if}
 
     <MainLocation></MainLocation>
 
     <!-- 프리미엄 영역 -->
+    {#if $main_list["premium"].length > 0}
+        <div class="premium-area mt-5">
+            <div
+                class="mb-3 ml-6 text-lg font-bold text-cyan-700 flex items-center"
+            >
+                <span class="mr-2">
+                    <i class="fa fa-bell" aria-hidden="true"></i>
+                </span>
+                <span class="mr-4">프리미엄</span>
+                <div
+                    class=" w-[50%] md:w-[40%] rounded-full"
+                    style="height: 2px; background-color: #007595;"
+                ></div>
+            </div>
+            <JobPostItemList type="premium"></JobPostItemList>
+        </div>
+    {/if}
 
-    <JobPostItemList type="premium"></JobPostItemList>
+    {#if $main_list["top"].length > 0}
+        <div class="top-area mt-5">
+            <div
+                class="mb-3 ml-6 text-lg font-bold text-cyan-700 flex items-center"
+            >
+                <span class="mr-2">
+                    <i class="fa fa-bell" aria-hidden="true"></i>
+                </span>
+                <span class="mr-4">지역 TOP</span>
+                <div
+                    class=" w-[50%] md:w-[40%] rounded-full"
+                    style="height: 2px; background-color: #007595;"
+                ></div>
+            </div>
+            <JobPostItemList type="top"></JobPostItemList>
+        </div>
+    {/if}
+
+    {#if $main_list["free"].length > 0}
+        <div class="free-area mt-5">
+            <div
+                class="mb-3 ml-6 text-lg font-bold text-cyan-700 flex items-center"
+            >
+                <span class="mr-2">
+                    <i class="fa fa-bell" aria-hidden="true"></i>
+                </span>
+                <span class="mr-4">일반 공고</span>
+                <div
+                    class=" w-[50%] md:w-[40%] rounded-full"
+                    style="height: 2px; background-color: #007595;"
+                ></div>
+            </div>
+
+            <JobPostItemList type="free"></JobPostItemList>
+        </div>
+    {/if}
+
     <!-- {#if $main_list["premium"].length > 0}
         <div class="premium-area mt-5">
             

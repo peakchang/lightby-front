@@ -185,8 +185,6 @@
                 </a>
             {/if}
 
-            <a href="/mytalent">gogo</a>
-
             <!-- {#if $page.url.pathname == "/"}
 
                 <button

@@ -493,15 +493,7 @@
             </div>
         </div>
 
-        <div class="text-center">
-            <button
-                class="btn btn-info w-1/3 text-white"
-                on:click={uploadMyTalent}
-            >
-                내 인재 정보 등록 하기
-            </button>
-
-            {#if authBool}
+        {#if authBool}
                 <button
                     class="btn btn-error w-1/3 text-white"
                     on:click={() => {
@@ -511,6 +503,16 @@
                     건너뛰기
                 </button>
             {/if}
+
+        <div class="text-center">
+            <button
+                class="btn btn-info w-1/3 text-white"
+                on:click={uploadMyTalent}
+            >
+                내 인재 정보 등록 하기
+            </button>
+
+            
         </div>
     </div>
 </div>

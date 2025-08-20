@@ -41,6 +41,9 @@
     let occupationArr = $state([]); // 직종분류 변수 담을 임시 배열
     let imgModifyList = $state("");
 
+    // 로그인 체크 모달
+    let notLoginChkModal = $state(false);
+
     // 이전 게시물 열어보기 모달
     let prevPostListModal = $state(false);
     let prevPostList = $state([]);
@@ -103,15 +106,10 @@
 
     // 시작 셋팅
     onMount(async () => {
-        
         $pageScrollStatus = false; // 페이지 시작시 최상위
         console.log($pageScrollStatus);
-        
 
         await tick();
-        if (!$user_info.idx) {
-            goto("/");
-        }
 
         if (data.modifyIdx) {
             $all_data = data.modifyContent;
@@ -200,6 +198,12 @@
 
     // 변화 감지
     $effect(() => {
+        // 모종의 이유로 모달이 닫힐때
+        if (!$user_info.idx) {
+            notLoginChkModal = true;
+        } else if (!$user_info.idx && notLoginChkModal == false) {
+            goto("/");
+        }
         // delImgList 에 리스트 담기!! (글쓰는 페이지!)
 
         if (delImgList.length > 0) {
@@ -690,6 +694,43 @@
 </svelte:head>
 
 <svelte:window on:message={paymentSuccess} />
+
+<!-- 경고창 모달 -->
+<!-- svelte-ignore event_directive_deprecated -->
+<CustomModal
+    bind:visible={notLoginChkModal}
+    closeOnBackground={false}
+    closeBtn={false}
+    xBtn={false}
+>
+    <div class="text-center">
+        <div class=" text-red-500 text-3xl mb-5">
+            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+        </div>
+        <div class="mb-5">구인 등록을 원하시면 로그인이 필요합니다.</div>
+        <div class="flex justify-center items-center gap-3">
+            <a href="/auth/login" class="btn btn-active w-1/3">
+                <button
+                    on:click={() => {
+                        goto("/auth/login");
+                    }}
+                >
+                    로그인 바로가기
+                </button>
+            </a>
+
+            <a href="/" class="btn btn-active w-1/3">
+                <button
+                    on:click={() => {
+                        goto("/");
+                    }}
+                >
+                    취소
+                </button>
+            </a>
+        </div>
+    </div>
+</CustomModal>
 
 <!-- svelte-ignore event_directive_deprecated -->
 <!-- svelte-ignore a11y_click_events_have_key_events -->

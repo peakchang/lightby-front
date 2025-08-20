@@ -125,7 +125,7 @@
             </a>
 
             <a
-                href="SMS:{detailContent.phone}?body=테스트입니다."
+                href="SMS:{detailContent.phone}?body=번개분양 보고 연락 드렸습니다."
                 class="w-1/4"
             >
                 <button class="btn btn-success btn-sm w-full text-white">
