@@ -275,9 +275,8 @@
     </div>
 </CustomModal>
 
-
 {#if !authBool}
-<PageHeader />
+    <PageHeader />
 {/if}
 
 <!-- svelte-ignore a11y_consider_explicit_label -->
@@ -493,7 +492,8 @@
             </div>
         </div>
 
-        {#if authBool}
+        <div class="text-center">
+            {#if authBool}
                 <button
                     class="btn btn-error w-1/3 text-white"
                     on:click={() => {
@@ -503,16 +503,12 @@
                     건너뛰기
                 </button>
             {/if}
-
-        <div class="text-center">
             <button
                 class="btn btn-info w-1/3 text-white"
                 on:click={uploadMyTalent}
             >
                 내 인재 정보 등록 하기
             </button>
-
-            
         </div>
     </div>
 </div>

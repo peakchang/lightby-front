@@ -33,7 +33,7 @@
     async function logout() {
         // 지역 설정 되어 있으면 풀기
         $main_location = "전국";
-        localStorage.removeItem("location");
+        sessionStorage.removeItem("location");
 
         const res = await fetchRequest("POST", "/auth/logout", {
             idx: $user_info.idx,
@@ -49,16 +49,18 @@
     }
 
     function searchFunc() {
-        localStorage.setItem("search_val", $search_val);
+        sessionStorage.setItem("search_val", $search_val);
         invalidateAll();
         searchModal = false;
         $loadingStore = true;
     }
 
     function goToMain() {
+        console.log("?@????@?@?@??@?@?");
+
         $main_location = "전국";
-        localStorage.removeItem("location");
-        localStorage.removeItem("search_val");
+        sessionStorage.removeItem("location");
+        sessionStorage.removeItem("search_val");
         goto("/", { invalidateAll: true });
     }
 
@@ -135,7 +137,7 @@
                     type="button"
                     class="btn btn-warning text-white"
                     on:click={() => {
-                        localStorage.removeItem("search_val");
+                        sessionStorage.removeItem("search_val");
                         invalidateAll();
                         searchModal = false;
                         $loadingStore = true;
