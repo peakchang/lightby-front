@@ -6,7 +6,10 @@
     console.log($page);
 
     let { data } = $props();
-    const clientKey = "test_gck_ex6BJGQOVDKvLWdjenWO3W4w2zNb"; // 상점을 특정하는 키
+    // const clientKey = "test_gck_ex6BJGQOVDKvLWdjenWO3W4w2zNb"; // 상점을 특정하는 키
+    
+    const clientKey = import.meta.env.VITE_TOSS_KEY // 상점 키
+    
 
     let customerKey = $state("");
     let orderId = $state("");
