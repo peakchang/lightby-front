@@ -217,11 +217,19 @@
             <span>|</span>
             <a href="/terms/service"><span>이용약관</span></a>
         </div>
-        <div class="text-xs leading-loose">
+        <!-- <div class="text-xs leading-loose">
             <p>상호: 위드브릿지</p>
             <p>대표자: 박창용</p>
             <p>사업자번호 : 509-63-00569</p>
             <p>주소 : 경기도화성시효행로1068,6층604-G36호</p>
+            <p>개인정보처리관리자 : 김가연</p>
+        </div> -->
+
+        <div class="text-xs leading-loose">
+            <p>상호: 애드피크</p>
+            <p>대표자: 박창현</p>
+            <p>사업자번호 : 240-06-01900</p>
+            <p>주소 : 경기도 부천시 소사구 경인로 37</p>
             <p>개인정보처리관리자 : 김가연</p>
         </div>
     </div>
