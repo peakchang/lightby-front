@@ -170,7 +170,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <!-- svelte-ignore event_directive_deprecated -->
-<div class=" pt-16 paperlogy px-3">
+<div class=" pt-16 paperlogy px-3 max-w-[620px] mx-auto">
     <!-- <button
         on:click={() => {
             invalidateAll();

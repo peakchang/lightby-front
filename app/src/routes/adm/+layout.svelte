@@ -13,6 +13,12 @@
     let drawerChecked = $state(false);
 
     onMount(() => {
+
+        console.log($user_info);
+        if(!$user_info || Number($user_info.rate) < 5){
+            goto('/')
+        }
+        
         $pageScrollStatus = false; // 페이지 시작시 최상위
     });
 
