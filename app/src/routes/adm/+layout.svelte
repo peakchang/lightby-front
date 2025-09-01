@@ -1,9 +1,11 @@
 <script>
     import { fade, fly } from "svelte/transition";
     import { slide } from "svelte/transition";
-    import { user_info } from "$lib/stores/stores";
+    
     import { onMount } from "svelte";
     import { goto } from "$app/navigation";
+
+    import { user_info, pageScrollStatus } from "$lib/stores/stores";
     let isOpen = $state(true);
 
     let { children } = $props();
@@ -11,7 +13,7 @@
     let drawerChecked = $state(false);
 
     onMount(() => {
-        // console.log($user_info);
+        $pageScrollStatus = false; // 페이지 시작시 최상위
     });
 
     function moveAdmMenu() {

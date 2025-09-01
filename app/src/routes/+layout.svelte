@@ -41,16 +41,18 @@
 	});
 
 	$effect(() => {
-		if (!$pageScrollStatus) {
-			siteWrab.scrollTop = 0;
-		} else {
-			siteWrab.scrollTop = $scrollVal;
-		}
+		if (siteWrab) {
+			if (!$pageScrollStatus) {
+				siteWrab.scrollTop = 0;
+			} else {
+				siteWrab.scrollTop = $scrollVal;
+			}
 
-		if ($page.url.pathname.includes("adm")) {
-			adminPage = true;
-		} else {
-			adminPage = false;
+			if ($page.url.pathname.includes("adm")) {
+				adminPage = true;
+			} else {
+				adminPage = false;
+			}
 		}
 	});
 
