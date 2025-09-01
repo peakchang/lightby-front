@@ -10,7 +10,7 @@ export const load = async ({ params, url, data }) => {
     let user_name = ""
     try {
         const res = await axios.post(`${back_api}/payment_customerkey_chk`, { userId })
-
+        
         customer_key = res.data.customer_key
         user_name = res.data.user_name
 

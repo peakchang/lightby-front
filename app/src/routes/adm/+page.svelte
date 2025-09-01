@@ -84,10 +84,25 @@
             console.error(err.message);
         }
     }
+
+    async function userRateUpdate() {
+        console.log(userList[this.value]);
+        try {
+            const res = await axios.post(
+                `${back_api}/adm_users/update_rate_user`,
+                {
+                    user_info: userList[this.value],
+                },
+            );
+
+            alert("변경이 완료 되었습니다.");
+            invalidateAll();
+        } catch (error) {}
+    }
 </script>
 
-<div class="mb-5">
-    <div class="flex items-center gap-2">
+<div class="mb-4">
+    <div class="flex items-center gap-2 mb-2">
         <input
             type="text"
             class="border border-gray-400 px-2 py-1 text-sm focus:outline-none focus:border-blue-500 rounded-md"
@@ -102,6 +117,10 @@
         </select>
         <!-- svelte-ignore event_directive_deprecated -->
         <button class="btn btn-soft btn-sm" on:click={searchFunc}>검색</button>
+    </div>
+
+    <div class="text-xs">
+        5 : 관리자 / 4 : 부관리자 / 3 : 서브관리자 (입력용)
     </div>
 </div>
 
@@ -139,7 +158,7 @@
                     <td class="tb"> {formatPhoneNum(manager.phone)}</td>
                     <td class="tb">{manager.name}</td>
                     <td class="tb">{manager.nickname}</td>
-                    <td class="tb">일반</td>
+                    <td class="tb">관리자</td>
                     <td class="tb">
                         <button class="btn btn-sm">보기</button>
                     </td>
@@ -172,7 +191,26 @@
                     <td class="tb">{formatPhoneNum(user.phone)}</td>
                     <td class="tb">{user.name}</td>
                     <td class="tb">{user.nickname}</td>
-                    <td class="tb">일반</td>
+                    <td class="tb">
+                        <div class="flex justify-center items-center gap-1.5">
+                            <select
+                                class="border border-gray-400 py-1 px-2 rounded-md"
+                                bind:value={userList[idx]["rate"]}
+                            >
+                                <option value="5">관리자</option>
+                                <option value="4">부관리자</option>
+                                <option value="3">서브관리자</option>
+                                <option value="1">일반</option>
+                            </select>
+                            <button
+                                class="btn btn-sm btn-success text-white"
+                                value={idx}
+                                on:click={userRateUpdate}
+                            >
+                                변경
+                            </button>
+                        </div>
+                    </td>
                     <td class="tb">
                         <button class="btn btn-sm">보기</button>
                     </td>

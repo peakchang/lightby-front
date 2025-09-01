@@ -136,6 +136,9 @@
 
         $all_data["user_id"] = $user_info.idx;
 
+        console.log(`$user_info : ${$user_info}`);
+        console.log($user_info);
+
         if (!$all_data["user_id"] && loopPrevent) {
             // 유저 정보 없을경우 뒤로 돌아가기
             blockBack = false;
@@ -284,11 +287,13 @@
         if (e.data.status) {
             $loadingStore = false;
             $all_data["payment_key"] = e.data.paymentInfo.payment_key;
+            $all_data["order_id"] = e.data.paymentInfo.order_id;
             const today = moment().format("YYYY-MM-DD");
             const tenDaysLater = moment().add(10, "days").format("YYYY-MM-DD");
             $all_data["ad_start_date"] = today;
             $all_data["ad_end_date"] = tenDaysLater;
             paymentStatus = true;
+
             try {
                 const res = await axios.post(`${back_api}/regist/upload`, {
                     allData: $all_data,
@@ -303,6 +308,11 @@
                 }, 3500);
             } catch (err) {
                 // 결제가 에러 나는 경우 결제 취소 해주자!!!
+
+                popup = undefined;
+
+                alertModalShow = true;
+                alertModalMessage = "결제에러! 다시 시도해주세요!";
 
                 const m = err.response.data.message;
                 console.error(`에러남!!!!`);
@@ -336,34 +346,40 @@
         }
 
         // 유료 상품이면 팝업 열고 리턴 처리!!
-        if ($all_data["product"] != "free" && paymentStatus == false) {
-            const payProductName = `${productInfo.name} + 아이콘${iconNames.length}`;
-            popup = window.open(
-                `/payments?user_id=${$user_info.idx}&order_name=${payProductName}&amount=${$all_data["sum"]}`,
-                "popup",
-                "width=550,height=670",
-            );
 
-            popupCheckInterval = setInterval(() => {
-                if (popup && popup.closed) {
-                    clearInterval(popupCheckInterval);
-                    popupCheckInterval = null;
+        if (!$user_info.rate || Number($user_info.rate) < 3) {
+            if ($all_data["product"] != "free" && paymentStatus == false) {
+                const payProductName = `${productInfo.name} + 아이콘${iconNames.length}`;
+                popup = window.open(
+                    `/payments?user_id=${$user_info.idx}&order_name=${payProductName}&amount=${$all_data["sum"]}`,
+                    "popup",
+                    "width=550,height=670",
+                );
 
-                    if (!paymentStatus) {
-                        $loadingStore = false;
-                        alertModalShow = true;
-                        alertModalMessage =
-                            "결제가 취소되었습니다. 다시 시도해주세요.";
-                        popup = null;
+                popupCheckInterval = setInterval(() => {
+                    if (popup && popup.closed) {
+                        clearInterval(popupCheckInterval);
+                        popupCheckInterval = null;
+
+                        if (!paymentStatus) {
+                            $loadingStore = false;
+                            alertModalShow = true;
+                            alertModalMessage =
+                                "결제가 취소되었습니다. 다시 시도해주세요.";
+                            popup = null;
+                        }
+
+                        // 여기에 닫힌 후 실행할 코드 추가
                     }
+                }, 500); // 0.5초마다 감지
 
-                    // 여기에 닫힌 후 실행할 코드 추가
-                }
-            }, 500); // 0.5초마다 감지
-
-            $loadingStore = true;
-            return;
+                $loadingStore = true;
+                return;
+            }
         }
+
+        // const allData = $all_data
+        // allData['amount'] = $all_data["sum"]
 
         try {
             const res = await axios.post(`${back_api}/regist/upload`, {
