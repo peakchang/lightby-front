@@ -32,7 +32,8 @@
     });
 
     let postList = $state([]);
-    onMount(() => {
+
+    $effect(() => {
         postList = $main_list[type];
     });
 

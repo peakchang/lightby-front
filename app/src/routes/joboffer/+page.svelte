@@ -382,6 +382,14 @@
         // const allData = $all_data
         // allData['amount'] = $all_data["sum"]
 
+        if (Number($user_info.rate) >= 3) {
+            // 레벨이 3(서브관리자) 이상이면 광고 기간 등록 해주기!
+            const today = moment().format("YYYY-MM-DD");
+            const tenDaysLater = moment().add(10, "days").format("YYYY-MM-DD");
+            $all_data["ad_start_date"] = today;
+            $all_data["ad_end_date"] = tenDaysLater;
+        }
+
         try {
             const res = await axios.post(`${back_api}/regist/upload`, {
                 allData: $all_data,
@@ -686,12 +694,23 @@
 
     // 전화번호 업로드시 숫자만 남기기
     function formatPhoneNumber(event) {
-        let value = event.target.value.replace(/\D/g, ""); // 숫자만 남기기 (한글, 영어, 특수문자 제거)
+        let value = event.target.value.replace(/\D/g, ""); // 숫자만 남기기
 
-        if (value.length > 3 && value.length <= 7) {
+        if (value.length === 8) {
+            // 8자리: 국번 없는 대표번호 → 1661-4545
+            value = value.replace(/(\d{4})(\d{4})/, "$1-$2");
+        } else if (value.length === 9) {
+            // 9자리: 지역번호(2자리)+번호(7자리) → 02-123-4567
+            value = value.replace(/(\d{2})(\d{3})(\d{4})/, "$1-$2-$3");
+        } else if (value.length === 10) {
+            // 10자리: 지역번호(3자리)+번호(7자리) → 032-655-8844
+            value = value.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
+        } else if (value.length === 11) {
+            // 11자리: 휴대폰 → 010-5454-6464
+            value = value.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3");
+        } else if (value.length > 3 && value.length < 8) {
+            // 임시 처리: 4~7자리 입력 → 010-1234 같은 형태
             value = value.replace(/(\d{3})(\d+)/, "$1-$2");
-        } else if (value.length > 7) {
-            value = value.replace(/(\d{3})(\d{4})(\d+)/, "$1-$2-$3");
         }
 
         $all_data["phone"] = value;
