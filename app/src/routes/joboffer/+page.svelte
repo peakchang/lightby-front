@@ -347,6 +347,7 @@
 
         // 유료 상품이면 팝업 열고 리턴 처리!!
 
+        // 등급이 서브관리자 (3 이상) 이상이면 패스, 이하면 들어와서 체크
         if (!$user_info.rate || Number($user_info.rate) < 3) {
             if ($all_data["product"] != "free" && paymentStatus == false) {
                 const payProductName = `${productInfo.name} + 아이콘${iconNames.length}`;
