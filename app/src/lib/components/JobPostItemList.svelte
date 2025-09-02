@@ -28,13 +28,16 @@
 
     $effect(() => {
         postList = $main_list[type];
-        for (let i = 0; i < postList.length; i++) {
-            const value = postList[i];
-            postList[i]["fee_value"] = /^[0-9]+$/.test(value.fee)
-                ? Number(value.fee).toLocaleString()
-                : `${value.fee} 만`;
-        }
+
+        // for (let i = 0; i < postList.length; i++) {
+        //     const value = postList[i];
+        //     postList[i]["fee_value"] = /^[0-9]+$/.test(value.fee)
+        //         ? Number(value.fee).toLocaleString()
+        //         : `${value.fee} 만`;
+        // }
     });
+
+    console.log(postList);
 
     function goToDetail(idx) {
         // 비회원 조회수 제한!!
@@ -60,6 +63,10 @@
 
     function handleImageError() {
         imgError = true;
+    }
+
+    function isNumeric(str) {
+        return /^\d+$/.test(str);
     }
 </script>
 
@@ -135,7 +142,9 @@
                             <div class="mb-1">
                                 <span class="font-semibold text-blue-500">
                                     {value.fee_type}
-                                    {value.fee_value}원
+                                    {isNumeric(value.fee)
+                                        ? Number(value.fee).toLocaleString()
+                                        : value.fee}원
                                 </span>
                             </div>
 
