@@ -16,13 +16,6 @@
 
     console.log($main_list[type]);
 
-    for (let i = 0; i < $main_list[type].length; i++) {
-        const value = $main_list[type][i];
-        $main_list[type][i]["fee_value"] = /^[0-9]+$/.test(value.fee)
-            ? Number(value.fee).toLocaleString()
-            : `${value.fee} 만`;
-    }
-
     let imgError = $state(false);
 
     const businessReplaceDict = $derived({
@@ -35,6 +28,12 @@
 
     $effect(() => {
         postList = $main_list[type];
+        for (let i = 0; i < postList.length; i++) {
+            const value = postList[i];
+            postList[i]["fee_value"] = /^[0-9]+$/.test(value.fee)
+                ? Number(value.fee).toLocaleString()
+                : `${value.fee} 만`;
+        }
     });
 
     function goToDetail(idx) {
