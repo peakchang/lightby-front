@@ -7,8 +7,7 @@
 
     let { data } = $props();
 
-    const clientKey = import.meta.env.VITE_TOSS_KEY // 상점 키
-    
+    const clientKey = import.meta.env.VITE_TOSS_KEY; // 상점 키
 
     let customerKey = $state("");
     let orderId = $state("");
@@ -23,17 +22,21 @@
     orderName = $page.url.searchParams.get("order_name");
     customerName = data.user_name;
 
-    orderId = `order_${userId}`; // orderId 최초 생성!!
+    orderId = generateOrderId(userId)
     customerKey = data.customer_key;
 
-    $effect(() => {
+    function generateOrderId(userId) {
+        const ts = Date.now().toString(36); // 밀리초 단위 타임스탬프
+        const rand = Math.random().toString(36).slice(2, 6); // 랜덤 4자리
+        return `order_${userId}_${ts}${rand}`;
+    }
 
+    $effect(() => {
         console.log(orderId);
-        
+
         console.log(clientKey);
         console.log(customerKey);
-        
-        
+
         if (browser) {
             paymentWidget = PaymentWidget(clientKey, customerKey); // 회원 결제
             // const paymentWidget = PaymentWidget(clientKey, PaymentWidget.ANONYMOUS) // 비회원 결제
@@ -64,7 +67,7 @@
                 }
                 if (error.code === "INVALID_CARD_COMPANY") {
                     // 유효하지 않은 카드 코드에 대한 에러 처리
-                    console.log('유효하지 않은 카드');
+                    console.log("유효하지 않은 카드");
                 }
             });
     }
