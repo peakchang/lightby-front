@@ -28,7 +28,11 @@
 
     $effect(() => {
 
+        console.log(orderId);
+        
         console.log(clientKey);
+        console.log(customerKey);
+        
         
         if (browser) {
             paymentWidget = PaymentWidget(clientKey, customerKey); // 회원 결제

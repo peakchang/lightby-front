@@ -57,7 +57,6 @@ export const load = async ({ locals, request, cookies }) => {
                 const updateTodayCountQuery = "UPDATE today_count SET fake_count = ? WHERE date = ?";
                 await sql_con.promise().query(updateTodayCountQuery, [chkTodayCount[0]['fake_count'] + random, today]);
             }
-
         } catch (err) {
             console.error(err.message);
         }

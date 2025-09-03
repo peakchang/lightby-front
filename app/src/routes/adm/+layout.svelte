@@ -78,6 +78,10 @@
         <a href="/adm/manage_board" onclick={moveAdmMenu}>
             <div class="p-2 rounded-lg hover:bg-gray-200">게시물 관리</div>
         </a>
+
+        <a href="/adm/info" onclick={moveAdmMenu}>
+            <div class="p-2 rounded-lg hover:bg-gray-200">기타 정보</div>
+        </a>
     </div>
 {/if}
 
