@@ -265,6 +265,11 @@
             delete $all_data.sum;
             delete $all_data.idx;
 
+            delete $all_data.ad_end_date;
+            delete $all_data.ad_start_date;
+            delete $all_data.icons;
+            
+
             businessArr = $all_data["business"].split(",");
             occupationArr = $all_data["occupation"].split(",");
         } catch (error) {}
@@ -1112,6 +1117,15 @@
             {#if !data.modifyIdx}
                 <div class="text-center font-semibold text-2xl">
                     구인글 등록
+
+                    <span
+                        class="text-xs"
+                        on:click={() => {
+                            console.log($all_data);
+                        }}
+                    >
+                        lll
+                    </span>
                 </div>
 
                 <div
