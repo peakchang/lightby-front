@@ -36,8 +36,6 @@ export const load = async ({ params, url, data }) => {
         try {
             const res = await axios.post(`${back_api}/regist/load_user_info`, { userId })
             userInfo = res.data.userInfo
-            console.log(userInfo);
-            
         } catch (err) {
             console.error(err.message);
         }

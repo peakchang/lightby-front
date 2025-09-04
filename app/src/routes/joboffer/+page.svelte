@@ -35,8 +35,6 @@
 
     let { data } = $props();
 
-    let postNum = $state(0);
-
     let businessArr = $state([]); // 업종분류 변수 담을 임시 배열
     let occupationArr = $state([]); // 직종분류 변수 담을 임시 배열
     let imgModifyList = $state("");
@@ -52,7 +50,7 @@
 
     // 등록 전 결제 및 물어보는거 모달
     let submitPrevModal = $state(false); // 모달 변수
-    let paymentStatus = $state(false); // 업로드시에 결제 완료 여부 체크 변수!!
+    let paymentStatus = $state(false); // 업로드시에 결제 완료 여부 체크 변수!! (true 면 상품 등록 진행, free 는 임의로 true로, 기타 유료는 결제 완료시 true로 변경)
     let popup = $state();
     let popupCheckInterval = $state(); // 팝업이 닫혔을때 감지!!
 
@@ -87,6 +85,9 @@
     let successPrevModal = $state(false);
     let successPrevModalMessage = $state("");
 
+    // 첫 글 무료 셋팅 변수!
+    let freebies = $state(true);
+
     const chkBoolList = [
         // { var: "imgs", label: "현장 이미지" },
         { var: "subject", label: "공고 제목(현장명)" },
@@ -107,18 +108,19 @@
     // 시작 셋팅
     onMount(async () => {
         $pageScrollStatus = false; // 페이지 시작시 최상위
-        console.log($pageScrollStatus);
 
         await tick();
 
         if (data.modifyIdx) {
             $all_data = data.modifyContent;
         } else {
-            $all_data["name"] = formatPhoneNum(data.userInfo.name);
-            $all_data["phone"] = formatPhoneNum(data.userInfo.phone);
+            if (data.userInfo) {
+                $all_data["name"] = formatPhoneNum(data.userInfo.name);
+                $all_data["phone"] = formatPhoneNum(data.userInfo.phone);
+                freebies = data.userInfo.freebies;
+                console.log(`freebies : ${freebies}`);
+            }
         }
-
-        postNum = data.postNum;
 
         // 삭제할 이미지 있으면 쿠키에서 값 가져와서 삭제하기! (글쓰는 페이지 적용!!)
         const refreshFlag = Cookies.get("del_img_list");
@@ -135,9 +137,6 @@
         }
 
         $all_data["user_id"] = $user_info.idx;
-
-        console.log(`$user_info : ${$user_info}`);
-        console.log($user_info);
 
         if (!$all_data["user_id"] && loopPrevent) {
             // 유저 정보 없을경우 뒤로 돌아가기
@@ -259,6 +258,8 @@
 
             $all_data["product"] = "free";
             $all_data["icons"] = "";
+
+            $all_data["phone"] = formatPhoneNum($all_data["phone"]);
             getAddress = $all_data["addr"];
             delete $all_data.created_at;
             delete $all_data.updated_at;
@@ -268,7 +269,6 @@
             delete $all_data.ad_end_date;
             delete $all_data.ad_start_date;
             delete $all_data.icons;
-            
 
             businessArr = $all_data["business"].split(",");
             occupationArr = $all_data["occupation"].split(",");
@@ -338,7 +338,8 @@
 
         $all_data["fee"] = removeSpecialCharactersAndSpaces($all_data["fee"]);
 
-        if (postNum === 0) {
+        // 첫글 무료시!! freebies 가 true 면 값 지정을 해준다! false 면 유료로 등록 해야함!!!
+        if (freebies) {
             paymentStatus = true;
             if ($all_data["product"] == "premium") {
                 const today = moment().format("YYYY-MM-DD");
@@ -349,6 +350,10 @@
                 $all_data["ad_end_date"] = tenDaysLater;
             }
         }
+
+        console.log(paymentStatus);
+        console.log($all_data["product"]);
+        console.log($user_info);
 
         // 유료 상품이면 팝업 열고 리턴 처리!!
 
@@ -395,9 +400,11 @@
             $all_data["ad_end_date"] = tenDaysLater;
         }
 
+        // 상품 업로드!!
         try {
             const res = await axios.post(`${back_api}/regist/upload`, {
                 allData: $all_data,
+                freebies,
             });
             blockBack = false;
             successPrevModal = true;
@@ -464,8 +471,12 @@
         }
 
         // 상품 값 없을경우 기본값 free // 먄약 첫 글일 경우 premium
-        if (postNum === 0) {
+        if (freebies) {
             $all_data["product"] = "premium";
+            $all_data["sum"] = 66000;
+
+            productInfo.name = "프리미엄";
+            productInfo.price = 66000;
             iconsShow = true;
         } else if (!$all_data["product"]) {
             $all_data["product"] = "free";
@@ -887,7 +898,7 @@
             </div>
 
             <div class="mb-5">
-                {#if postNum === 0}
+                {#if freebies}
                     <p class="md:text-lg">첫글 작성자 혜택!</p>
                     <p>구인글 최초 1회 프리미엄 무료등록</p>
                 {:else}
@@ -907,7 +918,7 @@
                 <div
                     class="mb-5 border-2 peer-checked:border-blue-500 border-gray-200 p-2 mx-auto rounded-lg"
                 >
-                    {#if postNum === 0}
+                    {#if freebies}
                         <p class="line-through text-gray-500">
                             프리미엄 등록 특가 132,000 -> 66,000원
                         </p>
@@ -1043,7 +1054,7 @@
             >
                 <span class="text-gray-600">합계</span>
 
-                {#if postNum === 0}
+                {#if freebies}
                     <span class="font-medium">
                         <span class="line-through text-gray-400">
                             {$all_data["sum"]
@@ -1105,7 +1116,7 @@
 <div class="bg-white relative min-h-screen paperlogy">
     <div class="max-w-[530px] mx-auto pt-14 pb-24">
         <!-- <button on:click={testFunc}> testBtn </button> -->
-        {#if postNum == 0}
+        {#if freebies}
             <div class="text-right text-blue-700">
                 <i class="fa fa-hand-pointer-o" aria-hidden="true"></i>
                 <span>첫번째 구인공고 작성시 프리미엄 무료!</span>

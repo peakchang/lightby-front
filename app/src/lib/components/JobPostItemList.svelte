@@ -11,11 +11,6 @@
     import { raiseViewCount } from "$lib/lib";
     import { onMount } from "svelte";
     let { type } = $props();
-
-    console.log(type);
-
-    console.log($main_list[type]);
-
     let imgError = $state(false);
 
     const businessReplaceDict = $derived({
@@ -36,8 +31,6 @@
         //         : `${value.fee} 만`;
         // }
     });
-
-    console.log(postList);
 
     function goToDetail(idx) {
         // 비회원 조회수 제한!!
