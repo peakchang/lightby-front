@@ -70,6 +70,9 @@ export async function POST({ request, cookies }) {
                 maxAge: 60 * 60 * 24 * 14
             });
 
+            console.log(cookies);
+            
+
         } else {
             return json({ message: '비밀번호가 일치하지 않습니다.' }, { status: 400 })
         }

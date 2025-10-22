@@ -13,6 +13,12 @@ export async function handle({ event, resolve }) {
     const accessToken = event.cookies.get('access_token');
     const refreshToken = event.cookies.get('refresh_token');
 
+    console.log(accessToken);
+    console.log(refreshToken);
+    
+    
+    
+
     // 기본값 초기화
     let userInfo = {}
 
