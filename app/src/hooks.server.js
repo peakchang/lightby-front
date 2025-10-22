@@ -5,7 +5,7 @@ import moment from 'moment-timezone';
 import axios from 'axios';
 import { back_api } from '$lib/const';
 
-export async function handle({ event, resolve, cookies }) {
+export async function handle({ event, resolve }) {
 
     if (event.url.pathname.startsWith('/.well-known/')) {
         return new Response(null, { status: 404 });
@@ -54,7 +54,7 @@ export async function handle({ event, resolve, cookies }) {
             });
 
             // 리프레쉬토큰 기존 그대로 기간 연장
-            cookies.set('refresh_token', refreshToken, {
+            event.cookies.set('refresh_token', refreshToken, {
                 httpOnly: true,
                 secure: true,
                 path: '/',
