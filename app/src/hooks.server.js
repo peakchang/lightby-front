@@ -66,7 +66,8 @@ export async function handle({ event, resolve }) {
 
 
         } catch (error) {
-
+            console.log('위치는 여기?');
+            
             console.error(error.message);
 
             if (error.message != "cookies is not defined") {
