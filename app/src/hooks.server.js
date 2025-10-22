@@ -5,7 +5,7 @@ import moment from 'moment-timezone';
 import axios from 'axios';
 import { back_api } from '$lib/const';
 
-export async function handle({ event, resolve }) {
+export async function handle({ event, resolve, cookies }) {
 
     if (event.url.pathname.startsWith('/.well-known/')) {
         return new Response(null, { status: 404 });
@@ -67,7 +67,7 @@ export async function handle({ event, resolve }) {
 
         } catch (error) {
             console.log('위치는 여기?');
-            
+
             console.error(error.message);
 
             if (error.message != "cookies is not defined") {
