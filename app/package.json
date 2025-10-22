@@ -21,6 +21,7 @@
 	"dependencies": {
 		"@sveltejs/adapter-node": "^5.2.12",
 		"@tailwindcss/vite": "^4.1.7",
+		"apexcharts": "^5.3.5",
 		"axios": "^1.9.0",
 		"bcrypt": "^6.0.0",
 		"browser-image-compression": "^2.0.2",
@@ -31,6 +32,7 @@
 		"moment-timezone": "^0.5.48",
 		"mysql2": "^3.14.1",
 		"sortablejs": "^1.15.6",
+		"svelte-apexcharts": "^1.0.2",
 		"tailwindcss": "^4.1.7"
 	},
 	"description": "Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).",

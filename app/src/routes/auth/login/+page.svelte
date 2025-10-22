@@ -5,6 +5,7 @@
     import { page } from "$app/stores";
     import { onMount, tick } from "svelte";
     import axios from "axios";
+    import { back_api } from "$lib/const";
 
     let id = $state("");
     let password = $state("");
@@ -101,10 +102,8 @@
 </CustomModal>
 
 <!-- svelte-ignore event_directive_deprecated -->
-<div class="bg-green-50 relative min-h-screen paperlogy">
-    <div
-        class="max-w-[530px] mx-auto pt-12 pb-10 bg-white p-14 min-h-screen"
-    >
+<div class="bg-green-50 relative min-h-screen suit-font">
+    <div class="max-w-[530px] mx-auto pt-12 pb-10 bg-white p-14 min-h-screen">
         <div class="text-center bg-white">
             <a href="/">
                 <img src="/logo.png" alt="" class=" max-w-[150px] mx-auto" />

@@ -74,10 +74,13 @@
 
             if (id) {
                 try {
-                    const res = await axios.post(`/auth/duplicate_chk`, {
-                        type,
-                        value: id,
-                    });
+                    const res = await axios.post(
+                        `${back_api}/auth/duplicate_chk`,
+                        {
+                            type,
+                            value: id,
+                        },
+                    );
 
                     idErrBool = false;
                     idSuccessBool = true;
@@ -89,7 +92,7 @@
         } else if (type == "nickname") {
             if (nickname) {
                 try {
-                    const res = await axios.post(`/auth/duplicate_chk`, {
+                    const res = await axios.post(`${back_api}/auth/duplicate_chk`, {
                         type,
                         value: nickname,
                     });
@@ -103,7 +106,7 @@
         } else {
             if (phone) {
                 try {
-                    const res = await axios.post(`/auth/duplicate_chk`, {
+                    const res = await axios.post(`${back_api}/auth/duplicate_chk`, {
                         type,
                         value: removeSpecialCharactersAndSpaces(phone),
                     });
@@ -133,7 +136,7 @@
         authShowBool = true;
         authNumber = generateRandomNumber();
         console.log(authNumber);
-        
+
         try {
             const res = await axios.post(`${back_api}/send_sms`, {
                 phone,
@@ -266,7 +269,7 @@
         phone = removeSpecialCharactersAndSpaces(phone);
 
         try {
-            const res = await axios.post(`/auth/join`, {
+            const res = await axios.post(`${back_api}/auth/join`, {
                 id,
                 name,
                 nickname,
@@ -275,7 +278,7 @@
             });
 
             joinStatus.set({
-                type: 'general',
+                type: "general",
                 info: { id: id, password: password },
             });
 
@@ -338,10 +341,8 @@
     </div>
 </CustomModal>
 
-<div class="bg-green-50 relative min-h-screen paperlogy">
-    <div
-        class="max-w-[530px] mx-auto pt-12 pb-10 bg-white p-14 min-h-screen"
-    >
+<div class="bg-green-50 relative min-h-screen suit-font">
+    <div class="max-w-[530px] mx-auto pt-12 pb-10 bg-white p-14 min-h-screen">
         <div class="text-center bg-white">
             <a href="/">
                 <img src="/logo.png" alt="" class=" max-w-[150px] mx-auto" />

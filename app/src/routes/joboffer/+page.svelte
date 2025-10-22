@@ -1113,7 +1113,7 @@
 <PageHeader />
 
 <!-- svelte-ignore event_directive_deprecated -->
-<div class="bg-white relative min-h-screen paperlogy">
+<div class="bg-white relative min-h-screen suit-font">
     <div class="max-w-[530px] mx-auto pt-14 pb-24">
         <!-- <button on:click={testFunc}> testBtn </button> -->
         {#if freebies}

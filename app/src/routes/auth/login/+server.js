@@ -5,6 +5,8 @@ import jwt from 'jsonwebtoken';
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '$env/static/private';
 import bcrypt from 'bcrypt';
 import moment from "moment-timezone";
+import axios from "axios";
+import { back_api } from "$lib/const.js";
 
 /*
 >> 프론트에서 가져온 추가 정보들로 DB 입력 / JWT토큰 생성해서 아이디 값 저장 / 다시 DB에 토큰 값 저장하기!
@@ -16,18 +18,20 @@ export async function POST({ request, cookies }) {
 
     let userInfo = {}
     try {
-        const getUserInfoQuery = "SELECT * FROM users WHERE id = ?";
-        const [getUserInfo] = await sql_con.promise().query(getUserInfoQuery, [id]);
 
-        if (getUserInfo.length === 0) {
-            return json({ message: '아이디가 존재하지 않습니다.' }, { status: 400 })
+
+        try {
+            const getUserRes = await axios.post(`${back_api}/auth/login_idchk`, {
+                id, password
+            })
+            userInfo = getUserRes.data.userInfo
+
+        } catch (error) {
+            return json({ message: error.response.data.message }, { status: 400 })
         }
-
-        userInfo = getUserInfo[0]
-        const isMatch = await bcrypt.compare(password, getUserInfo[0].password);
+        const isMatch = await bcrypt.compare(password, userInfo.password);
 
         if (isMatch) {
-
             const accessPayload = {
                 userId: userInfo.idx,
                 rate: userInfo.rate
@@ -40,18 +44,23 @@ export async function POST({ request, cookies }) {
             const accessToken = jwt.sign(accessPayload, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
             const refreshToken = jwt.sign(refreshPayload, REFRESH_TOKEN_SECRET, { expiresIn: '14d' });
 
-            const now = moment().format('YYYY-MM-DD HH:mm:ss')
-
             // 리프레쉬 토큰 / 마지막 접속 시간 업데이트
-            const refreshTokenUpdateQuery = `UPDATE users SET refresh_token = ?, connected_at = ? WHERE idx = ?`;
-            await sql_con.promise().query(refreshTokenUpdateQuery, [refreshToken, now, getUserInfo[0].idx]);
+
+            try {
+                const res = await axios.post(`${back_api}/auth/token_update`, {
+                    refreshToken,
+                    idx: userInfo.idx
+                })
+            } catch (error) {
+                return json({ message: error.response.data.message }, { status: 400 })
+            }
 
             cookies.set('access_token', accessToken, {
                 httpOnly: true,
                 secure: true,
                 path: '/',
-                maxAge: 60 * 15
-                // maxAge: 5
+                // maxAge: 60 * 15
+                maxAge: 5
             });
 
             cookies.set('refresh_token', refreshToken, {
@@ -72,8 +81,8 @@ export async function POST({ request, cookies }) {
 }
 
 
-/* 
-1. 아이디 비번 체크 후 액세스토큰 / 리프레쉬토큰 생성
-2. 다 같이 idx값 저장후 액세스토큰은 쿠키에 / 리프레쉬토큰은 DB에 저장
-3. payload 에서는 userId 값이 들어감 (DB의 idx 값임)
-*/
+// /*
+// 1. 아이디 비번 체크 후 액세스토큰 / 리프레쉬토큰 생성
+// 2. 다 같이 idx값 저장후 액세스토큰은 쿠키에 / 리프레쉬토큰은 DB에 저장
+// 3. payload 에서는 userId 값이 들어감 (DB의 idx 값임)
+// */

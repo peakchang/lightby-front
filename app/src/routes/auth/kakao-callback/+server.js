@@ -4,6 +4,8 @@ import { getQueryStr } from "$lib/server/lib";
 import jwt from 'jsonwebtoken';
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '$env/static/private';
 import moment from "moment-timezone";
+import axios from "axios";
+import { back_api } from "$lib/const.js";
 
 
 /*
@@ -18,12 +20,19 @@ export async function POST({ request, cookies }) {
     let userId = "";
 
     try {
-        const insertSnsUserQuery = `INSERT INTO users (${queryStr.str}) VALUES (${queryStr.question})`;
-        const [result] = await sql_con.promise().query(insertSnsUserQuery, queryStr.values);
 
-        userId = result.insertId
+
+
+        const res = await axios.post(`${back_api}/auth/kakao_join`, {
+            query_str: queryStr.str,
+            query_question: queryStr.question,
+            query_values: queryStr.values
+        })
+
+        userId = res.data.insertId
         const payload = {
-            userId
+            userId,
+            rate: 5
         }
 
         // 토큰 생성!
@@ -31,10 +40,12 @@ export async function POST({ request, cookies }) {
         const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET, { expiresIn: '14d' });
 
 
-        const now = moment().format('YYYY-MM-DD HH:mm:ss')
-        const tokenUpdateQuery = `UPDATE users SET refresh_token = ?, connected_at = ? WHERE idx = ?`;
-        const [insertInfo] = await sql_con.promise().query(tokenUpdateQuery, [refreshToken, now, result.insertId]);
-        
+        const resTokenUpdate = await axios.post(`${back_api}/auth/kakao_token_update`, {
+            refreshToken,
+            idx: userId
+        })
+
+
         cookies.set('access_token', accessToken, {
             httpOnly: true,
             secure: true,

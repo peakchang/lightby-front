@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { sql_con } from "$lib/server/db";
 import { KAKAO_RESTAPI, KAKAO_REDIRECT_URI, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '$env/static/private';
 import moment from 'moment-timezone';
+import { back_api } from '$lib/const.js';
 
 // KAKAO 콜백 처리될때 아이디 있으면 쿠키에 JWT 인증 넣고 리턴~ (JWT 값에는 DB ID 값만 넣기)
 
@@ -66,8 +67,11 @@ export async function load({ params, url, cookies }) {
 
 
         // 해당 유저 정보로 DB에 있는지 (기존 가입 유저인지) 체크
-        const getUserInfoQuery = "SELECT * FROM users WHERE sns_id = ?";
-        const [getUserInfo] = await sql_con.promise().query(getUserInfoQuery, [kakaoUserInfo.id]);
+
+        const res = await axios.post(`${back_api}/auth/kakao_id_chk`, { sns_id: kakaoUserInfo.id })
+
+        const getUserInfo = res.data.getUserInfo
+
 
         if (getUserInfo.length > 0) {
 
@@ -87,18 +91,16 @@ export async function load({ params, url, cookies }) {
                 const accessToken = jwt.sign(accessPayload, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
                 const refreshToken = jwt.sign(refreshPayload, REFRESH_TOKEN_SECRET, { expiresIn: '14d' });
 
-
-
                 data.loginStatus = true;
 
                 const options = {
                     expiresIn: '7d',
                 }
 
-                const now = moment().format('YYYY-MM-DD HH:mm:ss')
-
-                const tokenUpdateQuery = `UPDATE users SET refresh_token = ?, connected_at = ? WHERE idx = ?`;
-                await sql_con.promise().query(tokenUpdateQuery, [refreshToken, now, userInfo.idx]);
+                const resTokenUpdate = await axios.post(`${back_api}/auth/kakao_token_update`, {
+                    refreshToken,
+                    idx: userInfo.idx
+                })
 
                 cookies.set('access_token', accessToken, {
                     httpOnly: true,
@@ -119,14 +121,14 @@ export async function load({ params, url, cookies }) {
 
         } else {
 
-
-
-
-
-
             // 닉네임 중복 체크
-            const nickChkQuery = "SELECT * FROM users WHERE nickname = ?";
-            const [nickChk] = await sql_con.promise().query(nickChkQuery, [kakaoUserInfo.kakao_account.profile.nickname]);
+
+            const res = await axios.post(`${back_api}/auth/kakao_nickname_duplicatechk`, {
+                nickname: kakaoUserInfo.kakao_account.profile.nickname
+            })
+
+
+            const nickChk = res.data.nickChk
             if (nickChk.length == 0) {
                 data.userInfo.nickname = kakaoUserInfo.kakao_account.profile.nickname
             }

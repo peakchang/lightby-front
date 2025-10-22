@@ -83,7 +83,7 @@
         if (type == "nickname") {
             if (nickname) {
                 try {
-                    const res = await axios.post(`/auth/duplicate_chk`, {
+                    const res = await axios.post(`${back_api}/auth/duplicate_chk`, {
                         type,
                         value: nickname,
                     });
@@ -97,7 +97,7 @@
         } else {
             if (phone) {
                 try {
-                    const res = await axios.post(`/auth/duplicate_chk`, {
+                    const res = await axios.post(`${back_api}/auth/duplicate_chk`, {
                         type,
                         value: removeSpecialCharactersAndSpaces(phone),
                     });

@@ -62,8 +62,6 @@
 
     $effect(() => {
         console.log($scrollY);
-        
-        
         if ($scrollY != 0) {
             // 스크롤 조금이라도 움직이면 hidden 해제!
             showBool = false;
@@ -103,7 +101,7 @@
 
 <!-- <svelte:window bind:scrollY={y} /> -->
 <div
-    class="fixed top-0 left-0 w-full z-50 paperlogy slide-menu"
+    class="fixed top-0 left-0 w-full z-50 slide-menu"
     class:hidden={showBool}
     class:show={!headerShowBool}
 >
@@ -112,7 +110,7 @@
     </div>
 </div>
 <!-- svelte-ignore event_directive_deprecated -->
-<div class="fixed bottom-0 left-0 w-full z-20 paperlogy">
+<div class="fixed bottom-0 left-0 w-full z-20">
     <div class="max-w-[530px] mx-auto">
         <div
             class="flex gap-2 justify-center bg-white pt-3 pb-3 border-t border-gray-200"

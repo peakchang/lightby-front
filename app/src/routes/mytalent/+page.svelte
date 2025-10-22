@@ -282,7 +282,7 @@
 <!-- svelte-ignore a11y_consider_explicit_label -->
 <!-- svelte-ignore event_directive_deprecated -->
 <div class="bg-white relative min-h-screen">
-    <div class="max-w-[530px] mx-auto paperlogy pt-14 pb-24 px-4 md:px-0">
+    <div class="max-w-[530px] mx-auto suit-font pt-14 pb-24 px-4 md:px-0">
         <div class="text-center mb-10">
             <p>📝 프로필을 작성해 주세요.</p>
             <p>😄 시행사 · 대행사 · 본부장 · 팀장님께서 ⚡</p>

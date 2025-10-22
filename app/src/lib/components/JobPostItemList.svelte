@@ -55,7 +55,8 @@
     }
 
     function handleImageError() {
-        imgError = true;
+        // imgError = true;
+        this.src = "/alt_image.jpg";
     }
 
     function isNumeric(str) {

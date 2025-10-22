@@ -14,7 +14,7 @@
 <!-- svelte-ignore a11y_consider_explicit_label -->
 
 
-<div class="bg-white relative min-h-screen paperlogy">
+<div class="bg-white relative min-h-screen suit-font">
     <div class="max-w-[530px] mx-auto pb-16">
         {@render children()}
     </div>

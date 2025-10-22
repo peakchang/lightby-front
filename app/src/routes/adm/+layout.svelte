@@ -15,9 +15,9 @@
     onMount(() => {
 
         console.log($user_info);
-        if(!$user_info || Number($user_info.rate) < 3){
-            goto('/')
-        }
+        // if(!$user_info || Number($user_info.rate) < 3){
+        //     goto('/')
+        // }
         
         $pageScrollStatus = false; // 페이지 시작시 최상위
     });
@@ -81,6 +81,10 @@
 
         <a href="/adm/info" onclick={moveAdmMenu}>
             <div class="p-2 rounded-lg hover:bg-gray-200">기타 정보</div>
+        </a>
+
+        <a href="/adm/count" onclick={moveAdmMenu}>
+            <div class="p-2 rounded-lg hover:bg-gray-200">방문자수</div>
         </a>
     </div>
 {/if}

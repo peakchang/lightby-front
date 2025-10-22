@@ -11,6 +11,7 @@
         loadingStore,
         viewLimitAlertModal,
     } from "$lib/stores/stores";
+
     import { fetchRequest } from "$lib/lib";
 
     let { children, data } = $props();
@@ -189,7 +190,7 @@
 </CustomModal>
 
 <div
-    class="fixed top-0 left-1/2 max-w-[640px] w-full -translate-x-1/2 bg-white py-3 px-3 paperlogy z-40 rounded-b-md"
+    class="fixed top-0 left-1/2 max-w-[640px] w-full -translate-x-1/2 bg-white py-3 px-3 z-40 rounded-b-md suit-font"
     style="box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);"
 >
     <div class="flex justify-between items-center">
@@ -242,7 +243,7 @@
     </div>
 </div>
 
-<div class="paperlogy">
+<div class="suit-font">
     {@render children()}
 
     <div class="border-t border-gray-400 mt-8 pb-4"></div>
@@ -274,7 +275,7 @@
     </div>
 </div>
 
-<div class="fixed left-0 bottom-0 w-full paperlogy z-40">
+<div class="fixed left-0 bottom-0 w-full suit-font z-40">
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
     <!-- svelte-ignore event_directive_deprecated -->

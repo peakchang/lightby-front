@@ -2,6 +2,8 @@ import { sql_con } from '$lib/server/db'
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '$env/static/private';
 import jwt from 'jsonwebtoken';
 import moment from 'moment-timezone';
+import axios from 'axios';
+import { back_api } from '$lib/const';
 
 export async function handle({ event, resolve }) {
 
@@ -11,50 +13,38 @@ export async function handle({ event, resolve }) {
     const accessToken = event.cookies.get('access_token');
     const refreshToken = event.cookies.get('refresh_token');
 
-
-    // 기본 초기화~
+    // 기본값 초기화
     let userInfo = {}
 
-
-    try {
-        if (accessToken) {
-            const payload = jwt.verify(accessToken, ACCESS_TOKEN_SECRET)
-            console.log(payload);
-
-            userInfo = { idx: payload.userId, rate: payload.rate };
-            // 액세스 토큰 정상이면 바로 리턴 처리~
-            event.locals.userInfo = userInfo;
-            const res = await resolve(event); // 요청 처리
-            return res;
-
-        }
-    } catch (error) {
-    }
-
-    // 액세스 토큰으로 처리 안되었다면 리프레쉬 토큰으로 액세스 토큰 재발급 하기~
-    if (refreshToken) {
+    if (accessToken) {
 
         try {
-            const refreshPayload = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
-            const getUserInfoQuery = "SELECT * FROM users WHERE idx = ?";
-            const [userInfoRow] = await sql_con.promise().query(getUserInfoQuery, [refreshPayload.userId]);
+            const resUserInfo = await axios.post(`${back_api}/auth/access_hook_chk`, {
+                accessToken
+            })
+            userInfo = { idx: resUserInfo.data.userId, rate: resUserInfo.data.rate }
+        } catch (error) {
 
-            const now = moment().format('YYYY-MM-DD HH:mm:ss')
-            const updateLastConnectQuery = "UPDATE users SET connected_at = ? WHERE idx = ?"
-            await sql_con.promise().query(updateLastConnectQuery, [now, userInfoRow[0]['idx']]);
+        }
 
 
-            // userInfoRow.length 가 0 이면 아이디가 없는것 / 토큰 불일치 하면 다시 로그인 하라고 리턴처리
-            if (userInfoRow.length == 0 || userInfoRow[0].refresh_token != refreshToken) {
 
-                event.cookies.delete('access_token', { path: '/' });
-                event.cookies.delete('refresh_token', { path: '/' });
+        event.locals.userInfo = userInfo;
+        const res = await resolve(event); // 요청 처리
+        return res;
 
-                event.locals.userInfo = {};
-                return await resolve(event);
-            }
-            const newAccessToken = jwt.sign({ userId: userInfoRow[0].idx, rate: userInfoRow[0].rate }, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+    } else if (refreshToken) {
+        try {
+            let userInfoRow = {}
+            const payload = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
+            const res = await axios.post(`${back_api}/auth/refresh_hook_chk`, {
+                idx: payload.userId,
+                refreshToken
+            })
+            userInfoRow = res.data.userInfoRow
+            const newAccessToken = jwt.sign({ userId: userInfoRow.idx, rate: userInfoRow.rate }, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
 
+            // 새로운 액세스 토큰 발급
             event.cookies.set('access_token', newAccessToken, {
                 httpOnly: true,
                 secure: true,
@@ -63,15 +53,35 @@ export async function handle({ event, resolve }) {
                 // maxAge: 5
             });
 
-            userInfo = { idx: userInfoRow[0].idx, rate: userInfoRow[0].rate };
+            // 리프레쉬토큰 기존 그대로 기간 연장
+            cookies.set('refresh_token', refreshToken, {
+                httpOnly: true,
+                secure: true,
+                path: '/',
+                maxAge: 60 * 60 * 24 * 14
+            });
+
+            userInfo = { idx: userInfoRow.idx, rate: userInfoRow.rate };
             event.locals.userInfo = userInfo;
-        } catch (err) {
-            // console.error(err.message);
-            // 와중에 에러나면 그냥 토큰 다 날리기~
-            event.cookies.delete('access_token', { path: '/' });
-            event.cookies.delete('refresh_token', { path: '/' });
+
+
+        } catch (error) {
+
+            console.error(error.message);
+
+            if (error.message != "cookies is not defined") {
+                event.cookies.delete('access_token', { path: '/' });
+                event.cookies.delete('refresh_token', { path: '/' });
+
+                event.locals.userInfo = {};
+                return await resolve(event);
+            }
+
+
+
         }
     }
+
     const res = await resolve(event); // 요청 처리
 
     return res;
