@@ -63,6 +63,10 @@ export const load = async ({ locals, request, cookies }) => {
 
     }
 
+    console.log('+layout.server.js!!!');
+    console.log(locals.userInfo);
+
+
     return {
         // 이건 회원 정보 넘겨주기!!
         user: locals.userInfo

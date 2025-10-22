@@ -33,7 +33,9 @@ export async function handle({ event, resolve }) {
 
         }
 
-
+        console.log('hook access toss info!!');
+        console.log(userInfo);
+        
 
         event.locals.userInfo = userInfo;
         const res = await resolve(event); // 요청 처리
@@ -67,7 +69,11 @@ export async function handle({ event, resolve }) {
                 maxAge: 60 * 60 * 24 * 14
             });
 
+            console.log('hook toss info!!');
+            
             userInfo = { idx: userInfoRow.idx, rate: userInfoRow.rate };
+            console.log(userInfo);
+            
             event.locals.userInfo = userInfo;
 
 
