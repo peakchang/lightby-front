@@ -110,7 +110,14 @@ export function getRemainingDaysPlusOne(dateStr) {
 
 
 
-
+// 랜덤 값 구하기! (isInteger 가 true 면 정수 / false면 실수 (0.0))
+export function getRandomBetween(min, max, isInteger = true) {
+    if (isInteger) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    } else {
+        return Math.random() * (max - min) + min;
+    }
+}
 
 // 메인 / 수수료인증 게시판에서 클릭시 조회수 증가 시키는 함수!
 export async function raiseViewCount(table, idx) {
