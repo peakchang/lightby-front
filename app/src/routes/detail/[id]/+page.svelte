@@ -13,9 +13,7 @@
     import {
         favorateBool,
         user_info,
-        pageScrollStatus,
         toastStore,
-        scrollVal,
         scrollY
     } from "$lib/stores/stores.js";
 
@@ -36,9 +34,7 @@
     let alertModalBool = $state(false);
 
     onMount(() => {
-        console.log($scrollVal);
 
-        $pageScrollStatus = false; // 페이지 시작시 최상위
 
         $favorateBool = data.favorateBool;
 

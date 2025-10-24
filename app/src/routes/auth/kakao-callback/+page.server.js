@@ -152,7 +152,6 @@ export async function load({ params, url, cookies }) {
     } catch (error) {
         console.error(error.message);
     }
-
-
+    
     return data
 }
