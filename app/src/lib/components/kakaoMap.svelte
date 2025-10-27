@@ -1,4 +1,6 @@
 <script>
+    import { onMount } from "svelte";
+    import { browser } from "$app/environment";
     let {
         getAddress,
         phText = "여기여기",
@@ -6,29 +8,37 @@
         tudeAct,
     } = $props();
 
-    let kakao;
-    let kakaomapArea = $state({});
+    onMount(() => {
+        console.log("gogogo");
 
-    $effect(() => {
-        kakao = window.kakao;
-        kakaomapArea = document.querySelector("#map-area");
-        createMap();
-    });
+        if (!browser) return;
 
-    async function createMap() {
-        if (getAddress) {
-            kakao.maps.load(() => {
+        const KAKAO_JS_KEY = import.meta.env.VITE_KAKAO_JS;
+
+        // 카카오맵 스크립트 로드
+        const script = document.createElement("script");
+        script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_JS_KEY}&libraries=services&autoload=false`;
+        script.async = true;
+
+        script.onload = () => {
+            window.kakao.maps.load(() => {
+                // 지도 옵션
                 var options = {
                     center: new kakao.maps.LatLng(33.450701, 126.570667),
                     level: 3,
                 };
 
-                var map = new kakao.maps.Map(kakaomapArea, options);
+                console.log(window.kakao.maps);
 
-                // 주소-좌표 변환 객체를 생성합니다
-                var geocoder = new kakao.maps.services.Geocoder();
+                const mapContainer = document.querySelector(".map-container");
+                console.log(mapContainer);
 
-                // 주소로 좌표를 검색합니다
+                // 지도 생성
+                const map = new window.kakao.maps.Map(mapContainer, options);
+
+                const geocoder = new window.kakao.maps.services.Geocoder();
+                console.log(getAddress);
+
                 geocoder.addressSearch(getAddress, function (result, status) {
                     // 정상적으로 검색이 완료됐으면
                     if (status === kakao.maps.services.Status.OK) {
@@ -63,17 +73,18 @@
                     }
                 });
             });
-        }
-    }
-</script>
+        };
 
-<svelte:head>
-    <script
-        type="text/javascript"
-        defer
-        src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=72689d54e68abd94260d9284c64d7545&libraries=services&autoload=false`}
-    ></script>
-</svelte:head>
+        document.head.appendChild(script);
+
+        // 클린업
+        return () => {
+            if (script.parentNode) {
+                script.parentNode.removeChild(script);
+            }
+        };
+    });
+</script>
 
 {#if getAddress}
     <!-- svelte-ignore element_invalid_self_closing_tag -->

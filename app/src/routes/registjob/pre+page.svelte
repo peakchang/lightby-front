@@ -3,7 +3,7 @@
     import PageHeader from "$lib/components/PageHeader.svelte";
     import QuestionItem from "$lib/components/QuestionItem.svelte";
     import SortableImg from "$lib/components/SortableImg.svelte";
-    import KakaoMap from "$lib/components/kakaoMap.svelte";
+    import KakaoMap from "$lib/components/kakaoMap_pre.svelte";
     import CustomModal from "$lib/components/CustomModal.svelte";
     import Toast from "$lib/components/Toast.svelte";
     import { user_info, all_data } from "$lib/stores/stores";

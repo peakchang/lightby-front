@@ -68,6 +68,7 @@
     $effect(() => {});
 </script>
 
+<!-- svelte-ignore a11y_missing_attribute -->
 <svelte:head>
     <script
         type="text/javascript"

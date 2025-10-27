@@ -6,7 +6,7 @@
     import PageHeader from "$lib/components/PageHeader.svelte";
     import QuestionItem from "$lib/components/QuestionItem.svelte";
     import SortableImg from "$lib/components/SortableImg.svelte";
-    import KakaoMap from "$lib/components/kakaoMap.svelte";
+    import KakaoMap from "$lib/components/kakaoMap_pre.svelte";
     import CustomModal from "$lib/components/CustomModal.svelte";
 
     import { onDestroy, onMount, tick } from "svelte";

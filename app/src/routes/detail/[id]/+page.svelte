@@ -1,7 +1,7 @@
 <script>
     import axios from "axios";
 
-    import KakaoMap from "$lib/components/kakaoMap.svelte";
+    import KakaoMap from "$lib/components/kakaoMap_pre.svelte";
     import DetailMenu from "$lib/components/DetailMenu.svelte";
     import CustomModal from "$lib/components/CustomModal.svelte";
 
@@ -60,7 +60,6 @@
     });
 
     $effect(() => {
-        console.log($scrollY);
         if ($scrollY != 0) {
             // 스크롤 조금이라도 움직이면 hidden 해제!
             showBool = false;

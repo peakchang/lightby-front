@@ -71,10 +71,6 @@
     //     }
     // });
     onMount(() => {
-        console.log($scrollVal);
-
-        console.log($main_list["premium"]);
-
         $pageScrollStatus = true; // 페이지 진입시 저장된 스크롤로 이동
 
         if (bannerList.length > 0) {
