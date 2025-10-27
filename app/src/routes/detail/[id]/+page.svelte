@@ -14,10 +14,11 @@
         favorateBool,
         user_info,
         toastStore,
-        scrollY
+        scrollY,
     } from "$lib/stores/stores.js";
 
     import { public_img_bucket, img_bucket, back_api } from "$lib/const";
+    import { formatPhoneNum } from "$lib/lib.js";
 
     let headerShowBool = $state(true); // 스크롤 내릴시 상단 메뉴 보이게 하기 위한 변수!
     let showBool = $state(true); // 처음 페이지 로딩시 위로 올라가는 잔상 없애기 위해!
@@ -25,6 +26,10 @@
     let { data } = $props();
 
     const detailContent = $derived(data.detail);
+    // svelte-ignore state_referenced_locally
+    const feeValue = /^[0-9]+$/.test(detailContent.fee)
+        ? Number(detailContent.fee).toLocaleString()
+        : `${detailContent.fee} 만`;
 
     let mainImage = $state([]);
     let shareModal = $state(false);
@@ -34,8 +39,6 @@
     let alertModalBool = $state(false);
 
     onMount(() => {
-
-
         $favorateBool = data.favorateBool;
 
         if (detailContent.imgs) {
@@ -270,7 +273,7 @@
         </div>
         <div class="mt-3">
             <span class="font-bold"> 전화번호&nbsp;:&nbsp;</span>
-            {detailContent.phone}
+            {formatPhoneNum(detailContent.phone)}
         </div>
         <div class="flex items-center gap-0.5 mt-5 text-sm">
             <svg
@@ -330,7 +333,7 @@
 
     <div class="my-3 font-semibold text-lg">급여 및 영업지원 정보</div>
     <div class="leading-loose">
-        <p>수수료 : {detailContent.fee_type} {detailContent.fee}</p>
+        <p>수수료 : {detailContent.fee_type} {feeValue}</p>
         <p>
             일비 : {detailContent.daily_expense
                 ? detailContent.daily_expense

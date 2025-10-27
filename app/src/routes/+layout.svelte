@@ -29,7 +29,7 @@
 
 	// 현재 경로에 따라 애니메이션 사용할지 결정
 	let useAnimation = $state(false);
-	let adminPage = $state(false);
+	let exceptionPage = $state(false);
 
 	// 전체 wrapper!!! 스크롤 때문에!!
 	let siteWrab = $derived({});
@@ -47,10 +47,14 @@
 				siteWrab.scrollTop = $scrollVal;
 			}
 
-			if ($page.url.pathname.includes("adm")) {
-				adminPage = true;
+			// 어드민 페이지 or iframe 을 위한 페이지일 경우 제외
+			if (
+				$page.url.pathname.includes("adm") ||
+				$page.url.pathname.includes("embed")
+			) {
+				exceptionPage = true;
 			} else {
-				adminPage = false;
+				exceptionPage = false;
 			}
 		}
 	});
@@ -161,7 +165,7 @@
 	<!-- <script src="https://developers.kakao.com/sdk/js/kakao.js"></script> -->
 </svelte:head>
 
-{#if adminPage}
+{#if exceptionPage}
 	{@render children()}
 {:else}
 	<!-- svelte-ignore event_directive_deprecated -->
