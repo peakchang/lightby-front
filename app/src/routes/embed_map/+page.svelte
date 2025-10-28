@@ -4,12 +4,13 @@
     import { browser } from "$app/environment";
 
 
-    let getAddress = $state("성주로 86-4");
-    let phText = $state("여기여기");
-    let height = $state("400px");
+    let getAddress = $state("");
+    let phText = $state("근무지");
+    let height = $state("500px");
 
     onMount(() => {
         if (!browser) return;
+        getAddress = $page.url.searchParams.get('address') || ""
 
         const KAKAO_JS_KEY = import.meta.env.VITE_KAKAO_JS;
 
@@ -29,6 +30,8 @@
 
                 // 지도 생성
                 const map = new window.kakao.maps.Map(mapContainer, options);
+
+                
                 const geocoder = new window.kakao.maps.services.Geocoder();
 
                 geocoder.addressSearch(getAddress, function (result, status) {
