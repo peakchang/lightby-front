@@ -70,6 +70,14 @@
 
 <!-- svelte-ignore a11y_missing_attribute -->
 <svelte:head>
+    <script
+        type="text/javascript"
+        defer
+        src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${import.meta.env.VITE_KAKAO_JS}&libraries=services&autoload=false`}
+    ></script>
+
+    <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+
     <!-- 메타 스크립트 -->
     <script>
         !(function (f, b, e, v, n, t, s) {
