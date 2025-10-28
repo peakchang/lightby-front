@@ -1,6 +1,8 @@
 <script>
+    import { page } from "$app/stores";
     import { onMount } from "svelte";
     import { browser } from "$app/environment";
+
 
     let getAddress = $state("성주로 86-4");
     let phText = $state("여기여기");
@@ -23,17 +25,11 @@
                     center: new kakao.maps.LatLng(33.450701, 126.570667),
                     level: 3,
                 };
-
-                console.log(window.kakao.maps);
-
                 const mapContainer = document.querySelector("#map-area");
-                console.log(mapContainer);
 
                 // 지도 생성
                 const map = new window.kakao.maps.Map(mapContainer, options);
-
                 const geocoder = new window.kakao.maps.services.Geocoder();
-                console.log(getAddress);
 
                 geocoder.addressSearch(getAddress, function (result, status) {
                     // 정상적으로 검색이 완료됐으면

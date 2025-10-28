@@ -136,11 +136,6 @@
 <!-- svelte-ignore event_directive_deprecated -->
 
 <svelte:head>
-	<script
-		type="text/javascript"
-		defer
-		src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${import.meta.env.VITE_KAKAO_JS}&libraries=services&autoload=false`}
-	></script>
 	<!-- Swiper JS -->
 	<script
 		src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"
