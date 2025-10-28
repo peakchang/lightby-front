@@ -6,7 +6,7 @@
 
     let getAddress = $state("");
     let phText = $state("근무지");
-    let height = $state("500px");
+    let height = $state("400px");
 
     onMount(() => {
         if (!browser) return;
