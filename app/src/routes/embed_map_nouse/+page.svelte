@@ -1,36 +1,32 @@
 <script>
-    import { page } from "$app/stores";
-    import { onMount } from "svelte";
-    import { browser } from "$app/environment";
-
-
     let getAddress = $state("성주로 86-4");
     let phText = $state("여기여기");
     let height = $state("400px");
+    let tudeAct = $state();
 
-    onMount(() => {
-        if (!browser) return;
+    let kakao;
+    let kakaomapArea = $state({});
 
-        const KAKAO_JS_KEY = import.meta.env.VITE_KAKAO_JS;
+    $effect(() => {
+        kakao = window.kakao;
+        kakaomapArea = document.querySelector("#map-area");
+        createMap();
+    });
 
-        // 카카오맵 스크립트 로드
-        const script = document.createElement("script");
-        script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_JS_KEY}&libraries=services&autoload=false`;
-        script.async = true;
-
-        script.onload = () => {
-            window.kakao.maps.load(() => {
-                // 지도 옵션
+    async function createMap() {
+        if (getAddress) {
+            kakao.maps.load(() => {
                 var options = {
                     center: new kakao.maps.LatLng(33.450701, 126.570667),
                     level: 3,
                 };
-                const mapContainer = document.querySelector("#map-area");
 
-                // 지도 생성
-                const map = new window.kakao.maps.Map(mapContainer, options);
-                const geocoder = new window.kakao.maps.services.Geocoder();
+                var map = new kakao.maps.Map(kakaomapArea, options);
 
+                // 주소-좌표 변환 객체를 생성합니다
+                var geocoder = new kakao.maps.services.Geocoder();
+
+                // 주소로 좌표를 검색합니다
                 geocoder.addressSearch(getAddress, function (result, status) {
                     // 정상적으로 검색이 완료됐으면
                     if (status === kakao.maps.services.Status.OK) {
@@ -65,23 +61,19 @@
                     }
                 });
             });
-        };
-
-        document.head.appendChild(script);
-
-        // 클린업
-        return () => {
-            if (script.parentNode) {
-                script.parentNode.removeChild(script);
-            }
-        };
-    });
+        }
+    }
 </script>
 
-<div class="">
+<svelte:head>
+    <script
+        type="text/javascript"
+        defer
+        src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${import.meta.env.VITE_KAKAO_JS}&libraries=services&autoload=false`}
+    ></script>
+</svelte:head>
+
+{#if getAddress}
     <!-- svelte-ignore element_invalid_self_closing_tag -->
     <div id="map-area" style="width:100%; height:{height}" />
-</div>
-
-<style>
-</style>
+{/if}
