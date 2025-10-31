@@ -11,14 +11,14 @@
 
 	import CustomModal from "$lib/components/CustomModal.svelte";
 	import PdButton from "$lib/components/PdButton.svelte";
-	import { goto } from "$app/navigation";
+	import { afterNavigate, beforeNavigate, goto } from "$app/navigation";
 
 	import {
 		toastStore,
 		viewLimitAlertModal,
 		loadingStore,
-		scrollY,
 		pageScrollStatus,
+		scrollY,
 		scrollVal,
 	} from "$lib/stores/stores";
 
@@ -39,14 +39,40 @@
 		localStorage.removeItem("search_val");
 	});
 
+	// 페이지 최초 진입시 $pageScrollStatus 에 따라 최상위 또는 마지막 스크롤 위치로!
+	afterNavigate((e) => {
+		if (!siteWrab) return;
+
+		try {
+			const from = e.from.route.id;
+			const to = e.to.route.id;
+			// 수수료 상세 제외 app 페이지 (하단 네비 메인 페이지) 끼리 이동시에는 최상위로 이동
+			if (from.includes("(app)") && to.includes("(app)")) {
+				if (
+					!from.includes("showfee/[id]") &&
+					!to.includes("showfee/[id]")
+				) {
+					$scrollVal = 0;
+				}
+			}
+		} catch (error) {}
+
+		if (!$pageScrollStatus) {
+			siteWrab.scrollTop = 0;
+		} else {
+			siteWrab.scrollTop = $scrollVal;
+		}
+	});
+
+	// $pageScrollStatus 가 true 일 경우 페이지 떠나기 전 스크롤 위치 저장
+	beforeNavigate((e) => {
+		if ($pageScrollStatus) {
+			$scrollVal = $scrollY;
+		}
+	});
+
 	$effect(() => {
 		if (siteWrab) {
-			if (!$pageScrollStatus) {
-				siteWrab.scrollTop = 0;
-			} else {
-				siteWrab.scrollTop = $scrollVal;
-			}
-
 			// 어드민 페이지 or iframe 을 위한 페이지일 경우 제외
 			if (
 				$page.url.pathname.includes("adm") ||
@@ -136,10 +162,6 @@
 <!-- svelte-ignore event_directive_deprecated -->
 
 <svelte:head>
-	<!-- Swiper JS -->
-	<script
-		src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"
-	></script>
 	<!-- Link Swiper's CSS -->
 	<link
 		rel="stylesheet"

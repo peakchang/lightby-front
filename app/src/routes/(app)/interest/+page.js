@@ -30,18 +30,17 @@ export const load = async ({ params, url, data }) => {
         type = "zzim"
     }
 
+    console.log(type);
+    
+
     if (tabNum != 2 && userId) {
         try {
             const res = await axios.post(`${back_api}/sitelist/get_interest_list`, { userId, type })
-
             console.log(res.data);
-
             interestStatus = res.data.interestStatus
             statusMessage = res.data.statusMessage
             postList = res.data.postList
             console.log(postList);
-            
-
         } catch (error) {
 
         }

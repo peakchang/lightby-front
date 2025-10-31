@@ -14,12 +14,10 @@
         favorateBool,
         user_info,
         toastStore,
-        scrollY,
-        pageScrollStatus,
+        scrollY
     } from "$lib/stores/stores.js";
 
     import { public_img_bucket, img_bucket, back_api } from "$lib/const";
-    import { formatPhoneNum } from "$lib/lib";
 
     let headerShowBool = $state(true); // 스크롤 내릴시 상단 메뉴 보이게 하기 위한 변수!
     let showBool = $state(true); // 처음 페이지 로딩시 위로 올라가는 잔상 없애기 위해!
@@ -28,99 +26,34 @@
 
     const detailContent = $derived(data.detail);
 
-    const imgList = data.detail.imgs ? data.detail.imgs.split(",") : "";
-    let mainImage = $state(imgList);
-
+    let mainImage = $state([]);
     let shareModal = $state(false);
 
-    let alertModalBool = $state(false);
-    let feeValue = $state("");
-
     let imgSwiper = $state({});
-    let swiperContainer = $derived({});
 
-    let swiper = $state({});
+    let alertModalBool = $state(false);
 
-    const slides = [
-        {
-            id: 1,
-            image: "https://picsum.photos/800/400?random=1",
-            title: "슬라이드 1",
-        },
-        {
-            id: 2,
-            image: "https://picsum.photos/800/400?random=2",
-            title: "슬라이드 2",
-        },
-        {
-            id: 3,
-            image: "https://picsum.photos/800/400?random=3",
-            title: "슬라이드 3",
-        },
-        {
-            id: 4,
-            image: "https://picsum.photos/800/400?random=4",
-            title: "슬라이드 4",
-        },
-    ];
+    onMount(() => {
 
-    onMount(async () => {
-        $pageScrollStatus = false;
 
         $favorateBool = data.favorateBool;
 
-        feeValue = /^[0-9]+$/.test(detailContent.fee)
-            ? Number(detailContent.fee).toLocaleString()
-            : `${detailContent.fee} 만`;
-
-        try {
-            const SwiperModule = await import(
-                "https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.mjs"
-            );
-            // 스와이퍼 셋팅
-            imgSwiper = new SwiperModule.default(swiperContainer, {
-                loop: true,
-                speed: 600,
-                navigation: {
-                    nextEl: ".swiper-button-next",
-                    prevEl: ".swiper-button-prev",
-                },
-                pagination: {
-                    el: ".swiper-pagination",
-                    clickable: true,
-                },
-                autoplay: {
-                    delay: 3000,
-                    disableOnInteraction: false,
-                },
-            });
-        } catch (error) {
-            console.error(error.message);
+        if (detailContent.imgs) {
+            mainImage = detailContent.imgs.split(",");
         }
 
-        // if (mainImage.length > 1) {
-        //     // 스와이퍼 셋팅
-        //     const SwiperModule = await import(
-        //         "https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.mjs"
-        //     );
-
-        //     imgSwiper = new SwiperModule.default(swiperContainer, {
-        //         loop: true,
-        //         speed: 600,
-        //         navigation: {
-        //             nextEl: ".swiper-button-next",
-        //             prevEl: ".swiper-button-prev",
-        //         },
-        //         pagination: {
-        //             el: ".swiper-pagination",
-        //             clickable: true,
-        //         },
-        //         autoplay: {
-        //             delay: 3000,
-        //             disableOnInteraction: false,
-        //         },
-        //     });
-        // }
+        // 스와이퍼 셋팅
+        imgSwiper = new Swiper(".mySwiper", {
+            loop: true,
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+            autoplay: {
+                delay: 2500,
+                disableOnInteraction: false,
+            },
+        });
     });
 
     $effect(() => {
@@ -312,16 +245,12 @@
             <img src={`${public_img_bucket}${mainImage[0]}`} alt="" />
         </div>
     {:else}
-        <div class="swiper" bind:this={swiperContainer}>
+        <div class="swiper mySwiper">
             <div class="swiper-wrapper items-center">
                 {#each mainImage as img, idx}
                     <div class="swiper-slide">
                         <div class=" img-area">
-                            <img
-                                src={`${public_img_bucket}${img}`}
-                                class="mx-auto"
-                                alt=""
-                            />
+                            <img src={`${public_img_bucket}${img}`} alt="" />
                         </div>
                     </div>
                 {/each}
@@ -341,7 +270,7 @@
         </div>
         <div class="mt-3">
             <span class="font-bold"> 전화번호&nbsp;:&nbsp;</span>
-            {formatPhoneNum(detailContent.phone)}
+            {detailContent.phone}
         </div>
         <div class="flex items-center gap-0.5 mt-5 text-sm">
             <svg
@@ -401,7 +330,7 @@
 
     <div class="my-3 font-semibold text-lg">급여 및 영업지원 정보</div>
     <div class="leading-loose">
-        <p>수수료 : {detailContent.fee_type} {feeValue}</p>
+        <p>수수료 : {detailContent.fee_type} {detailContent.fee}</p>
         <p>
             일비 : {detailContent.daily_expense
                 ? detailContent.daily_expense
@@ -486,26 +415,4 @@
     .slide-menu.show {
         transform: translateY(0);
     }
-
-    /* .swiper-button-next {
-        color: white;
-        background: rgba(0, 0, 0, 0.5);
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .swiper-button-prev {
-        color: white;
-        background: rgba(0, 0, 0, 0.5);
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    } */
 </style>

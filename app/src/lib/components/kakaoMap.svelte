@@ -7,10 +7,9 @@
         height = "400px",
         tudeAct,
     } = $props();
+    let mapStatus = $state(true);
 
     onMount(() => {
-        console.log("gogogo");
-
         if (!browser) return;
 
         const KAKAO_JS_KEY = import.meta.env.VITE_KAKAO_JS;
@@ -27,17 +26,12 @@
                     center: new kakao.maps.LatLng(33.450701, 126.570667),
                     level: 3,
                 };
-
-                console.log(window.kakao.maps);
-
-                const mapContainer = document.querySelector(".map-container");
-                console.log(mapContainer);
+                const mapContainer = document.querySelector("#map-area");
 
                 // 지도 생성
                 const map = new window.kakao.maps.Map(mapContainer, options);
 
                 const geocoder = new window.kakao.maps.services.Geocoder();
-                console.log(getAddress);
 
                 geocoder.addressSearch(getAddress, function (result, status) {
                     // 정상적으로 검색이 완료됐으면
@@ -86,7 +80,10 @@
     });
 </script>
 
-{#if getAddress}
+<div class="">
     <!-- svelte-ignore element_invalid_self_closing_tag -->
     <div id="map-area" style="width:100%; height:{height}" />
-{/if}
+</div>
+
+<style>
+</style>

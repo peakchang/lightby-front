@@ -33,6 +33,7 @@
 		"mysql2": "^3.14.1",
 		"sortablejs": "^1.15.6",
 		"svelte-apexcharts": "^1.0.2",
+		"swiper": "^12.0.3",
 		"tailwindcss": "^4.1.7"
 	},
 	"description": "Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).",

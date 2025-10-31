@@ -22,14 +22,6 @@
 
 
     // 하단 메인 메뉴 내 페이지들 끼리는 무조건 최상단에 위치! ($scrollVal 을 0으로 초기화)
-    afterNavigate((e) => {
-        if (e.from && e.from.route.id.includes("(app)")) {
-            if (!e.from.route.id.includes("showfee")) {
-                $scrollVal = 0;
-            }
-        }
-    });
-
     onMount((e) => {
         $pageScrollStatus = true; // 페이지 진입시 저장된 스크롤로 이동
     });

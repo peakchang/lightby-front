@@ -25,8 +25,6 @@
         search_val,
         main_list,
         prev,
-        scrollY,
-        scrollVal,
         pageScrollStatus,
     } from "$lib/stores/stores.js";
 
@@ -62,14 +60,6 @@
         data.baseEnv.banner_links ? data.baseEnv.banner_links.split(",") : [],
     );
 
-    // 하단 메인 메뉴 내 페이지들 끼리는 무조건 최상단에 위치! ($scrollVal 을 0으로 초기화)
-    // afterNavigate((e) => {
-    //     if (e.from && e.from.route.id.includes("(app)")) {
-    //         console.log('혹시?');
-
-    //         $scrollVal = 0; // 페이지 진입시 스크롤 위치 초기화
-    //     }
-    // });
     onMount(() => {
         $pageScrollStatus = true; // 페이지 진입시 저장된 스크롤로 이동
 
@@ -84,10 +74,6 @@
     });
 
     $effect(() => {
-        if ($scrollY) {
-            $scrollVal = $scrollY; // 현재 스크롤 위치 저장 (페이지 벗어 날 때 까지 유지)
-        }
-
         // 추후 스크롤 내리면서 로딩 시 적용 시키기!!!
         // if (data.currentStatus == "premium") {
         //     $main_list["premium"] = data.mainList;
