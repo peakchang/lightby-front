@@ -12,7 +12,11 @@
         back_api,
     } from "$lib/const.js";
 
-    import { user_info, toastStore, pageScrollStatus } from "$lib/stores/stores";
+    import {
+        user_info,
+        toastStore,
+        pageScrollStatus,
+    } from "$lib/stores/stores";
 
     let { data } = $props();
 
@@ -30,7 +34,7 @@
     let lastData = $state("");
     onMount(() => {
         $pageScrollStatus = false; // 최상위 고정
-        
+
         userInfo = data.userInfo;
         if (userInfo.interest) {
             const interestJson = JSON.parse(userInfo.interest);
@@ -338,17 +342,20 @@
 
         <div class="mt-3 bg-white p-5 rounded-lg">
             <div class="flex gap-3">
-                <button
-                    class="btn btn-outline w-1/2 border-gray-500 text-gray-500"
-                    >로그아웃</button
-                >
+                <button class="btn btn-outline border-gray-500 text-gray-500 w-1/3">
+                    로그아웃
+                </button>
 
                 <a href="/faq" class="w-full">
                     <button
-                        class="btn btn-outline w-full border-gray-500 text-gray-500"
+                        class="btn btn-outline border-gray-500 text-gray-500 w-full"
                     >
                         고객센터
                     </button>
+                </a>
+
+                <a href="/auth/withdrawal" class="w-full">
+                    <button class="btn btn-error w-full text-white">회원 탈퇴</button>
                 </a>
             </div>
         </div>
