@@ -40,6 +40,19 @@ export function getCookieValue(name) {
     return null;
 }
 
+
+export function formatToManWon(value) {
+    if (value == null || value === '') return '';
+
+    const num = Number(value);
+    if (isNaN(num)) return '';
+
+    const manWon = num >= 10000 ? num / 10000 : num;
+    return `${manWon.toLocaleString()}만원`;
+}
+
+
+
 // axios 요청 시 살짝 지연을 주기위해 setTimeout 에 들어갈 랜덤값 구하는 함수!
 export function getRandBet(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;

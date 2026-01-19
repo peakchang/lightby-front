@@ -8,7 +8,7 @@
         viewLimitAlertModal,
         main_list,
     } from "$lib/stores/stores";
-    import { raiseViewCount } from "$lib/lib";
+    import { raiseViewCount, formatToManWon } from "$lib/lib";
     import { onMount } from "svelte";
     let { type } = $props();
     let imgError = $state(false);
@@ -137,8 +137,8 @@
                                 <span class="font-semibold text-blue-500">
                                     {value.fee_type}
                                     {isNumeric(value.fee)
-                                        ? Number(value.fee).toLocaleString()
-                                        : value.fee}원
+                                        ? formatToManWon(value.fee)
+                                        : ` ${value.fee} 원`}
                                 </span>
                             </div>
 

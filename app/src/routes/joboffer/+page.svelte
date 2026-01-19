@@ -1409,13 +1409,13 @@
                             placeholder="숫자만 입력해주세요"
                             class="input input-bordered input-info w-full bg-white"
                         />
-                        <div class=" w-12">원</div>
+                        <div class=" w-12">만 원</div>
                     </div>
                 </div>
 
                 <div class="text-xs text-right mt-1 text-green-700">
                     <p>
-                        수수료는 구인글 메인에 노출됩니다. 정확하게 입력해주시면
+                        수수료는 만 원 단위로, 구인글 메인에 노출됩니다. 정확하게 입력해주시면
                     </p>
                     <p>더 많은 사람들이 회원님의 공고를 확인하게 됩니다.</p>
                 </div>
