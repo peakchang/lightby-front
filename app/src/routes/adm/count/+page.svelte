@@ -3,6 +3,7 @@
     import moment from "moment-timezone";
     import { setParams } from "$lib/lib";
     import { page } from "$app/stores";
+    import { invalidateAll } from "$app/navigation";
 
     let { data } = $props();
 
@@ -12,15 +13,22 @@
 
     onMount(() => {
         const today = moment().format("YYYY-MM-DD");
-        const startDateValue = moment().startOf('month').format("YYYY-MM-DD");
+        const startDateValue = moment().startOf("month").format("YYYY-MM-DD");
         startDate = $page.url.searchParams.get("start") || startDateValue;
         endDate = $page.url.searchParams.get("end") || today;
-        count_list = data.countList || [];
     });
 
     function dateSubmit(e) {
         setParams({ start: startDate, end: endDate }, true);
     }
+
+    function setSearchDate() {
+        invalidateAll();
+    }
+
+    $effect(() => {
+        count_list = data.countList || [];
+    });
 </script>
 
 <div class="max-w-4xl mx-auto p-6 antialiased">
@@ -53,6 +61,7 @@
             </div>
             <button
                 class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-md shadow-emerald-100 flex items-center gap-2"
+                on:click={setSearchDate}
             >
                 <i class="fa fa-search"></i> 조회
             </button>
