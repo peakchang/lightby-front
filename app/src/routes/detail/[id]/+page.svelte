@@ -1,5 +1,5 @@
 <script>
-    import DetailView from "$lib/components/page/DetailView.svelte";
+    import DetailView from "$lib/components/page/Detailview.svelte";
     let { data } = $props();
     console.log(data);
     
