@@ -17,13 +17,11 @@ export const load = async ({ locals, request, cookies, fetch, url }) => {
     // 1. 브라우저가 보낸 원래 User-Agent 가져오기
     const userAgent = request.headers.get('user-agent') || '';
     console.log(userAgent);
-    
 
     // 2. 사용자의 원래 IP 가져오기 (SvelteKit 환경)
     // Cloudflare나 프록시 환경에 따라 다를 수 있으나 보통 아래와 같습니다.
     const clientIp = request.headers.get('x-forwarded-for') || '0.0.0.0';
     console.log(clientIp);
-    
 
     if (!visitCookie) {
 
@@ -33,7 +31,10 @@ export const load = async ({ locals, request, cookies, fetch, url }) => {
             // 백엔드 API 호출 (POST 방식)
             await fetch(`${back_api}/record_visit`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json', 'x-forwarded-for': clientIp,
+                    'user-agent': userAgent
+                },
                 body: JSON.stringify({
                     path: url.pathname,
                     referer: referer // 유입경로 추가
