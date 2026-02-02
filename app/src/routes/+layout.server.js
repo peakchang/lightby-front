@@ -14,17 +14,18 @@ export const load = async ({ locals, request, cookies, fetch, url }) => {
     const visitCookie = cookies.get('visit');
     console.log(visitCookie);
 
-    // 1. 브라우저가 보낸 원래 User-Agent 가져오기
-    const userAgent = request.headers.get('user-agent') || '';
-    console.log(userAgent);
 
-    // 2. 사용자의 원래 IP 가져오기 (SvelteKit 환경)
-    // Cloudflare나 프록시 환경에 따라 다를 수 있으나 보통 아래와 같습니다.
-    const clientIp = request.headers.get('x-forwarded-for') || '0.0.0.0';
-    console.log(clientIp);
 
     if (!visitCookie) {
 
+        // 1. 브라우저가 보낸 원래 User-Agent 가져오기
+        const userAgent = request.headers.get('user-agent') || '';
+        console.log(userAgent);
+
+        // 2. 사용자의 원래 IP 가져오기 (SvelteKit 환경)
+        // Cloudflare나 프록시 환경에 따라 다를 수 있으나 보통 아래와 같습니다.
+        const clientIp = request.headers.get('x-forwarded-for') || '0.0.0.0';
+        console.log(clientIp);
         const referer = request.headers.get('referer') || 'direct';
 
         try {
@@ -32,12 +33,14 @@ export const load = async ({ locals, request, cookies, fetch, url }) => {
             await fetch(`${back_api}/record_visit`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json', 'x-forwarded-for': clientIp,
-                    'user-agent': userAgent
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     path: url.pathname,
-                    referer: referer // 유입경로 추가
+                    referer: referer, // 유입경로 추가,
+                    clientIp: clientIp, // 아이피 값
+                    clientUA: userAgent // User-Agent
+
                 })
             });
 
