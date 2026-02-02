@@ -1113,6 +1113,8 @@
 <PageHeader />
 
 <!-- svelte-ignore event_directive_deprecated -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="bg-white relative min-h-screen suit-font">
     <div class="max-w-[530px] mx-auto pt-14 pb-24">
         <!-- <button on:click={testFunc}> testBtn </button> -->
@@ -1415,7 +1417,8 @@
 
                 <div class="text-xs text-right mt-1 text-green-700">
                     <p>
-                        수수료는 만 원 단위로, 구인글 메인에 노출됩니다. 정확하게 입력해주시면
+                        수수료는 만 원 단위로, 구인글 메인에 노출됩니다.
+                        정확하게 입력해주시면
                     </p>
                     <p>더 많은 사람들이 회원님의 공고를 확인하게 됩니다.</p>
                 </div>

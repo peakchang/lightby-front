@@ -8,7 +8,8 @@ import moment from "moment-timezone";
 export const load = async ({ params, url, data }) => {
 
     const today = moment().format("YYYY-MM-DD");
-    let start = url.searchParams.get('start') ? url.searchParams.get('start') : today;
+    const startDateValue = moment().startOf('month').format("YYYY-MM-DD");
+    let start = url.searchParams.get('start') ? url.searchParams.get('start') : startDateValue;
     let end = url.searchParams.get('end') ? url.searchParams.get('end') : today;
 
     let countList = [];
@@ -16,6 +17,9 @@ export const load = async ({ params, url, data }) => {
     try {
         const res = await axios.post(`${back_api}/adm_users/get_counter`, { start, end })
         countList = res.data.countList
+
+        console.log(countList);
+        
 
 
     } catch (err) {

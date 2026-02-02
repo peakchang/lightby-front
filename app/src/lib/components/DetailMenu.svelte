@@ -9,9 +9,10 @@
     import { goto } from "$app/navigation";
     import { prev } from "$lib/stores/stores";
 
-    let { favorateShow = true, shareShow = true, openShareModal } = $props();
+    let { favorateShow = true, shareShow = true } = $props();
 
     let notLoginAlertModal = $state(false);
+    let shareModal = $state(false);
 
     async function favorateAct() {
         if (!$user_info.idx) {
@@ -47,7 +48,52 @@
             console.log(err.response.data.message);
         }
     }
+
+    function openShareModal() {
+        shareModal = true;
+    }
 </script>
+
+<!-- svelte-ignore event_directive_deprecated -->
+<CustomModal bind:visible={shareModal}>
+    <div class="flex justify-center items-center gap-3">
+        <button
+            class="border border-gray-400 p-2 rounded-md text-gray-600 cursor-pointer"
+            on:click={() => {
+                navigator.clipboard
+                    .writeText($page.url.href)
+                    .then(() =>
+                        toastStore.set({
+                            show: true,
+                            message: "주소가 복사되었습니다",
+                            color: "#53C14B",
+                        }),
+                    )
+                    .catch((err) =>
+                        toastStore.set({
+                            show: true,
+                            message: "주소 복사에 실패 했습니다.",
+                            color: "#53C14B",
+                        }),
+                    );
+            }}
+        >
+            <div>
+                <i class="fa fa-link" aria-hidden="true"></i>
+            </div>
+            <div class="text-xs md:text-sm">주소복사</div>
+        </button>
+
+        <!-- <button
+            class="border border-gray-400 p-2 rounded-md text-gray-600 cursor-pointer bg-yellow-400"
+        >
+            <div class="flex justify-center items-center">
+                <img src="/kakao_logo.png" alt="" width="23" height="23" />
+            </div>
+            <div class="text-xs md:text-sm">카카오톡</div>
+        </button> -->
+    </div>
+</CustomModal>
 
 <CustomModal bind:visible={notLoginAlertModal} closeBtn={false}>
     <div class="text-center">

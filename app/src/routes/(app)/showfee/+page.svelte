@@ -1,10 +1,9 @@
 <script>
-    import { afterNavigate, beforeNavigate, goto } from "$app/navigation";
+    import { goto } from "$app/navigation";
     import moment from "moment-timezone";
-    
     import { raiseViewCount } from "$lib/lib.js";
-    import { browser } from "$app/environment";
     import { onMount } from "svelte";
+    import { public_img_bucket } from "$lib/const"; // 이미지 버킷 경로 필요
 
     import {
         prev,
@@ -20,82 +19,143 @@
     let boardList = $state([]);
     boardList = data.boardList;
 
-
-    // 하단 메인 메뉴 내 페이지들 끼리는 무조건 최상단에 위치! ($scrollVal 을 0으로 초기화)
-    onMount((e) => {
-        $pageScrollStatus = true; // 페이지 진입시 저장된 스크롤로 이동
+    onMount(() => {
+        $pageScrollStatus = true;
     });
 
     $effect(() => {
         if ($scrollY) {
-            $scrollVal = $scrollY; // 현재 스크롤 위치 저장 (페이지 벗어 날 때 까지 유지)
+            $scrollVal = $scrollY;
         }
     });
+
+    function handleDetail(boardData) {
+        // 비회원 조회수 제한
+        if (!$user_info.idx) {
+            if ($nonMemberViewLimitNum > 3) {
+                $viewLimitAlertModal = true;
+                return;
+            }
+            $nonMemberViewLimitNum = $nonMemberViewLimitNum + 1;
+        }
+
+        raiseViewCount("board_fee", boardData.idx);
+        $prev = "/showfee";
+        goto(`/showfee/${boardData.idx}`);
+    }
 </script>
 
-<!-- svelte-ignore a11y_click_events_have_key_events -->
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<!-- svelte-ignore event_directive_deprecated -->
-<div class="pt-20 pb-32 px-3">
-    {#each boardList as boardData}
-        <div
-            class="border-b py-5 px-3 border-gray-300 cursor-pointer"
-            on:click={() => {
-                // 비회원 조회수 제한!!
-                if (!$user_info.idx) {
-                    if ($nonMemberViewLimitNum > 3) {
-                        $viewLimitAlertModal = true;
-                        return;
-                    }
-                    $nonMemberViewLimitNum = $nonMemberViewLimitNum + 1;
-                }
+<div class="bg-gray-50 min-h-screen pt-20 pb-32 px-4">
+    <div class="max-w-2xl mx-auto space-y-4">
+        {#each boardList as boardData}
+            {@const images = boardData.imgs ? boardData.imgs.split(",") : []}
 
-                raiseViewCount("board_fee", boardData.idx);
-                $prev = "/showfee";
-                goto(`/showfee/${boardData.idx}`);
-            }}
-        >
-            <div class="mt-1 font-semibold">
-                {boardData.subject}
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <!-- svelte-ignore event_directive_deprecated -->
+            <div
+                class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 cursor-pointer
+                       transition-all active:scale-[0.98] hover:shadow-md"
+                on:click={() => handleDetail(boardData)}
+            >
+                <div class="flex gap-4">
+                    <div class="flex-1 min-w-0">
+                        <div
+                            class="text-[17px] font-bold text-gray-900 leading-snug mb-1 ellipsis-1"
+                        >
+                            {boardData.subject}
+                        </div>
+                        <div
+                            class="text-sm text-gray-500 ellipsis-2 mb-3 leading-relaxed"
+                        >
+                            {boardData.content}
+                        </div>
+                    </div>
+
+                    {#if images.length > 0}
+                        <div class="flex-shrink-0">
+                            <div
+                                class="relative w-20 h-20 md:w-24 md:h-24 overflow-hidden rounded-xl bg-gray-100 border border-gray-50"
+                            >
+                                <img
+                                    src="{public_img_bucket}{images[0]}"
+                                    alt="thumbnail"
+                                    class="thumb-img"
+                                    loading="lazy"
+                                />
+                                {#if images.length > 1}
+                                    <div
+                                        class="absolute bottom-1 right-1 bg-black/60 backdrop-blur-md text-white text-[10px] px-1.5 py-0.5 rounded-md font-medium"
+                                    >
+                                        +{images.length - 1}
+                                    </div>
+                                {/if}
+                            </div>
+                        </div>
+                    {/if}
+                </div>
+
+                <div
+                    class="flex items-center justify-between pt-3 mt-1 border-t border-gray-50"
+                >
+                    <div class="flex items-center gap-2">
+                        <div
+                            class="w-6 h-6 bg-sky-100 rounded-full flex items-center justify-center"
+                        >
+                            <i class="fa fa-user text-[10px] text-sky-500"></i>
+                        </div>
+                        <span class="text-xs font-medium text-gray-700"
+                            >{boardData.nickname}</span
+                        >
+                        <span class="text-[10px] text-gray-300">•</span>
+                        <span class="text-[11px] text-gray-400"
+                            >{moment(boardData.created_at).fromNow()}</span
+                        >
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-1 text-rose-400">
+                            <i class="fa fa-heart-o text-xs"></i>
+                            <span class="text-xs font-semibold"
+                                >{boardData.post_likes}</span
+                            >
+                        </div>
+                        <div class="flex items-center gap-1 text-sky-400">
+                            <i class="fa fa-commenting-o text-xs"></i>
+                            <span class="text-xs font-semibold"
+                                >{boardData.reply_count}</span
+                            >
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="mt-1 ellipsis whitespace-pre-wrap">
-                {boardData.content}
-            </div>
-            <div class=" mt-3 flex justify-end flex-wrap items-center">
-                <span class="text-xs md:text-sm">{boardData.nickname}</span>
-                <span class="mx-1.5">|</span>
-                <span class="flex items-center gap-1 text-sm">
-                    <i class="fa fa-heart-o" aria-hidden="true"></i>
-                    <span
-                        class="px-1.5 py-0.5 rounded-full text-[10px] md:text-xs"
-                    >
-                        {boardData.post_likes}
-                    </span>
-                </span>
-                <span class="mx-1">|</span>
-
-                <span class="flex items-center gap-1 text-sm">
-                    <i class="fa fa-commenting text-gray-500" aria-hidden="true"
-                    ></i>
-                    <span
-                        class="px-2 py-0.5 rounded-full text-[10px] md:text-xs"
-                    >
-                        {boardData.reply_count}
-                    </span>
-                </span>
-
-                <span class="mx-1">|</span>
-
-                <span class="text-xs md:text-sm">
-                    {moment(boardData.created_at).format("YY/MM/DD HH:mm")}
-                </span>
-            </div>
-        </div>
-    {/each}
+        {/each}
+    </div>
 </div>
 
 <style>
-    .ellipsis {
+    /* 깨짐 방지 및 고화질 렌더링 스타일 */
+    .thumb-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* 비율 유지하며 꽉 채움 */
+        object-position: center;
+
+        /* 이미지가 깨져 보일 때 도움이 되는 속성들 */
+        image-rendering: -webkit-optimize-contrast; /* 선명도 우선 렌더링 */
+        transform: translateZ(0); /* 하드웨어 가속 사용 */
+        backface-visibility: hidden;
+    }
+    /* 제목 1줄 제한 */
+    .ellipsis-1 {
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    /* 본문 2줄 제한 */
+    .ellipsis-2 {
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
