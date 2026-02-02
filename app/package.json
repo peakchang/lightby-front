@@ -21,7 +21,7 @@
 	"dependencies": {
 		"@sveltejs/adapter-node": "^5.2.12",
 		"@tailwindcss/vite": "^4.1.7",
-		"apexcharts": "^5.3.5",
+		"apexcharts": "^5.3.6",
 		"axios": "^1.9.0",
 		"bcrypt": "^6.0.0",
 		"browser-image-compression": "^2.0.2",

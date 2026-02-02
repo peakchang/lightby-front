@@ -14,7 +14,7 @@
 
     onMount(() => {
 
-        console.log($user_info);
+        // console.log($user_info);
         // if(!$user_info || Number($user_info.rate) < 3){
         //     goto('/')
         // }

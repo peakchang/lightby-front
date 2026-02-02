@@ -35,7 +35,6 @@
 	let siteWrab = $derived({});
 
 	onMount(() => {
-		console.log(siteWrab);
 		localStorage.removeItem("search_val");
 	});
 

@@ -9,39 +9,40 @@ import axios from 'axios';
 
 
 // hooks.server.js 에서 받아온 유저 정보 +layout.js 로 넘기기 위한 중간 단계
-export const load = async ({ locals, request, cookies }) => {
+export const load = async ({ locals, request, cookies, fetch, url }) => {
 
-    const visitCookie = cookies.get('visit', { path: '/' })
+    const visitCookie = cookies.get('visit');
+    console.log(visitCookie);
+    
+    if (!visitCookie) {
+        
+        const referer = request.headers.get('referer') || 'direct';
 
-    // 쿠키 설정이 안되어 있으면 작업 GO!!
-    if (!visitCookie || visitCookie != 'true') {
-        console.log('기존 DB 없으면 insert! 있으면 update! 가짜 카운트랑 진짜 카운트!');
         try {
-            const res = await axios.get(`${back_api}/insert_n_update_count`)
-        } catch (error) {
+            // 백엔드 API 호출 (POST 방식)
+            await fetch(`${back_api}/record_visit`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    path: url.pathname,
+                    referer: referer // 유입경로 추가
+                })
+            });
 
-        }
+            // 자정까지만 유지되는 쿠키 설정
+            const midnight = new Date();
+            midnight.setHours(24, 0, 0, 0);
 
-        // 작업 후에는 쿠키 설정 해주기!
-        const now = new Date();
-        const midnight = new Date(now);
-        midnight.setHours(24, 0, 0, 0); // 자정 = 오늘 24:00:00.000
-        cookies.set('visit', 'true', {
-            expires: midnight,
-            httpOnly: true,
-            secure: true,
-            path: '/',
-        });
-    } else {
-        console.log('쿠키 설정 되어 있으면 fake_count 만 업데이트!!');
-        try {
-            const res = await axios.get(`${back_api}/update_count`)
+            cookies.set('visit', 'true', {
+                expires: midnight,
+                httpOnly: true,
+                secure: true,
+                path: '/',
+            });
         } catch (error) {
+            console.error('Visit Record Error:', error);
         }
     }
-
-    console.log('+layout.server.js!!!');
-    console.log(locals.userInfo);
 
 
     return {
