@@ -317,7 +317,7 @@
                     class="w-full text-left p-2 rounded-xl font-medium transition-all
                     {$sort_val === opt.value
                         ? 'bg-cyan-50 text-cyan-600 ring-1 ring-cyan-100'
-                        : 'bg-white text-gray-600 border border-gray-100'}"
+                        : 'bg-white text-gray-600'}"
                     on:click={() => selectSort(opt)}
                 >
                     {opt.name}
