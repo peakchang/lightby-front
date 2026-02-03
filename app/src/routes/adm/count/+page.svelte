@@ -72,8 +72,26 @@
     function dateSubmit() {
         setParams({ start: startDate, end: endDate }, true);
     }
+
+    const getPageList = (current, total) => {
+        const range = 4; // 현재 페이지 앞뒤로 몇 개 보여줄지
+        let start = Math.max(1, current - range);
+        let end = Math.min(total, current + range);
+
+        let pages = [];
+        for (let i = start; i <= end; i++) {
+            pages.push(i);
+        }
+        return pages;
+    };
+
+    function goToPage(p) {
+        setParams({ page: p }, true);
+    }
 </script>
 
+<!-- svelte-ignore event_directive_deprecated -->
+<!-- svelte-ignore a11y_consider_explicit_label -->
 <div class="max-w-5xl mx-auto p-4 antialiased pb-20">
     <div
         class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8"
@@ -183,17 +201,92 @@
                                 >
                             </td>
                             <td
-                                class="px-6 py-4 text-gray-500 truncate max-w-[150px]"
-                                >{log.referer}</td
+                                class="px-6 py-4 text-gray-500 relative group cursor-help"
                             >
+                                <div class="truncate max-w-[150px]">
+                                    {log.referer}
+                                </div>
+
+                                <div
+                                    class="absolute invisible group-hover:visible bottom-full left-0 mb-2 z-50
+                bg-gray-800 text-white text-xs rounded-lg p-3 w-max max-w-sm
+                shadow-xl break-all whitespace-normal pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                    <div
+                                        class="font-bold mb-1 text-emerald-400 border-b border-gray-600 pb-1"
+                                    >
+                                        전체 URL
+                                    </div>
+                                    {log.referer}
+                                    <div
+                                        class="absolute top-full left-4 -mt-1 border-4 border-transparent border-t-gray-800"
+                                    ></div>
+                                </div>
+                            </td>
                             <td
-                                class="px-6 py-4 text-gray-400 truncate max-w-[200px]"
-                                >{log.user_agent}</td
+                                class="px-6 py-4 text-gray-400 relative group cursor-help"
                             >
+                                <div class="truncate max-w-[200px]">
+                                    {log.user_agent}
+                                </div>
+
+                                <div
+                                    class="absolute invisible group-hover:visible bottom-full left-0 mb-2 z-9999
+                bg-gray-800 text-white text-xs rounded-lg p-3 w-max max-w-sm
+                shadow-xl break-all whitespace-normal pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                    <div
+                                        class="font-bold mb-1 text-blue-400 border-b border-gray-600 pb-1"
+                                    >
+                                        User Agent 상세
+                                    </div>
+                                    {log.user_agent}
+                                    <div
+                                        class="absolute top-full left-4 -mt-1 border-4 border-transparent border-t-gray-800"
+                                    ></div>
+                                </div>
+                            </td>
                         </tr>
                     {/each}
                 </tbody>
             </table>
         </div>
+    </div>
+
+    <div class="mt-10">
+        <h3 class="text-lg font-bold text-gray-800 mb-4 px-2">
+            실시간 상세 로그
+        </h3>
+        {#if data.totalPage > 1}
+            <div class="flex justify-center items-center gap-2 mt-8 pb-10">
+                <button
+                    class="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30"
+                    disabled={data.currentPage <= 1}
+                    on:click={() => goToPage(data.currentPage - 1)}
+                >
+                    <i class="fa fa-chevron-left"></i>
+                </button>
+
+                {#each getPageList(data.currentPage, data.totalPage) as pageNum}
+                    <button
+                        class="w-10 h-10 rounded-xl text-sm font-bold transition-all {data.currentPage ===
+                        pageNum
+                            ? 'bg-emerald-500 text-white shadow-md shadow-emerald-100'
+                            : 'text-gray-400 hover:bg-gray-100'}"
+                        on:click={() => goToPage(pageNum)}
+                    >
+                        {pageNum}
+                    </button>
+                {/each}
+
+                <button
+                    class="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30"
+                    disabled={data.currentPage >= data.totalPage}
+                    on:click={() => goToPage(data.currentPage + 1)}
+                >
+                    <i class="fa fa-chevron-right"></i>
+                </button>
+            </div>
+        {/if}
     </div>
 </div>

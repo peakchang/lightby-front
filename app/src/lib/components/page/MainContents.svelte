@@ -1,5 +1,7 @@
 <script>
     /* 기존 import 및 로직 유지 */
+    import { fly, fade } from "svelte/transition";
+    import { cubicOut } from "svelte/easing";
     import { untrack, onMount, onDestroy } from "svelte";
     import { invalidateAll } from "$app/navigation";
     import { page } from "$app/stores";
@@ -8,6 +10,7 @@
         search_val,
         loadingStore,
         main_list,
+        sort_val,
         pageScrollStatus,
     } from "$lib/stores/stores.js";
 
@@ -21,13 +24,25 @@
     let bannerInterval;
     let nowBannerIdx = $state(0);
 
-    let activeSort = $state("default"); // 기본순: default, 최신순: latest, 조회순: views, 기간: period
+    // 필터 관련
+    let showFilter = $state(false);
     const sortOptions = [
-        { id: "default", label: "기본순", icon: "fa-th-large" },
-        { id: "latest", label: "최신등록순", icon: "fa-clock-o" },
-        { id: "views", label: "조회많은순", icon: "fa-eye" },
-        { id: "period", label: "모집기간순", icon: "fa-calendar" },
+        { name: "기본순", value: "base" },
+        { name: "수수료 높은순", value: "high_fee" },
+        { name: "최신등록순", value: "latest" },
+        { name: "조회많은순", value: "popular" },
     ];
+
+    function selectSort(opt) {
+        $sort_val = opt.value;
+        showFilter = false;
+        console.log($sort_val);
+        sessionStorage.setItem("sort_val", $sort_val);
+        invalidateAll();
+        $loadingStore = true;
+
+        // 여기서 정렬 로직 실행 (invalidateAll 등)
+    }
 
     const bannerList = $derived(
         data.baseEnv?.banners ? data.baseEnv.banners.split(",") : [],
@@ -49,7 +64,7 @@
 
     function searchFunc() {
         sessionStorage.setItem("search_val", $search_val);
-        if (!$search_val.trim()) return;
+        // if (!$search_val.trim()) return;
 
         if (!mainSearchHistory.includes($search_val)) {
             mainSearchHistory.unshift($search_val);
@@ -73,6 +88,8 @@
 </script>
 
 <!-- svelte-ignore a11y_consider_explicit_label -->
+<!-- svelte-ignore event_directive_deprecated -->
+<!-- svelte-ignore slot_element_deprecated -->
 <div class="{containerClass} mx-auto pt-6 pb-20 antialiased">
     <div class="mb-1 px-2 relative">
         <!-- svelte-ignore event_directive_deprecated -->
@@ -114,6 +131,20 @@
                         <i class="fa fa-times-circle text-gray-400"></i>
                     </button>
                 {/if}
+
+                <div class="w-[1px] h-4 bg-gray-200 mx-1"></div>
+                <button
+                    type="button"
+                    class="pl-2 pr-1 py-1 text-gray-500 hover:text-cyan-500 transition-colors flex justify-center items-center gap-1 flex-shrink-0"
+                    on:click={() => (showFilter = true)}
+                >
+                    <span
+                        class="text-[12px] whitespace-nowrap tracking-tighter"
+                    >
+                        필터
+                    </span>
+                    <i class="fa fa-filter text-xs"></i>
+                </button>
             </div>
         </form>
 
@@ -128,6 +159,7 @@
                         class="text-xs font-bold text-gray-400 uppercase tracking-wider"
                         >최근 검색어</span
                     >
+
                     <button
                         class="text-[10px] text-gray-300 hover:text-gray-500"
                         on:click={() => {
@@ -152,29 +184,6 @@
                 </div>
             </div>
         {/if}
-    </div>
-
-    <div class="px-4 mb-4 overflow-x-auto no-scrollbar">
-        <div class="flex items-center gap-1 whitespace-nowrap py-2">
-            {#each sortOptions as option}
-                <button
-                    on:click={() => (activeSort = option.id)}
-                    class="flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all duration-200 text-xs font-medium
-                {activeSort === option.id
-                        ? 'bg-cyan-500 border-cyan-500 text-white shadow-md shadow-cyan-100'
-                        : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'}"
-                >
-                    <i class="fa {option.icon} text-xs"></i>
-                    {option.label}
-                </button>
-            {/each}
-
-            <div class="w-px h-4 bg-gray-200 mx-1"></div>
-
-            <button class="p-2 text-gray-400 hover:text-cyan-500">
-                <i class="fa fa-sliders text-lg"></i>
-            </button>
-        </div>
     </div>
 
     {#if bannerList.length > 0}
@@ -279,6 +288,44 @@
         {/each}
     </div>
 </div>
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<!-- svelte-ignore event_directive_deprecated -->
+{#if showFilter}
+    <div
+        class="fixed inset-0 bg-black/60 z-[99]"
+        transition:fade={{ duration: 200 }}
+        on:click={() => (showFilter = false)}
+    ></div>
+
+    <div
+        class="fixed bottom-0 left-0 right-0 bg-white rounded-t-[2rem] z-[100] p-6 shadow-2xl"
+        transition:fly={{ y: 500, duration: 400, easing: cubicOut }}
+    >
+        <div
+            class="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-6"
+            on:click={() => (showFilter = false)}
+        ></div>
+
+        <h3 class="text-base font-bold text-gray-900 mb-5 text-center">
+            정렬 옵션
+        </h3>
+
+        <div class="grid grid-cols-1 gap-2 overflow-auto text-sm">
+            {#each sortOptions as opt}
+                <button
+                    class="w-full text-left p-2 rounded-xl font-medium transition-all
+                    {$sort_val === opt.value
+                        ? 'bg-cyan-50 text-cyan-600 ring-1 ring-cyan-100'
+                        : 'bg-white text-gray-600 border border-gray-100'}"
+                    on:click={() => selectSort(opt)}
+                >
+                    {opt.name}
+                </button>
+            {/each}
+        </div>
+    </div>
+{/if}
 
 <style>
     /* 스무스한 폰트 렌더링 */
@@ -289,5 +336,18 @@
     /* 배너 애니메이션 느낌을 위한 미세 조정 */
     img {
         -webkit-user-drag: none;
+    }
+
+    /* 바텀 시트 애니메이션 보조 */
+    .translate-y-full {
+        transform: translateY(100%);
+    }
+    .translate-y-0 {
+        transform: translateY(0);
+    }
+
+    /* 배경 스크롤 방지 (필요시) */
+    :global(body.modal-open) {
+        overflow: hidden;
     }
 </style>

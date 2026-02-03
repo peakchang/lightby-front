@@ -1,6 +1,6 @@
 import { back_api, public_img_bucket } from "$lib/const.js";
 import { user_info } from "$lib/stores/stores.js";
-import { main_location, search_val, main_list } from "$lib/stores/stores.js";
+import { main_location, search_val, main_list, sort_val } from "$lib/stores/stores.js";
 import axios from "axios";
 import { browser } from "$app/environment";
 
@@ -9,12 +9,16 @@ export const load = async ({ params, url, data }) => {
 
     // 메인에 노출될 사이트 리스트 불러오기
 
-    let mainLocation = "" // 
-    let searchVal = ""
+    let mainLocation = ""; // 
+    let searchVal = "";
+    let sortVal = "";
+
     if (browser) {
         mainLocation = sessionStorage.getItem("location");
         searchVal = sessionStorage.getItem("search_val");
-        
+        sortVal = sessionStorage.getItem("sort_val");
+
+
         // F5 할때를 대비해서!!!
         if (searchVal) {
             search_val.set(searchVal)
@@ -26,6 +30,12 @@ export const load = async ({ params, url, data }) => {
             main_location.set(mainLocation)
         } else {
             main_location.set("전국")
+        }
+
+        if (sortVal) {
+            sort_val.set(sortVal)
+        } else {
+            sort_val.set("base")
         }
     }
 
@@ -46,9 +56,9 @@ export const load = async ({ params, url, data }) => {
 
 
     try {
-        const res = await axios.post(`${back_api}/sitelist/load_site_list`, { mainLocation, searchVal })
+        const res = await axios.post(`${back_api}/sitelist/load_site_list`, { mainLocation, searchVal, sortVal })
 
-        
+
         main_list.set({
             premium: shuffleArray(res.data.premiumList),
             top: shuffleArray(res.data.topList),
