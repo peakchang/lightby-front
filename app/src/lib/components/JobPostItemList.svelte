@@ -55,7 +55,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <!-- svelte-ignore event_directive_deprecated -->
-<div class="flex flex-col gap-3 px-3 py-2">
+<div class="flex flex-col gap-3 py-2">
     {#each postList as value}
         <div
             class="group bg-white rounded-xl p-3 shadow-sm

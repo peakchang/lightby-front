@@ -232,7 +232,7 @@
         <slot name="location" />
     </div>
 
-    <div class="px-4 space-y-12">
+    <div class="space-y-12">
         {#each ["premium", "top", "free"] as type}
             {#if $main_list[type].length > 0}
                 <div class="{type}-section">
