@@ -106,35 +106,84 @@
             {/if}
         {/if}
     {:else}
-        <div class="pt-40 text-center">
-            <div class=" text-green-700 text-4xl">
-                <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
-            </div>
-            <div class="text-xl font-bold mt-5">
-                로그인이 필요한 페이지 입니다.
-            </div>
-            <div class="text-sm mt-5">
-                <p>관심현장은 로그인 후,</p>
-                <p>마이페이지에서 지역 설정을 하시거나</p>
-                <p>상세페이지에서 찜한 목록이 표시됩니다.</p>
-            </div>
-            <div class="mt-5">
-                <a
-                    href="/auth/login"
-                    on:click|preventDefault={() => {
-                        goto(`/auth/login?path=${$page.url.pathname}`);
-                    }}
+        <div
+            class="flex flex-col items-center justify-center pt-32 px-6 suit-font"
+        >
+            <div class="relative flex items-center justify-center mb-8">
+                <div
+                    class="absolute w-24 h-24 bg-blue-50 rounded-full animate-pulse"
+                ></div>
+                <div
+                    class="relative w-20 h-20 bg-white shadow-xl shadow-blue-100 rounded-3xl flex items-center justify-center border border-blue-50"
                 >
-                    <button class="btn btn-info btn-lg w-1/3 text-white">
-                        로그인하기
-                    </button>
-                </a>
+                    <i
+                        class="fa fa-user-circle-o text-4xl text-blue-500"
+                        aria-hidden="true"
+                    ></i>
+                </div>
+                <div
+                    class="absolute -top-1 -right-1 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center border-4 border-white shadow-sm"
+                >
+                    <i class="fa fa-lock text-white text-[10px]"></i>
+                </div>
+            </div>
+
+            <div class="text-center mb-10">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">
+                    로그인이 필요한 페이지입니다
+                </h2>
+
+                <div
+                    class="text-[15px] text-gray-500 leading-relaxed space-y-1"
+                >
+                    <p>관심 지역 설정과 찜한 목록은</p>
+                    <p>
+                        <span class="text-blue-600 font-semibold text-sm"
+                            >마이페이지</span
+                        >에서 지역을 설정하시거나
+                    </p>
+                    <p>
+                        상세페이지에서 <span
+                            class="text-pink-500 font-semibold text-sm">❤️</span
+                        >를 눌러 추가해 보세요.
+                    </p>
+                </div>
+            </div>
+
+            <div class="w-full max-w-[280px]">
+                <button
+                    class="w-full py-4 bg-blue-600 hover:bg-blue-700 active:scale-[0.98]
+                   text-white font-bold rounded-2xl shadow-lg shadow-blue-100 transition-all text-lg"
+                    on:click={() =>
+                        goto(`/auth/login?path=${$page.url.pathname}`)}
+                >
+                    로그인하기
+                </button>
             </div>
         </div>
     {/if}
 </div>
 
 <style>
+    /* 배경 애니메이션 (은은하게 퍼지는 효과) */
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+            opacity: 0.5;
+        }
+        50% {
+            transform: scale(1.2);
+            opacity: 0.3;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 0.5;
+        }
+    }
+    .animate-pulse {
+        animation: pulse 3s infinite ease-in-out;
+    }
+
     .tab-area {
         display: flex;
         justify-content: center;

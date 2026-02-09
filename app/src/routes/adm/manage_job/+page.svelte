@@ -186,7 +186,7 @@
                         {val.user_phone ? formatPhoneNum(val.user_phone) : ""}
                     </td>
                     <td>
-                        {moment.utc(val.created_at).format("YY/MM/DD HH:mm")}
+                        {moment(val.created_at).format("YY/MM/DD HH:mm")}
                     </td>
 
                     <td>

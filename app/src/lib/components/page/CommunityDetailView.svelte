@@ -21,6 +21,8 @@
 
     let { detailData, isApp = false } = $props();
 
+    console.log(detailData);
+
     let postItem = $state(detailData.postItem || {});
     let replyList = $state(detailData.replyList || []);
     let likeCount = $state(detailData.likeCount || 0);
@@ -147,17 +149,37 @@
                     <div
                         class="w-10 h-10 bg-gradient-to-br from-gray-200 to-gray-100 rounded-full flex items-center justify-center text-gray-400"
                     >
-                        <i class="fa fa-user"></i>
+                        {#if postItem.is_anonymous}
+                            <i class="fa fa-user text-[10px] text-sky-500"></i>
+                        {:else if postItem.profile_thumbnail}
+                            <img
+                                src={postItem.profile_thumbnail}
+                                alt="profile"
+                                class="w-full h-full object-cover"
+                            />
+                        {:else if postItem.profile_image}
+                            <img
+                                src={`${public_img_bucket}${postItem.profile_image}`}
+                                alt="profile"
+                                class="w-full h-full object-cover"
+                            />
+                        {:else}
+                            <i class="fa fa-user text-[10px] text-sky-500"></i>
+                        {/if}
                     </div>
                     <div class="flex flex-col">
-                        <span class="text-sm font-bold text-gray-800"
-                            >{postItem.nickname}</span
-                        >
-                        <span class="text-[11px] text-gray-400 font-medium"
-                            >{moment(postItem.created_at).format(
+                        <span class="text-sm font-bold text-gray-800">
+                            {#if postItem.is_anonymous}
+                                익명
+                            {:else}
+                                {postItem.nickname}
+                            {/if}
+                        </span>
+                        <span class="text-[11px] text-gray-400 font-medium">
+                            {moment(postItem.created_at).format(
                                 "YYYY.MM.DD HH:mm",
-                            )}</span
-                        >
+                            )}
+                        </span>
                     </div>
                 </div>
                 <div class="flex items-center gap-4 text-gray-400">

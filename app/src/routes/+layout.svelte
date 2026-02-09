@@ -94,9 +94,10 @@
 		"auth/manage",
 		"showfee/",
 		"simplewrite",
-		"test/t1",
 		"joboffer",
 		"faq",
+		"mytalent",
+		"manage_board",
 	];
 
 	const unsubscribe = page.subscribe(($page) => {
@@ -109,26 +110,47 @@
 </script>
 
 <CustomModal bind:visible={$viewLimitAlertModal} closeBtn={false}>
-	<div class="text-center">
-		<div class=" text-green-700 text-3xl mb-2">
-			<i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+	<div
+		class="max-w-sm mx-auto p-8 bg-white rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-50 text-center suit-font"
+	>
+		<div class="relative inline-flex mb-6">
+			<div
+				class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center relative z-10"
+			>
+				<i class="fa fa-file-text-o text-2xl" aria-hidden="true"></i>
+			</div>
+			<div
+				class="absolute -bottom-1 -right-1 w-7 h-7 bg-white rounded-full flex items-center justify-center shadow-sm z-20"
+			>
+				<i class="fa fa-lock text-blue-600 text-sm"></i>
+			</div>
 		</div>
-		<div class="mb-5">
-			<p>게시물을 더 확인 하시려면 로그인이 필요합니다.</p>
-			<p>로그인 하시겠습니까?</p>
+
+		<h3 class="text-xl font-bold text-gray-900 mb-3 tracking-tight">
+			잠깐! 로그인이 필요해요
+		</h3>
+		<div class="text-gray-500 text-[15px] leading-relaxed mb-8">
+			<p>게시물의 상세 내용을 더 확인하시려면</p>
+			<p>로그인이 완료되어야 합니다.</p>
 		</div>
-		<div class="flex justify-center gap-3">
-			<!-- svelte-ignore event_directive_deprecated -->
+
+		<div class="space-y-3">
 			<button
-				class="btn btn-info text-white w-1/3"
-				on:click={() => {
-					goto("/auth/login");
-				}}
+				class="w-full py-4 bg-blue-600 hover:bg-blue-700 active:scale-[0.98]
+                   text-white font-bold rounded-2xl shadow-lg shadow-blue-100 transition-all"
+				on:click={() => goto("/auth/login")}
 			>
 				로그인 바로가기
 			</button>
 
-			<button class="btn btn-soft w-1/3">닫기</button>
+			<button
+				class="w-full py-3 text-gray-400 hover:text-gray-600 font-medium rounded-xl transition-colors text-sm"
+				on:click={() => {
+					/* 닫기 로직 */
+				}}
+			>
+				나중에 볼게요
+			</button>
 		</div>
 	</div>
 </CustomModal>
@@ -284,5 +306,38 @@
 
 	:global(#toast) {
 		transition: opacity 0.5s ease-in-out;
+	}
+
+	:global(.base-input) {
+		width: 100%;
+		background-color: #f8fafc;
+		color: #1e293b;
+		border: 1px solid #e2e8f0;
+		border-radius: 0.75rem;
+		font-size: 14px;
+		padding: 1rem 1.25rem;
+
+		/* 그림자 수정: 아래쪽으로 2px 정도 은은하게 깔리는 스타일 */
+		box-shadow:
+			0 2px 4px rgba(0, 0, 0, 0.04),
+			0 1px 1px rgba(0, 0, 0, 0.01);
+
+		transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+		outline: none;
+	}
+
+	:global(.base-input:focus) {
+		border-color: #60a5fa;
+		background-color: #ffffff;
+		/* 포커스 시에는 그림자 대신 블루 광채(ring)로 강조 */
+		box-shadow: 0 0 0 4px #eff6ff;
+		/* 살짝 위로 들리는 느낌을 주고 싶다면 아래 주석 해제 */
+		/* transform: translateY(-1px); */
+	}
+
+	/* Placeholder 스타일 (선택사항) */
+
+	:global(.base-input::placeholder) {
+		color: #94a3b8; /* slate-400 가독성 좋음 */
 	}
 </style>

@@ -171,7 +171,7 @@
 
             try {
                 const res = await axios.post(
-                    `${back_api}/adm_etc/upload_talent_include_image`,
+                    `${back_api}/regist/upload_talent_include_image`,
                     imgForm,
                     {
                         headers: {
@@ -200,7 +200,7 @@
         } else {
             try {
                 const res = await axios.post(
-                    `${back_api}/adm_etc/upload_talent_no_image`,
+                    `${back_api}/regist/upload_talent_no_image`,
                     {
                         name,
                         gender,
@@ -227,7 +227,9 @@
                         successMessage = "내 인재 정보가 업데이트 되었습니다.";
                     }
                 }
-            } catch (error) {}
+            } catch (err) {
+                console.error(err.message);
+            }
             console.log("이미지 업로드 없음");
         }
     }
@@ -243,14 +245,74 @@
 </CustomModal>
 
 <CustomModal bind:visible={successModal} closeBtn={false}>
-    <div class="text-center">
-        <div class=" text-green-700 text-3xl mb-2">
-            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+    <div class="px-4 py-8 text-center suit-font animate-fade-in">
+        <div class="relative mx-auto w-20 h-20 mb-6">
+            <div
+                class="absolute inset-0 bg-emerald-100 rounded-full animate-ping opacity-20"
+            ></div>
+
+            <div
+                class="relative w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center shadow-lg shadow-emerald-100 animate-bounce-in"
+            >
+                <svg
+                    width="40"
+                    height="40"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="white"
+                    stroke-width="3.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
         </div>
-        <div>{successMessage}</div>
+
+        <div class="space-y-2 mb-8">
+            <h3 class="text-xl font-black text-gray-800 tracking-tight">
+                {successMessage.includes("성공")
+                    ? "축하드려요! 🎉"
+                    : "완료되었습니다!"}
+            </h3>
+            <p
+                class="text-[15px] text-gray-500 leading-relaxed whitespace-pre-line"
+            >
+                {successMessage}
+            </p>
+        </div>
+
         {#if modalLoading}
-            <div class="mt-2">
-                <span class="loading loading-ring loading-xl"></span>
+            <div
+                class="flex flex-col items-center gap-3 bg-gray-50 rounded-2xl py-4 px-6 border border-gray-100"
+            >
+                <div class="flex gap-1.5">
+                    <span
+                        class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-bounce"
+                    ></span>
+                    <span
+                        class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-bounce [animation-delay:0.2s]"
+                    ></span>
+                    <span
+                        class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-bounce [animation-delay:0.4s]"
+                    ></span>
+                </div>
+                <span
+                    class="text-[11px] font-bold text-emerald-600 tracking-widest uppercase"
+                >
+                    잠시 후 이동합니다.
+                </span>
+            </div>
+        {:else}
+            <div class="mt-2 flex flex-col gap-2">
+                <button
+                    class="w-full bg-emerald-500 text-white py-4 rounded-2xl font-bold text-[15px] shadow-lg shadow-emerald-100 active:scale-[0.98] transition-all duration-200"
+                    on:click={() => {
+                        successModal = false;
+                    }}
+                >
+                    확인
+                </button>
             </div>
         {/if}
     </div>
@@ -276,266 +338,286 @@
 </CustomModal>
 
 {#if !authBool}
-    <PageHeader />
+    <PageHeader pageName={"프로필 관리"} />
 {/if}
 
-<!-- svelte-ignore a11y_consider_explicit_label -->
-<!-- svelte-ignore event_directive_deprecated -->
-<div class="bg-white relative min-h-screen">
-    <div class="max-w-[530px] mx-auto suit-font pt-14 pb-24 px-4 md:px-0">
-        <div class="text-center mb-10">
-            <p>📝 프로필을 작성해 주세요.</p>
-            <p>😄 시행사 · 대행사 · 본부장 · 팀장님께서 ⚡</p>
-            <p>빠르게 연락드릴 수 있어요 🤝</p>
+<div class="bg-gray-50 relative min-h-screen suit-font">
+    <div class="max-w-[530px] mx-auto pt-14 pb-24 px-4">
+        <div class="text-center mb-10 animate-fade-in">
+            <div class="inline-block p-3 bg-white rounded-2xl shadow-sm mb-4">
+                <span class="text-2xl">📝</span>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">
+                프로필 완성하기
+            </h1>
+            <p class="text-sm text-gray-400 leading-relaxed">
+                시행사, 본부장님이 회원님을 기다리고 있어요!<br />
+                멋진 프로필로
+                <span class="text-sky-500 font-bold">좋은 현장</span>의 제안을
+                받아보세요.
+            </p>
         </div>
 
-        <div class="mb-6">
-            <!-- 프로필 변경 영역 -->
-            <div class="w-32 h-32 relative mx-auto">
-                <button
-                    class="absolute bottom-[-10px] right-[-10px] w-7 h-7 border-2 rounded-full bg-white text-xs text-gray-500"
-                    on:click={changeProfile}
-                >
-                    <i class="fa fa-camera" aria-hidden="true"></i>
-                </button>
-
-                <div
-                    class="w-32 h-32 border-2 border-gray-300 rounded-xl overflow-hidden flex justify-center items-center"
-                >
-                    {#if previewImg}
-                        <img src={previewImg} alt="" class="w-full h-full" />
-                    {:else if profile}
-                        <img
-                            src="{public_img_bucket}{profile}"
-                            alt=""
-                            class="w-full h-full"
-                        />
-                    {:else}
-                        <img
-                            src="/profile-base.png"
-                            alt=""
-                            class="w-full h-full"
-                        />
-                    {/if}
-                </div>
-            </div>
-
-            {#if profileStatus}
-                <div class="mt-4 text-center">
-                    <button
-                        class="btn btn-warning btn-sm"
-                        value="update"
-                        on:click={updateProfile}
+        <div class="space-y-6">
+            <div
+                class="bg-white p-8 rounded-[32px] shadow-sm border border-gray-100 text-center"
+            >
+                <div class="relative w-32 h-32 mx-auto mb-6">
+                    <div
+                        class="w-full h-full rounded-[40px] overflow-hidden ring-4 ring-sky-50 shadow-inner bg-gray-50 flex justify-center items-center"
                     >
-                        변경
-                    </button>
+                        {#if previewImg}
+                            <img
+                                src={previewImg}
+                                alt="preview"
+                                class="w-full h-full object-cover"
+                            />
+                        {:else if profile}
+                            <img
+                                src="{public_img_bucket}{profile}"
+                                alt="profile"
+                                class="w-full h-full object-cover"
+                            />
+                        {:else}
+                            <img
+                                src="/profile-base.png"
+                                alt="default"
+                                class="w-full h-full object-cover opacity-50"
+                            />
+                        {/if}
+                    </div>
                     <button
-                        class="btn btn-error btn-sm"
-                        value="delete"
-                        on:click={updateProfile}
-                    >
-                        취소
-                    </button>
-                </div>
-            {:else}
-                <div class="mt-4 text-center">
-                    <button
-                        class="btn btn-accent btn-sm text-white block mx-auto"
+                        class="absolute -bottom-2 -right-2 w-10 h-10 bg-sky-500 text-white rounded-2xl shadow-lg flex justify-center items-center hover:bg-sky-600 transition-all"
                         on:click={changeProfile}
                     >
-                        프로필 이미지 변경
+                        <i class="fa fa-camera"></i>
                     </button>
-                    <div class="text-xs mt-3">
-                        프로필 이미지는 300 X 300 이내 정사각형 사이즈로
-                        넣어주세요
+                </div>
+                <p class="text-xs text-gray-400">
+                    신뢰감을 줄 수 있는 깔끔한 사진을 권장해요!
+                </p>
+            </div>
+
+            <div
+                class="bg-white p-6 rounded-[32px] shadow-sm border border-gray-100 space-y-5"
+            >
+                <h3
+                    class="font-bold text-gray-800 flex items-center gap-2 mb-2"
+                >
+                    <span class="w-1.5 h-4 bg-sky-500 rounded-full"></span> 기본
+                    정보
+                </h3>
+
+                <div>
+                    <label
+                        class="block text-xs font-bold text-gray-400 mb-2 ml-1"
+                        >이름</label
+                    >
+                    <input
+                        type="text"
+                        placeholder="실명을 입력해 주세요"
+                        class="base-input"
+                        bind:value={name}
+                    />
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-gray-400 mb-2 ml-1"
+                            >성별</label
+                        >
+                        <div class="flex p-1 bg-gray-100 rounded-2xl">
+                            <label class="flex-1">
+                                <input
+                                    type="radio"
+                                    hidden
+                                    value="남자"
+                                    bind:group={gender}
+                                />
+                                <div
+                                    class="text-center py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer {gender ===
+                                    '남자'
+                                        ? 'bg-white shadow-sm text-sky-500'
+                                        : 'text-gray-400'}"
+                                >
+                                    남자
+                                </div>
+                            </label>
+                            <label class="flex-1">
+                                <input
+                                    type="radio"
+                                    hidden
+                                    value="여자"
+                                    bind:group={gender}
+                                />
+                                <div
+                                    class="text-center py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer {gender ===
+                                    '여자'
+                                        ? 'bg-white shadow-sm text-sky-500'
+                                        : 'text-gray-400'}"
+                                >
+                                    여자
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-gray-400 mb-2 ml-1"
+                            >나이</label
+                        >
+                        <input
+                            type="number"
+                            placeholder="예: 32"
+                            class="base-input"
+                            bind:value={age}
+                        />
                     </div>
                 </div>
-            {/if}
-        </div>
-
-        <div class="mb-6">
-            <div class="mb-1">이름</div>
-            <div>
-                <input
-                    type="text"
-                    class="border w-2/3 py-2 px-3 border-gray-300 rounded-md focus:outline-none focus:border-blue-500 text-sm"
-                    bind:value={name}
-                />
             </div>
-        </div>
 
-        <div class="mb-6">
-            <div class="mb-1">성별</div>
-            <div class="flex gap-2">
-                <label class="button-checkbox w-full">
-                    <input
-                        type="radio"
-                        hidden
-                        value="남자"
-                        bind:group={gender}
-                    />
-                    <div>남자</div>
-                </label>
-
-                <label class="button-checkbox w-full">
-                    <input
-                        type="radio"
-                        hidden
-                        value="여자"
-                        bind:group={gender}
-                    />
-                    <div>여자</div>
-                </label>
-            </div>
-        </div>
-
-        <div class="mb-6">
-            <div class="mb-1">연령</div>
-            <div>
-                <input
-                    type="text"
-                    class="border w-2/3 py-2 px-3 border-gray-300 rounded-md focus:outline-none focus:border-blue-500 text-sm"
-                    bind:value={age}
-                />
-            </div>
-            <div class="text-gray-600 text-xs mt-1 ml-1">
-                나이를 입력 해 주세요.
-            </div>
-        </div>
-
-        <div class="mb-6">
-            <div class="mb-1">경력</div>
-
-            {#if careerList.length > 0}
-                <table class="w-full mb-5">
-                    <tbody>
-                        {#each careerList as val, idx}
-                            <tr>
-                                <td
-                                    class="border border-gray-300 p-2.5 text-sm"
-                                >
-                                    <div
-                                        class="flex justify-between items-center"
-                                    >
-                                        <span>{val}</span>
-                                        <button
-                                            class="cursor-pointer"
-                                            value={idx}
-                                            on:click={deleteCareerList}
-                                        >
-                                            <svg
-                                                width="25px"
-                                                height="25px"
-                                                viewBox="0 0 24 24"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                ><path
-                                                    d="M19 13H6v-1h13zM12.5 2.2a10.3 10.3 0 1 0 10.3 10.3A10.299 10.299 0 0 0 12.5 2.2zm0 19.6a9.3 9.3 0 1 1 9.3-9.3 9.31 9.31 0 0 1-9.3 9.3z"
-                                                /><path
-                                                    fill="none"
-                                                    d="M0 0h24v24H0z"
-                                                /></svg
-                                            >
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        {/each}
-                    </tbody>
-                </table>
-            {/if}
-
-            <div class="flex items-center gap-2">
-                <input
-                    type="text"
-                    class="border w-full py-2 px-3 border-gray-300 rounded-md focus:outline-none focus:border-blue-500 text-sm"
-                    bind:value={careerSplit}
-                    on:input={(e) => {
-                        e.target.value = e.target.value.replace(/\|/g, "");
-                    }}
-                />
-
-                <!-- svelte-ignore a11y_consider_explicit_label -->
-                <button
-                    class="cursor-pointer"
-                    on:click={() => {
-                        careerList.push(careerSplit);
-                        careerSplit = "";
-                    }}
+            <div
+                class="bg-white p-6 rounded-[32px] shadow-sm border border-gray-100"
+            >
+                <h3
+                    class="font-bold text-gray-800 flex items-center gap-2 mb-4"
                 >
-                    <svg
-                        fill="#000000"
-                        width="30px"
-                        height="30px"
-                        viewBox="0 0 32 32"
-                        version="1.1"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M16 0c-8.836 0-16 7.163-16 16s7.163 16 16 16c8.837 0 16-7.163 16-16s-7.163-16-16-16zM16 30.032c-7.72 0-14-6.312-14-14.032s6.28-14 14-14 14 6.28 14 14-6.28 14.032-14 14.032zM23 15h-6v-6c0-0.552-0.448-1-1-1s-1 0.448-1 1v6h-6c-0.552 0-1 0.448-1 1s0.448 1 1 1h6v6c0 0.552 0.448 1 1 1s1-0.448 1-1v-6h6c0.552 0 1-0.448 1-1s-0.448-1-1-1z"
-                        ></path>
-                    </svg>
-                </button>
-            </div>
-            <div class="text-gray-600 text-xs mt-1 ml-1">
-                경력을 한줄 씩 입력 후 + 버튼을 클릭 해 주세요
-            </div>
-        </div>
+                    <span class="w-1.5 h-4 bg-emerald-500 rounded-full"></span>
+                    주요 경력
+                </h3>
 
-        <div class="mb-6">
-            <div class="mb-1">자기소개</div>
-            <div>
+                <div class="space-y-2 mb-4">
+                    {#each careerList as val, idx}
+                        <div
+                            class="flex items-center justify-between bg-emerald-50/50 p-4 rounded-2xl border border-emerald-100 animate-slide-in"
+                        >
+                            <span class="text-sm font-medium text-emerald-700"
+                                >{val}</span
+                            >
+                            <button
+                                class="text-emerald-300 hover:text-red-400 transition-colors"
+                                on:click={() => careerList.splice(idx, 1)}
+                            >
+                                <i class="fa fa-minus-circle text-lg"></i>
+                            </button>
+                        </div>
+                    {/each}
+                </div>
+
+                <div class="relative">
+                    <input
+                        type="text"
+                        placeholder="예: OO신도시 아파트 분양 팀장 (3년)"
+                        class="base-input"
+                        bind:value={careerSplit}
+                    />
+                    <button
+                        class="absolute right-2 top-2 w-10 h-10 bg-emerald-500 text-white rounded-xl shadow-md flex justify-center items-center active:scale-90 transition-all"
+                        on:click={() => {
+                            if (careerSplit) {
+                                careerList.push(careerSplit);
+                                careerSplit = "";
+                            }
+                        }}
+                    >
+                        <i class="fa fa-plus"></i>
+                    </button>
+                </div>
+                <p class="text-[11px] text-gray-400 mt-3 ml-1">
+                    경력을 한 줄씩 입력 후 + 버튼을 눌러주세요.
+                </p>
+            </div>
+
+            <div
+                class="bg-white p-6 rounded-[32px] shadow-sm border border-gray-100"
+            >
+                <h3
+                    class="font-bold text-gray-800 flex items-center gap-2 mb-4"
+                >
+                    <span class="w-1.5 h-4 bg-orange-500 rounded-full"></span> 자기소개
+                </h3>
                 <textarea
-                    class="border w-full py-2 px-3 border-gray-300 rounded-md focus:outline-none focus:border-blue-500 text-sm"
+                    class="base-input"
                     rows="6"
+                    placeholder="자신의 강점이나 전문 분야를 자유롭게 적어주세요."
                     bind:value={introduction}
                 ></textarea>
             </div>
         </div>
 
-        <div class="text-center">
-            {#if authBool}
-                <button
-                    class="btn btn-error w-1/3 text-white"
-                    on:click={() => {
-                        skipModal = true;
-                    }}
-                >
-                    건너뛰기
-                </button>
-            {/if}
+        <div class="mt-12 flex flex-col gap-3">
             <button
-                class="btn btn-info w-1/3 text-white"
+                class="w-full bg-sky-500 text-white py-5 rounded-2xl font-extrabold text-lg shadow-xl shadow-sky-100 active:scale-95 transition-all"
                 on:click={uploadMyTalent}
             >
-                내 인재 정보 등록 하기
+                내 인재 정보 등록하기 ⚡️
             </button>
+
+            {#if authBool}
+                <button
+                    class="w-full bg-transparent text-gray-400 py-3 font-medium text-sm underline underline-offset-4 decoration-gray-200"
+                    on:click={() => (skipModal = true)}
+                >
+                    나중에 등록하고 건너뛰기
+                </button>
+            {/if}
         </div>
     </div>
 </div>
 
 <style>
-    .button-checkbox div {
-        display: block;
-        background-color: #f0f0f0;
-        color: #333;
-        font-size: 14px;
-        border: 1.5px solid #ccc;
-        border-radius: 5px;
-        padding: 8px 0;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.3s;
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .animate-fade-in {
+        animation: fadeIn 0.6s ease-out;
+    }
+    .animate-slide-in {
+        animation: fadeIn 0.3s ease-out;
     }
 
-    .button-checkbox input[type="checkbox"]:checked + div {
-        background-color: #08b9ff;
-        color: white;
-        border-color: #0099ff;
+    /* 나타날 때 효과 */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-out forwards;
     }
 
-    .button-checkbox input[type="radio"]:checked + div {
-        background-color: #08b9ff;
-        color: white;
-        border-color: #0099ff;
+    /* 아이콘 통 튀어오르는 효과 */
+    @keyframes bounceIn {
+        0% {
+            transform: scale(0.3);
+            opacity: 0;
+        }
+        50% {
+            transform: scale(1.1);
+        }
+        70% {
+            transform: scale(0.9);
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+    .animate-bounce-in {
+        animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)
+            forwards;
     }
 </style>

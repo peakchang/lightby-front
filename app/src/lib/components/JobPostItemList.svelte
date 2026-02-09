@@ -95,9 +95,13 @@
                         </div>
 
                         <div
-                            class="text-[15px] md:text-lg font-semibold text-gray-900 leading-snug truncate mb-1"
+                            class="text-[15px] md:text-base font-semibold text-gray-900 leading-snug mb-1"
                         >
-                            {value.subject}
+                            <div class="flex items-center gap-1 w-full min-w-0">
+                                <span class="truncate min-w-0">
+                                    {value.subject}
+                                </span>
+                            </div>
                         </div>
 
                         <div class="flex items-baseline gap-1.5">
@@ -130,7 +134,12 @@
 
                 {#if value.icons}
                     <div class="absolute bottom-[-2px] right-[-2px]">
-                        <div
+                        <span
+                            class="text-[10px] md:text-xs flex-shrink-0 badge badge-outline border-red-500 text-red-600 font-bold px-1.5 py-2 animate-pulse"
+                        >
+                            HOT 현장
+                        </span>
+                        <!-- <div
                             class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-lg p-1 shadow-sm border border-gray-200"
                         >
                             <img
@@ -140,7 +149,7 @@
                                 alt="icon"
                                 class="w-full h-full object-contain"
                             />
-                        </div>
+                        </div> -->
                     </div>
                 {/if}
             </div>

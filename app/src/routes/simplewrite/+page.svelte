@@ -43,6 +43,8 @@
     let imgModifyList = $state("");
     let modifyIdx = $state(undefined);
 
+    let isAnonymous = $state(false); // 익명 체크 여부
+
     onMount(async () => {
         $pageScrollStatus = false; // 페이지 시작시 최상위
         await tick();
@@ -144,6 +146,7 @@
                 subject,
                 content,
                 imgs,
+                is_anonymous: isAnonymous ? 1 : 0,
             });
 
             blockBack = false;
@@ -224,107 +227,231 @@
     }
 </script>
 
+<!-- 페이지 벗어나려고 할 시 보이는 모달 -->
 <!-- svelte-ignore event_directive_deprecated -->
 <CustomModal bind:visible={escapePageModal} closeBtn={false}>
-    <div class="text-center">
-        <div class=" text-red-500 text-3xl mb-5">
-            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+    <div class="py-4 px-2">
+        <div class="flex justify-center mb-6">
+            <div
+                class="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center text-amber-500 shadow-sm border border-amber-100"
+            >
+                <i class="fa fa-exclamation-circle text-3xl" aria-hidden="true"
+                ></i>
+            </div>
         </div>
-        <div class="mb-5">
-            페이지에서 벗어날시 등록중인 글은 삭제됩니다. 진행하시겠습니까?
+
+        <div class="text-center space-y-2 mb-8">
+            <h3 class="text-lg font-extrabold text-slate-800">
+                정말 나가시겠어요?
+            </h3>
+            <div class="text-slate-500 text-sm leading-relaxed">
+                <p>지금 페이지를 벗어나면</p>
+                <p>
+                    <span class="text-red-500 font-bold"
+                        >작성 중인 모든 내용이 삭제</span
+                    >됩니다.
+                </p>
+            </div>
         </div>
-        <div class="flex justify-center items-center gap-3">
+
+        <div
+            class="flex flex-col sm:flex-row justify-center items-center gap-3"
+        >
             <button
-                class="btn btn-active btn-info text-white w-1/3"
+                class="w-full sm:flex-1 h-12 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-200 transition-all order-2 sm:order-1"
                 on:click={goToBackAndArrangeImg}
             >
-                뒤로가기
+                벗어나기
             </button>
-            <button class="btn btn-active w-1/3">취소</button>
+            <button
+                class="w-full sm:flex-1 h-12 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 shadow-md shadow-indigo-100 active:scale-95 transition-all order-1 sm:order-2"
+                on:click={() => (escapePageModal = false)}
+            >
+                계속 작성하기
+            </button>
         </div>
     </div>
 </CustomModal>
 
 <CustomModal bind:visible={uploadChkModalShow} closeBtn={false}>
-    <!-- svelte-ignore event_directive_deprecated -->
-    <div class="text-center">
-        <div class=" text-red-500 text-3xl mb-5">
-            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+    <div class="p-4">
+        <div class="flex justify-center mb-6">
+            <div class="bg-red-50 p-4 rounded-full">
+                <i
+                    class="fa fa-exclamation-circle text-red-500 text-4xl"
+                    aria-hidden="true"
+                ></i>
+            </div>
         </div>
-        <div class="mb-5">
-            {uploadChkModalTxt}
+
+        <div class="text-center mb-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-2">
+                확인이 필요합니다
+            </h3>
+            <p class="text-gray-600 leading-relaxed">
+                {uploadChkModalTxt}
+            </p>
         </div>
-        <div class="flex justify-center items-center gap-3">
+
+        <div class="flex justify-center">
             <button
-                class="btn btn-active w-1/3"
+                class="w-full py-3 bg-gray-800 hover:bg-gray-900 text-white rounded-xl font-medium transition-all shadow-lg active:scale-95"
                 on:click={() => {
-                    if (errType == "subject") {
-                        subjectArea.focus();
-                    } else {
-                        contentArea.focus();
-                    }
+                    errType == "subject"
+                        ? subjectArea.focus()
+                        : contentArea.focus();
                 }}
             >
-                닫기
+                확인했습니다
             </button>
         </div>
     </div>
 </CustomModal>
 
-<PageHeader></PageHeader>
+<PageHeader pageName="게시판 글 작성"></PageHeader>
 
-<!-- svelte-ignore event_directive_deprecated -->
-<div class="pt-16 pb-32 suit-font px-3">
-    <div class="bg-white relative min-h-screen">
-        <div class="max-w-[530px] mx-auto pb-16">
-            <div class="border border-gray-300 p-2 rounded-lg">
-                <div class="mb-5">
+<div class=" pt-6 pb-32 suit-font px-4 bg-slate-50 min-h-screen">
+    <div class="max-w-[640px] mx-auto">
+        <div class="mb-8 flex justify-between items-end px-1">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800">
+                    {#if modifyIdx}게시글 수정{:else}새로운 게시글{/if}
+                </h1>
+                <p class="text-slate-500 text-sm mt-1">
+                    다양한 현장 이야기를 들려주세요.
+                </p>
+            </div>
+
+            <label class="flex items-center gap-2 cursor-pointer group">
+                <span
+                    class="text-sm font-medium text-slate-500 group-hover:text-slate-700 transition-colors"
+                >
+                    익명으로 작성
+                </span>
+                <div class="relative inline-flex items-center cursor-pointer">
                     <input
+                        type="checkbox"
+                        bind:checked={isAnonymous}
+                        class="sr-only peer"
+                    />
+                    <div
+                        class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"
+                    ></div>
+                </div>
+            </label>
+        </div>
+
+        <div
+            class="bg-white shadow-sm border border-slate-200 rounded-2xl overflow-hidden transition-all"
+        >
+            <div class="p-6 md:p-8 space-y-8">
+                <div class="space-y-2">
+                    <label
+                        for="subject"
+                        class="text-sm font-semibold text-slate-700 ml-1"
+                    >
+                        제목
+                    </label>
+                    <input
+                        id="subject"
                         type="text"
+                        placeholder="제목을 입력해 주세요"
                         bind:this={subjectArea}
                         bind:value={subject}
-                        class="border border-gray-300 rounded-lg p-2 w-full focus:outline-none focus:border-blue-400 text-xs md:text-sm"
+                        class="w-full text-lg font-medium border-0 border-b-2 border-slate-100 p-2 focus:ring-0 focus:border-blue-500 transition-colors placeholder:text-slate-300"
                     />
                 </div>
-                <!-- imgModifyList={} -->
-                <SortableImg
-                    {updateImg}
-                    maxImgCount={10}
-                    folder={"boardfee"}
-                    {imgModifyList}
-                ></SortableImg>
 
-                <div class="mt-5">
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2 ml-1">
+                        <label class="text-sm font-semibold text-slate-700"
+                            >이미지 첨부</label
+                        >
+                        <span class="text-xs text-slate-400 font-normal"
+                            >최대 10장</span
+                        >
+                    </div>
+                    <div
+                        class="bg-slate-50 rounded-xl p-4 border-2 border-dashed border-slate-200 hover:border-blue-300 transition-colors"
+                    >
+                        <SortableImg
+                            {updateImg}
+                            maxImgCount={10}
+                            folder={"boardfee"}
+                            {imgModifyList}
+                        ></SortableImg>
+                    </div>
+                </div>
+
+                <div class="">
+                    <label
+                        for="content"
+                        class="text-sm font-semibold text-slate-700 ml-1"
+                        >내용</label
+                    >
                     <textarea
-                        rows="5"
-                        class="border border-gray-300 rounded-lg p-2 w-full focus:outline-none focus:border-blue-400 text-xs md:text-sm"
+                        id="content"
+                        rows="12"
+                        placeholder="이곳에 내용을 작성해 주세요..."
+                        class="w-full bg-slate-50 rounded-xl border-slate-200 p-4 focus:bg-white focus:ring-4 focus:ring-blue-50/50 focus:border-blue-400 transition-all text-slate-700 leading-relaxed resize-none"
                         bind:value={content}
                         bind:this={contentArea}
                     ></textarea>
                 </div>
 
-                <div class="text-center mt-3">
+                <div
+                    class="flex items-start gap-3 p-4 bg-amber-50 rounded-xl text-amber-700"
+                >
+                    <div class="mt-0.5 text-amber-500">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                    </div>
+                    <div class="text-[12px] leading-tight opacity-90">
+                        <p class="font-bold mb-1 underline underline-offset-2">
+                            업로드 안내
+                        </p>
+                        <p>
+                            작성 완료 시 이미지는 글 상단에, 텍스트는 하단에
+                            정렬되어 표시됩니다.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="pt-4 flex gap-3">
+                    <button
+                        class="btn btn-ghost bg-slate-100 hover:bg-slate-200 text-slate-600 flex-1 h-12"
+                        on:click={() => history.back()}
+                    >
+                        취소
+                    </button>
+
                     {#if modifyIdx}
                         <button
-                            class="btn btn-success text-white w-1/2 md:w-1/3"
+                            class="btn flex-[2] h-12 border-none bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-md shadow-emerald-100 transition-all font-bold"
                             on:click={updateShowFee}
                         >
-                            수정하기
+                            <i class="fa fa-check mr-2"></i> 수정 완료
                         </button>
                     {:else}
                         <button
-                            class="btn btn-success text-white w-1/2 md:w-1/3"
+                            class="btn flex-[2] h-12 border-none bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-100 transition-all font-bold"
                             on:click={uploadShowFee}
                         >
-                            등록하기
+                            게시글 등록하기
                         </button>
                     {/if}
-                </div>
-
-                <div class="mt-8 text-xs">
-                    ○ 글 업로드 시 이미지는 상단 / 글은 하단에 표시됩니다.
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    /* 스무스한 포커스 효과를 위한 커스텀 스타일 */
+    input:focus,
+    textarea:focus {
+        outline: none;
+    }
+    .suit-font {
+        font-family: "SUIT", sans-serif;
+    }
+</style>

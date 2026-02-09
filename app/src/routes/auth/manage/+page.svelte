@@ -309,309 +309,325 @@
 </script>
 
 <CustomModal bind:visible={alertModal} closeBtn={false}>
-    <div class="text-center">
-        <div class=" text-red-500 text-3xl mb-2">
+    <div class="px-4 py-6 text-center suit-font">
+        <div class="text-red-500 text-4xl mb-4 animate-bounce">
             <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
         </div>
-        <div>{alertMessage}</div>
+        <div
+            class="text-gray-800 font-bold text-lg mb-6 leading-tight whitespace-pre-line"
+        >
+            {alertMessage}
+        </div>
+        <button
+            class="w-full bg-gray-900 text-white py-3.5 rounded-xl font-bold text-sm active:scale-[0.98] transition-all"
+            on:click={() => (alertModal = false)}
+        >
+            확인
+        </button>
     </div>
 </CustomModal>
 
-<PageHeader></PageHeader>
+<PageHeader pageName={"계정 설정"}></PageHeader>
 
-<!-- svelte-ignore event_directive_deprecated -->
-<!-- svelte-ignore a11y_consider_explicit_label -->
-<div class="bg-white relative min-h-screen suit-font">
-    <div class="max-w-[530px] mx-auto pt-14 pb-24">
-        <div class="wrapper">
-
-            
-            <div class="w-20 h-20 relative mx-auto">
-                <button
-                    class="absolute bottom-[-10px] right-[-10px] w-7 h-7 border-2 rounded-full bg-white text-xs text-gray-500"
-                    on:click={changeProfile}
-                >
-                    <i class="fa fa-camera" aria-hidden="true"></i>
-                </button>
-
+<div class="bg-[#F8F9FA] min-h-screen suit-font pb-24">
+    <div class="max-w-[530px] mx-auto pt-10">
+        <div class="px-6 mb-8 text-center">
+            <div class="relative inline-block">
                 <div
-                    class="w-20 h-20 border-2 border-gray-300 rounded-xl overflow-hidden flex justify-center items-center"
+                    class="w-24 h-24 rounded-[2rem] overflow-hidden shadow-xl border-4 border-white"
                 >
                     {#if profile}
                         <img
                             src="{public_img_bucket}{profile}"
-                            alt=""
-                            class="w-full h-full"
+                            alt="profile"
+                            class="w-full h-full object-cover"
                         />
                     {:else}
                         <img
                             src="/profile-base.png"
-                            alt=""
-                            class="w-full h-full"
+                            alt="default"
+                            class="w-full h-full object-cover"
                         />
                     {/if}
                 </div>
+                <button
+                    class="absolute bottom-0 right-0 w-8 h-8 bg-gray-900 text-white rounded-full flex items-center justify-center border-2 border-white shadow-lg active:scale-90 transition-transform"
+                    on:click={changeProfile}
+                >
+                    <i class="fa fa-camera text-xs" aria-hidden="true"></i>
+                </button>
             </div>
 
             {#if profileStatus}
-                <div class="mt-4 text-center">
+                <div class="flex justify-center gap-2 mt-5">
                     <button
-                        class="btn btn-warning btn-sm"
-                        value="update"
+                        class="px-5 py-2 bg-emerald-500 text-white rounded-lg text-xs font-bold shadow-md shadow-emerald-100"
                         on:click={updateProfile}
+                        value="update">적용</button
                     >
-                        변경
-                    </button>
                     <button
-                        class="btn btn-error btn-sm"
-                        value="delete"
-                        on:click={updateProfile}
+                        class="px-5 py-2 bg-white text-gray-400 rounded-lg text-xs font-bold border border-gray-200"
+                        on:click={() => (profileStatus = false)}>취소</button
                     >
-                        취소
-                    </button>
                 </div>
             {:else}
-                <div class="mt-4 text-center">
-                    <button
-                        class="btn btn-accent btn-sm text-white block mx-auto"
-                        on:click={changeProfile}
+                <div class="mt-4">
+                    <h2 class="text-xl font-black text-gray-900">
+                        {userInfo.nickname}님
+                    </h2>
+                    <p
+                        class="text-[11px] text-gray-400 mt-1 uppercase tracking-wider font-medium"
                     >
-                        프로필 이미지 변경
-                    </button>
-                    <div class="text-xs mt-3">
-                        프로필 이미지는 300 X 300 이내 정사각형 사이즈로
-                        넣어주세요
-                    </div>
+                        Account Settings
+                    </p>
                 </div>
             {/if}
+        </div>
 
-            <div class="w-[80%] mx-auto mt-5">
-                <div class="pb-4.5 mb-4.5 border-b border-gray-200">
-                    <div class="text-sm text-gray-500 mb-1.5">- 아이디</div>
-                    <!-- <div class="ml-3">changyong112</div> -->
-                    <div class="ml-3 flex justify-start items-center">
+        <div class="px-5 space-y-4">
+            <div
+                class="bg-white rounded-[1.5rem] p-6 shadow-sm border border-gray-100"
+            >
+                <div
+                    class="flex justify-between items-center py-3 border-b border-gray-50"
+                >
+                    <span class="text-sm font-bold text-gray-400">아이디</span>
+                    <div
+                        class="flex items-center gap-2 font-semibold text-gray-800"
+                    >
                         {#if userInfo.sns_id}
-                            <span>SNS 로그인</span>
                             <span
-                                class="text-xs px-2.5 py-0.5 bg-yellow-400 ml-5 rounded-md"
+                                class="text-xs px-2 py-0.5 bg-[#FEE500] text-[#3C1E1E] rounded-md flex items-center gap-1"
                             >
-                                <i class="fa fa-comment" aria-hidden="true"></i>
-                                KAKAO
+                                <i
+                                    class="fa fa-comment text-[10px]"
+                                    aria-hidden="true"
+                                ></i> KAKAO
                             </span>
                         {:else}
-                            <span>{userInfo.id}</span>
+                            {userInfo.id}
                         {/if}
                     </div>
                 </div>
 
-                <div class="pb-4.5 mb-4.5 border-b border-gray-200">
-                    <div class="text-sm text-gray-500 mb-1.5">- 이름</div>
-                    <div class="ml-3">{userInfo.name}</div>
+                <div
+                    class="flex justify-between items-center py-3 border-b border-gray-50"
+                >
+                    <span class="text-sm font-bold text-gray-400">이름</span>
+                    <span class="font-semibold text-gray-800"
+                        >{userInfo.name}</span
+                    >
                 </div>
 
-                <div class="pb-4.5 mb-4.5 border-b border-gray-200">
-                    <div class="text-sm text-gray-500 mb-1">- 닉네임</div>
-                    <div class="ml-3 flex justify-between items-center">
-                        <input
-                            type="text"
-                            class="border py-1 px-3 text-sm rounded-md border-gray-400 focus:outline-none focus:border-blue-400"
-                            class:hidden={!nickChangeBool}
-                            bind:this={nickChangeInput}
-                            bind:value={nickname}
-                        />
-                        <span class="mt-1" class:hidden={nickChangeBool}>
-                            {userInfo.nickname}
-                        </span>
-
-                        <div>
-                            <button
-                                class="btn btn-success btn-sm text-white"
-                                on:click={() => {
-                                    nickChangeBool = !nickChangeBool;
-                                    if (nickChangeBool) {
-                                        setTimeout(() => {
-                                            nickChangeInput.focus();
-                                        }, 10);
-                                    }
-                                }}
-                            >
-                                {#if nickChangeBool}
-                                    취소
-                                {:else}
-                                    변경하기
-                                {/if}
-                            </button>
-
-                            {#if nickChangeBool}
-                                <button
-                                    class="btn btn-info btn-sm text-white"
-                                    data-type="nickname"
-                                    on:click={async (e) => {
-                                        const nickBool = await duplicate_chk(e);
-                                        if (nickBool) {
-                                            updateNickname(e);
-                                        } else {
-                                        }
-                                    }}
-                                >
-                                    변경
-                                </button>
-                            {/if}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pb-4.5 mb-4.5 border-b border-gray-200">
-                    <div class="text-sm text-gray-500 mb-1">- 휴대폰</div>
-                    <div class="ml-3 flex justify-between items-center">
-                        <input
-                            type="text"
-                            class="border py-1 px-3 text-sm rounded-md border-gray-400 focus:outline-none focus:border-blue-400"
-                            class:hidden={!phoneChangeBool}
-                            bind:this={phoneChangeInput}
-                            bind:value={phone}
-                            on:input={formatPhoneNumber}
-                        />
-
-                        <span class="mt-1" class:hidden={phoneChangeBool}>
-                            {#if userInfo.phone}
-                                {formatPhoneNum(userInfo.phone)}
-                            {/if}
-                        </span>
-
-                        <div>
-                            {#if phoneChangeBool}
-                                <button
-                                    class="btn btn-info btn-sm text-white"
-                                    data-type="phone"
-                                    disabled={authShowBool}
-                                    on:click={async (e) => {
-                                        const phoneBool =
-                                            await duplicate_chk(e);
-
-                                        if (phoneBool) {
-                                            startAuth();
-                                        }
-                                    }}
-                                >
-                                    인증
-                                </button>
-                            {/if}
-
-                            <button
-                                class="btn btn-success btn-sm text-white"
-                                disabled={authShowBool}
-                                on:click={() => {
-                                    phoneChangeBool = !phoneChangeBool;
-                                    phone = formatPhoneNum(userInfo.phone);
-                                    if (phoneChangeBool) {
-                                        setTimeout(() => {
-                                            phoneChangeInput.focus();
-                                        }, 10);
-                                    }
-                                }}
-                            >
-                                {#if !phoneChangeBool}
-                                    변경하기
-                                {:else}
-                                    취소
-                                {/if}
-                            </button>
-                        </div>
-                    </div>
-
-                    {#if authShowBool}
-                        <div
-                            class="ml-3 mt-2 flex justify-between items-center"
+                <div class="py-4 border-b border-gray-50">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-bold text-gray-400"
+                            >닉네임</span
                         >
+                        <button
+                            class="text-[12px] font-bold {nickChangeBool
+                                ? 'text-gray-400'
+                                : 'text-blue-500'}"
+                            on:click={() => {
+                                nickChangeBool = !nickChangeBool;
+                                if (nickChangeBool)
+                                    setTimeout(
+                                        () => nickChangeInput.focus(),
+                                        50,
+                                    );
+                            }}
+                        >
+                            {nickChangeBool ? "취소" : "변경하기"}
+                        </button>
+                    </div>
+
+                    {#if nickChangeBool}
+                        <div class="flex gap-2 animate-fade-in">
                             <input
                                 type="text"
-                                class="border py-1 px-3 text-sm rounded-md border-gray-400 focus:outline-none focus:border-blue-400"
-                                bind:value={authNumChk}
+                                class="flex-1 bg-gray-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-100 transition-all outline-none font-semibold"
+                                bind:this={nickChangeInput}
+                                bind:value={nickname}
                             />
-
-                            <div>
-                                <span
-                                    class="mr-3 text-sm font-light"
-                                    style="color: #DB3A00;"
-                                    >{formatTime(timeLeft)}</span
-                                >
-                                <button
-                                    class="btn btn-info btn-sm text-white"
-                                    data-type="phone"
-                                    on:click={chkAuthAndPhoneUpdate}
-                                >
-                                    변경
-                                </button>
-                            </div>
+                            <button
+                                class="bg-blue-500 text-white px-6 rounded-xl text-sm font-bold shadow-md shadow-blue-100 active:scale-95 transition-all"
+                                on:click={async (e) => {
+                                    if (await duplicate_chk(e))
+                                        updateNickname(e);
+                                }}
+                                data-type="nickname">변경</button
+                            >
+                        </div>
+                    {:else}
+                        <div class="font-bold text-gray-800 ml-1">
+                            {userInfo.nickname}
                         </div>
                     {/if}
                 </div>
 
-                {#if userInfo.sns_id}
-                    &nbsp;
-                {:else}
-                    <div class="pb-4.5 mb-4.5 border-b border-gray-200">
-                        <div class="text-sm text-gray-500 mb-3">- 비밀번호</div>
+                <div class="py-4 border-b border-gray-50">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-bold text-gray-400"
+                            >휴대폰 번호</span
+                        >
+                        <button
+                            class="text-[12px] font-bold {phoneChangeBool
+                                ? 'text-gray-400'
+                                : 'text-blue-500'}"
+                            disabled={authShowBool}
+                            on:click={() => {
+                                phoneChangeBool = !phoneChangeBool;
+                                phone = formatPhoneNum(userInfo.phone);
+                                if (phoneChangeBool)
+                                    setTimeout(
+                                        () => phoneChangeInput.focus(),
+                                        50,
+                                    );
+                            }}
+                        >
+                            {phoneChangeBool ? "취소" : "변경하기"}
+                        </button>
+                    </div>
 
-                        {#if !pwdChangeBool}
-                            <div class="ml-3 flex justify-between items-center">
-                                <span class="mt-1">***********</span>
+                    {#if phoneChangeBool}
+                        <div class="space-y-2 animate-fade-in">
+                            <div class="flex gap-2">
+                                <input
+                                    type="text"
+                                    class="flex-1 bg-gray-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-100 transition-all outline-none font-semibold"
+                                    bind:this={phoneChangeInput}
+                                    bind:value={phone}
+                                    on:input={formatPhoneNumber}
+                                    disabled={authShowBool}
+                                />
                                 <button
-                                    class="btn btn-success btn-sm text-white"
-                                    on:click={() => {
-                                        pwdChangeBool = !pwdChangeBool;
+                                    class="bg-gray-800 text-white px-6 rounded-xl text-sm font-bold active:scale-95 transition-all disabled:bg-gray-200"
+                                    disabled={authShowBool}
+                                    on:click={async (e) => {
+                                        if (await duplicate_chk(e)) startAuth();
                                     }}
+                                    data-type="phone">인증발송</button
                                 >
-                                    변경하기
-                                </button>
+                            </div>
+
+                            {#if authShowBool}
+                                <div class="flex gap-2 animate-bounce-in">
+                                    <div class="relative flex-1">
+                                        <input
+                                            type="text"
+                                            class="w-full bg-blue-50 border-2 border-blue-100 rounded-xl px-4 py-3 text-sm outline-none font-bold text-blue-600"
+                                            placeholder="인증번호 입력"
+                                            bind:value={authNumChk}
+                                        />
+                                        <span
+                                            class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-red-500"
+                                        >
+                                            {formatTime(timeLeft)}
+                                        </span>
+                                    </div>
+                                    <button
+                                        class="bg-blue-600 text-white px-6 rounded-xl text-sm font-bold shadow-lg shadow-blue-100 active:scale-95"
+                                        on:click={chkAuthAndPhoneUpdate}
+                                        >확인</button
+                                    >
+                                </div>
+                            {/if}
+                        </div>
+                    {:else}
+                        <div class="font-bold text-gray-800 ml-1">
+                            {userInfo.phone
+                                ? formatPhoneNum(userInfo.phone)
+                                : "번호 없음"}
+                        </div>
+                    {/if}
+                </div>
+
+                {#if !userInfo.sns_id}
+                    <div class="py-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-bold text-gray-400"
+                                >비밀번호</span
+                            >
+                            <button
+                                class="text-[12px] font-bold {pwdChangeBool
+                                    ? 'text-gray-400'
+                                    : 'text-blue-500'}"
+                                on:click={() =>
+                                    (pwdChangeBool = !pwdChangeBool)}
+                            >
+                                {pwdChangeBool ? "취소" : "변경하기"}
+                            </button>
+                        </div>
+
+                        {#if pwdChangeBool}
+                            <div class="space-y-2 animate-fade-in">
+                                <input
+                                    type="password"
+                                    placeholder="기존 비밀번호"
+                                    class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm outline-none"
+                                    bind:value={prevPassword}
+                                />
+                                <div class="flex gap-2">
+                                    <input
+                                        type="password"
+                                        placeholder="새로운 비밀번호"
+                                        class="flex-1 bg-gray-50 border-none rounded-xl px-4 py-3 text-sm outline-none"
+                                        bind:value={password}
+                                    />
+                                    <button
+                                        class="bg-blue-500 text-white px-6 rounded-xl text-sm font-bold active:scale-95"
+                                        on:click={changePasswordFunc}
+                                        >변경</button
+                                    >
+                                </div>
                             </div>
                         {:else}
                             <div
-                                class="ml-3 mb-1 flex justify-between items-center"
+                                class="font-bold text-gray-800 ml-1 tracking-widest"
                             >
-                                <input
-                                    type="text"
-                                    class="border py-1 px-3 text-sm rounded-md border-gray-400 focus:outline-none focus:border-blue-400"
-                                    placeholder="기존 비밀번호"
-                                    bind:value={prevPassword}
-                                />
-                            </div>
-                            <div class="ml-3 flex justify-between items-center">
-                                <input
-                                    type="text"
-                                    class="border py-1 px-3 text-sm rounded-md border-gray-400 focus:outline-none focus:border-blue-400"
-                                    placeholder="새로운 비밀번호"
-                                    bind:value={password}
-                                />
-
-                                <div>
-                                    <button
-                                        class="btn btn-success btn-sm text-white"
-                                        on:click={changePasswordFunc}
-                                    >
-                                        변경
-                                    </button>
-                                    <button
-                                        class="btn btn-info btn-sm text-white"
-                                        on:click={() => {
-                                            pwdChangeBool = !pwdChangeBool;
-                                        }}
-                                    >
-                                        취소
-                                    </button>
-                                </div>
+                                ••••••••
                             </div>
                         {/if}
                     </div>
                 {/if}
             </div>
 
-            <!-- <div class=" text-center">
-                <button class="btn btn-info w-[50%] text-white">
-                    변경하기
-                </button>
-            </div> -->
+            <p
+                class="text-center text-[11px] text-gray-400 px-10 leading-relaxed"
+            >
+                회원정보는 개인정보 처리방침에 따라 안전하게 보호되며,<br />
+                정보 변경 시 즉시 서비스에 반영됩니다.
+            </p>
         </div>
     </div>
 </div>
+
+<style>
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-out;
+    }
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-5px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-bounce-in {
+        animation: bounceIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes bounceIn {
+        from {
+            transform: scale(0.95);
+            opacity: 0;
+        }
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+</style>

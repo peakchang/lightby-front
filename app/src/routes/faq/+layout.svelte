@@ -4,26 +4,7 @@
     let { children } = $props();
 </script>
 
-<!-- svelte-ignore a11y_click_events_have_key_events -->
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<!-- svelte-ignore event_directive_deprecated -->
-<div class="fixed top-0 left-0 w-full z-20 suit-font">
-    <div class="max-w-[530px] mx-auto bg-white border-b border-gray-300">
-        <div class="flex justify-between items-center">
-            <div
-                class="cursor-pointer p-2"
-                style="color: #3da83b;"
-                on:click={() => {
-                    goto("/my");
-                }}
-            >
-                <i class="fa fa-angle-left text-2xl mr-1" aria-hidden="true"
-                ></i>
-                <span class="text-sm">뒤로가기</span>
-            </div>
-        </div>
-    </div>
-</div>
+<PageHeader pageName={"고객센터"} />
 
 <div class="bg-white relative min-h-screen suit-font">
     <div class="max-w-[530px] mx-auto pt-14 pb-24">

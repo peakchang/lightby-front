@@ -118,29 +118,39 @@
 </svelte:head>
 
 <CustomModal bind:visible={loginAlertModalShow} closeBtn={false}>
-    <div class="text-center">
-        <div class=" text-green-700 text-3xl mb-2">
-            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+    <div
+        class="max-w-sm mx-auto p-8 bg-white rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.04)] border border-gray-50 text-center suit-font"
+    >
+        <div
+            class="inline-flex items-center justify-center w-16 h-16 mb-6 bg-blue-50 text-blue-500 rounded-full"
+        >
+            <i class="fa fa-lock text-3xl" aria-hidden="true"></i>
         </div>
-        <div class="mb-2 text-lg">로그인이 필요합니다!</div>
-        <div class="flex justify-center gap-3">
-            <PdButton
-                classVal="w-1/3 py-2 rounded-lg text-white text-sm"
-                backgroundColor="#1266FF"
-                hoverColor="#0042ED"
-                on:click={() => {
-                    goto("/auth/login");
-                }}
+
+        <h2 class="text-xl font-bold text-gray-900 mb-2">
+            로그인이 필요합니다
+        </h2>
+        <p class="text-gray-400 text-sm mb-8 leading-relaxed">
+            요청하신 페이지는 회원 전용입니다.<br />
+            로그인 후 더 많은 서비스를 이용해 보세요!
+        </p>
+
+        <div class="flex flex-col gap-3">
+            <button
+                class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] transition-all text-white font-bold rounded-2xl shadow-lg shadow-blue-100"
+                on:click={() => goto("/auth/login")}
             >
                 로그인 바로가기
-            </PdButton>
-            <PdButton
-                classVal="w-1/3 py-2 rounded-lg text-white text-sm"
-                backgroundColor="#5D5D5D"
-                hoverColor="#393939"
+            </button>
+
+            <button
+                class="w-full py-3 text-gray-400 hover:text-gray-600 font-medium rounded-2xl transition-colors text-sm"
+                on:click={() => {
+                    /* 닫기 로직 */
+                }}
             >
-                닫기
-            </PdButton>
+                나중에 하기
+            </button>
         </div>
     </div>
 </CustomModal>
@@ -190,59 +200,47 @@
     </div>
 </CustomModal>
 
-<div
-    class="fixed top-0 left-1/2 max-w-[640px] w-full -translate-x-1/2 bg-white py-3 px-3 z-40 rounded-b-md suit-font"
-    style="box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);"
+<header
+    class="fixed top-0 left-1/2 -translate-x-1/2 max-w-[640px] w-full z-40 bg-white/95 backdrop-blur-sm px-4 py-3 rounded-b-2xl suit-font transition-all"
+    style="box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);"
 >
     <div class="flex justify-between items-center">
-        <div>
-            <!-- svelte-ignore event_directive_deprecated -->
-            <a href="/" on:click|preventDefault={goToMain}>
+        <div class="flex items-center">
+            <a
+                href="/"
+                on:click|preventDefault={goToMain}
+                class="active:scale-95 transition-transform"
+            >
                 <img
                     src="/logo.png"
-                    alt=""
-                    class=" max-w-[100px] md:max-w-[120px] cursor-pointer"
+                    alt="번개분양"
+                    class="max-w-[100px] md:max-w-[120px] h-auto object-contain"
                 />
             </a>
         </div>
 
-        <div class="flex justify-center items-center gap-2">
+        <div class="flex items-center gap-2">
             {#if $user_info.idx}
-                <!-- svelte-ignore event_directive_deprecated -->
                 <button
-                    class="btn btn-outline btn-success btn-xs md:btn-sm"
+                    class="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gray-100 text-gray-500 text-xs font-bold hover:bg-gray-200 active:scale-95 transition-all border-none"
                     on:click={logout}
                 >
-                    <i class="fa fa-user-circle" aria-hidden="true"></i>
+                    <i class="fa fa-sign-out text-sm"></i>
                     <span>로그아웃</span>
                 </button>
             {:else}
-                <a href="/auth/login">
+                <a href="/auth/login" class="no-underline">
                     <button
-                        class="btn btn-outline btn-success btn-xs md:btn-sm hover:text-white"
+                        class="flex items-center gap-1.5 px-5 py-1.5 rounded-full bg-sky-500 text-white text-xs font-extrabold shadow-md shadow-sky-100 hover:bg-sky-600 active:scale-95 transition-all border-none"
                     >
-                        <i class="fa fa-user-circle" aria-hidden="true"></i>
+                        <i class="fa fa-user-circle text-sm"></i>
                         <span>로그인</span>
                     </button>
                 </a>
             {/if}
-
-            <!-- {#if $page.url.pathname == "/"}
-
-                <button
-                    class="btn btn-outline btn-info btn-xs md:btn-sm hover:text-white"
-                    on:click={() => {
-                        searchModal = true;
-                        console.log(searchArea);
-                    }}
-                >
-                    <i class="fa fa-search" aria-hidden="true"></i>
-                    <span>검색</span>
-                </button>
-            {/if} -->
         </div>
     </div>
-</div>
+</header>
 
 <div class="suit-font">
     {@render children()}
@@ -296,14 +294,20 @@
                         goto(`/joboffer?prev=${$page.url.pathname}`);
                     }}
                 >
-                    <PdButton
-                        classVal="py-1.5 px-4 text-white font-light rounded-full"
-                        backgroundColor="#5587ED"
-                        hoverColor="#6799FF"
+                    <button
+                        class="flex items-center justify-center gap-2 px-5 py-2.5
+           bg-gradient-to-r from-[#5587ED] to-[#4876D6]
+           hover:from-[#6799FF] hover:to-[#5587ED]
+           active:scale-[0.96] transition-all duration-200
+           text-white font-bold rounded-full shadow-md group suit-font"
                     >
-                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                        <span class="ml-1">구인등록</span>
-                    </PdButton>
+                        <i
+                            class="fa fa-plus-circle text-lg transition-transform group-hover:scale-110"
+                            aria-hidden="true"
+                        ></i>
+
+                        <span class="text-[15px] tracking-tight">구인등록</span>
+                    </button>
                 </a>
             {:else if ["/showfee"].includes($page.url.pathname)}
                 <!-- svelte-ignore event_directive_deprecated -->
@@ -318,14 +322,22 @@
                         goto("/simplewrite");
                     }}
                 >
-                    <PdButton
-                        classVal="py-1.5 px-4 text-white font-light rounded-full"
-                        backgroundColor="#5587ED"
-                        hoverColor="#6799FF"
+                    <button
+                        class="flex items-center justify-center gap-2 px-5 py-2.5
+           bg-gradient-to-r from-[#5587ED] to-[#4876D6]
+           hover:from-[#6799FF] hover:to-[#5587ED]
+           active:scale-[0.96] transition-all duration-200
+           text-white font-bold rounded-full shadow-md group suit-font"
                     >
-                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                        <span class="ml-1">게시글 등록</span>
-                    </PdButton>
+                        <i
+                            class="fa fa-plus-circle text-lg transition-transform group-hover:scale-110"
+                            aria-hidden="true"
+                        ></i>
+
+                        <span class="text-[15px] tracking-tight"
+                            >게시글 등록</span
+                        >
+                    </button>
                 </a>
             {/if}
         </div>
@@ -365,7 +377,7 @@
             <div
                 class="w-5 h-5 md:w-6 md:h-6 flex justify-center items-center ml-1"
             >
-                <svg
+                <!-- <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 576 512"
                     class="w-full"
@@ -376,10 +388,22 @@
                     ><path
                         d="M62.4 53.9C56.8 37.1 38.6 28.1 21.9 33.6S-3.9 57.4 1.6 74.1L51.6 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l40.9 0 56.7 170.1c4.5 13.5 17.4 22.4 31.6 21.9s26.4-10.4 29.8-24.2L233 288l46 0L321 455.8c3.4 13.8 15.6 23.7 29.8 24.2s27.1-8.4 31.6-21.9L439.1 288l40.9 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-19.6 0 50-149.9c5.6-16.8-3.5-34.9-20.2-40.5s-34.9 3.5-40.5 20.2L392.9 224l-64 0L287 56.2C283.5 42 270.7 32 256 32s-27.5 10-31 24.2L183 224l-64 0L62.4 53.9zm78 234.1l26.6 0-11.4 45.6L140.4 288zM249 224l7-28.1 7 28.1-14 0zm96 64l26.6 0-15.2 45.6L345 288z"
                     />
-                </svg>
+                </svg> -->
+
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-full"
+                    viewBox="0 0 640 640"
+                    style={$page.url.pathname == "/showfee"
+                        ? "fill: rgb(97,162,255);"
+                        : "fill: rgb(134,134,134);"}
+                    ><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path
+                        d="M416 208C416 305.2 330 384 224 384C197.3 384 171.9 379 148.8 370L67.2 413.2C57.9 418.1 46.5 416.4 39 409C31.5 401.6 29.8 390.1 34.8 380.8L70.4 313.6C46.3 284.2 32 247.6 32 208C32 110.8 118 32 224 32C330 32 416 110.8 416 208zM416 576C321.9 576 243.6 513.9 227.2 432C347.2 430.5 451.5 345.1 463 229.3C546.3 248.5 608 317.6 608 400C608 439.6 593.7 476.2 569.6 505.6L605.2 572.8C610.1 582.1 608.4 593.5 601 601C593.6 608.5 582.1 610.2 572.8 605.2L491.2 562C468.1 571 442.7 576 416 576z"
+                    /></svg
+                >
             </div>
 
-            <span class="text-[10px] text-xs">수수료인증</span>
+            <span class="text-[10px] text-xs">현장소통</span>
         </li>
 
         <li
@@ -459,6 +483,3 @@
 
     <div></div>
 </div>
-
-<style>
-</style>

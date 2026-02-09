@@ -17,9 +17,11 @@
 
     let { data } = $props();
     let boardList = $state([]);
-    boardList = data.boardList;
 
     onMount(() => {
+        boardList = data.boardList;
+        console.log(boardList);
+
         $pageScrollStatus = true;
     });
 
@@ -100,13 +102,36 @@
                 >
                     <div class="flex items-center gap-2">
                         <div
-                            class="w-6 h-6 bg-sky-100 rounded-full flex items-center justify-center"
+                            class="w-8 h-8 bg-sky-100 rounded-full flex items-center justify-center"
                         >
-                            <i class="fa fa-user text-[10px] text-sky-500"></i>
+                            {#if boardData.is_anonymous}
+                                <i class="fa fa-user text-[10px] text-sky-500"
+                                ></i>
+                            {:else if boardData.profile_thumbnail}
+                                <img
+                                    src={boardData.profile_thumbnail}
+                                    alt="profile"
+                                    class="w-full h-full object-cover"
+                                />
+                            {:else if boardData.profile_image}
+                                <img
+                                    src={`${public_img_bucket}${boardData.profile_image}`}
+                                    alt="profile"
+                                    class="w-full h-full object-cover"
+                                />
+                            {:else}
+                                <i class="fa fa-user text-[10px] text-sky-500"
+                                ></i>
+                            {/if}
                         </div>
-                        <span class="text-xs font-medium text-gray-700"
-                            >{boardData.nickname}</span
-                        >
+
+                        <span class="text-xs font-medium text-gray-700">
+                            {#if boardData.is_anonymous}
+                                익명
+                            {:else}
+                                {boardData.nickname}
+                            {/if}
+                        </span>
                         <span class="text-[10px] text-gray-300">•</span>
                         <span class="text-[11px] text-gray-400"
                             >{moment(boardData.created_at).fromNow()}</span

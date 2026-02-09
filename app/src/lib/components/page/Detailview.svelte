@@ -20,7 +20,7 @@
     // 컴포넌트 외부에서 주입받는 props
     let { item, isApp = false, favorateValue = false } = $props();
 
-    let detail = $derived(item.detail)
+    let detail = $derived(item.detail);
     let mainImage = $state(detail.imgs ? detail.imgs.split(",") : []);
     let shareModal = $state(false);
     let alertModalBool = $state(false);
@@ -83,185 +83,271 @@
 </script>
 
 <div
-    class="fixed top-0 left-0 w-full z-50 slide-menu"
-    class:hidden={showBool}
-    class:show={!headerShowBool}
+    class="fixed top-0 left-0 w-full z-50 transition-all duration-300 shadow-lg"
+    class:translate-y-[-100%]={headerShowBool}
+    class:translate-y-0={!headerShowBool}
 >
-    <div class="max-w-[530px] mx-auto bg-white">
-        <DetailMenu openShareModal={() => (shareModal = true)} />
+    <div
+        class="max-w-[630px] mx-auto bg-white/90 backdrop-blur-md border-b border-gray-100"
+    >
+        {#if isApp}
+            <DetailMenu item_id={item.pageId} />
+        {:else}
+            <DetailMenu />
+        {/if}
     </div>
 </div>
 
-<div id="detail-wrap" class:pb-24={!isApp}>
-    <DetailMenu openShareModal={() => (shareModal = true)} />
-
-    {#if detail.user_id == $user_info.idx}
-        <!-- svelte-ignore event_directive_deprecated -->
-        <div class="text-right my-3 px-3">
-            <button
-                class="btn btn-info text-white btn-sm"
-                on:click={() => goto(`/joboffer?modifyidx=${detail.idx}`)}
-                >내 글 수정</button
-            >
-            <button
-                class="btn btn-error text-white btn-sm"
-                on:click={() => (alertModalBool = true)}>내 글 삭제</button
-            >
-        </div>
-    {/if}
-
-    <div class="mb-8">
+<div id="detail-wrap" class="bg-gray-50 min-h-screen" class:pb-24={!isApp}>
+    <div
+        class="max-w-[630px] mx-auto bg-white/90 backdrop-blur-md border-b border-gray-100"
+    >
+        {#if isApp}
+            <DetailMenu item_id={item.pageId} />
+        {:else}
+            <DetailMenu />
+        {/if}
+    </div>
+    <div class="relative group bg-white">
         {#if mainImage.length > 1}
             <div class="swiper" bind:this={swiperContainer}>
-                <div class="swiper-wrapper">
+                <div class="swiper-wrapper flex items-center">
                     {#each mainImage as img}
-                        <div class="swiper-slide">
+                        <div class="swiper-slide h-[350px] overflow-hidden">
                             <img
                                 src="{public_img_bucket}{img}"
                                 alt=""
-                                class="mx-auto"
+                                class="w-full h-full object-cover"
                             />
                         </div>
                     {/each}
                 </div>
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
+                <div class="swiper-pagination"></div>
             </div>
         {:else if mainImage.length === 1}
-            <img
-                src="{public_img_bucket}{mainImage[0]}"
-                alt=""
-                class="mx-auto"
-            />
+            <div class="">
+                <img
+                    src="{public_img_bucket}{mainImage[0]}"
+                    alt=""
+                    class="w-full h-full object-cover"
+                    on:error={(e) => {
+                        e.target.style.display = "none";
+                        e.target.parentElement.style.display = "none";
+                    }}
+                />
+            </div>
+        {/if}
+
+        {#if detail.user_id == $user_info.idx}
+            <div class="absolute top-4 right-4 z-10 flex gap-2">
+                <button
+                    class="btn btn-circle btn-sm bg-white/80 border-none shadow-md hover:bg-info hover:text-white"
+                    on:click={() => goto(`/joboffer?modifyidx=${detail.idx}`)}
+                >
+                    <i class="fa fa-pencil"></i>
+                </button>
+                <button
+                    class="btn btn-circle btn-sm bg-white/80 border-none shadow-md hover:bg-error hover:text-white"
+                    on:click={() => (alertModalBool = true)}
+                >
+                    <i class="fa fa-trash"></i>
+                </button>
+            </div>
         {/if}
     </div>
 
-    <div class="bg-white rounded-lg p-3">
-        <div class="font-bold text-xl text-center">{detail.subject}</div>
-        <div class="mt-3">
-            <p><span class="font-bold">현장 포인트:</span> {detail.point}</p>
-            <p>
-                <span class="font-bold">전화번호:</span>
-                {formatPhoneNum(detail.phone)}
-            </p>
-        </div>
-        <div class="flex items-center gap-0.5 mt-5 text-sm">
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 384 512"
-                width="16"
-                height="16"
-                ><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path
-                    d="M297.2 248.9C311.6 228.3 320 203.2 320 176c0-70.7-57.3-128-128-128S64 105.3 64 176c0 27.2 8.4 52.3 22.8 72.9c3.7 5.3 8.1 11.3 12.8 17.7c0 0 0 0 0 0c12.9 17.7 28.3 38.9 39.8 59.8c10.4 19 15.7 38.8 18.3 57.5L109 384c-2.2-12-5.9-23.7-11.8-34.5c-9.9-18-22.2-34.9-34.5-51.8c0 0 0 0 0 0s0 0 0 0c-5.2-7.1-10.4-14.2-15.4-21.4C27.6 247.9 16 213.3 16 176C16 78.8 94.8 0 192 0s176 78.8 176 176c0 37.3-11.6 71.9-31.4 100.3c-5 7.2-10.2 14.3-15.4 21.4c0 0 0 0 0 0s0 0 0 0c-12.3 16.8-24.6 33.7-34.5 51.8c-5.9 10.8-9.6 22.5-11.8 34.5l-48.6 0c2.6-18.7 7.9-38.6 18.3-57.5c11.5-20.9 26.9-42.1 39.8-59.8c0 0 0 0 0 0s0 0 0 0s0 0 0 0c4.7-6.4 9-12.4 12.7-17.7zM192 128c-26.5 0-48 21.5-48 48c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-44.2 35.8-80 80-80c8.8 0 16 7.2 16 16s-7.2 16-16 16zm0 384c-44.2 0-80-35.8-80-80l0-16 160 0 0 16c0 44.2-35.8 80-80 80z"
-                /></svg
+    <div class="p-5 bg-white shadow-sm mb-3">
+        <div class="flex items-center gap-2 mb-5">
+            <span
+                class="badge badge-outline border-sky-500 text-sky-600 font-bold px-3 py-3"
             >
-            TIP : 번개분양을 보고 연락드렸다고 하시면 보다 상담이 쉬워집니다.
+                HOT 현장
+            </span>
+            <span class="text-gray-400 text-sm">{detail.agency}</span>
+        </div>
+        <h1 class="text-2xl font-bold text-gray-800 leading-tight mb-5">
+            {detail.subject}
+        </h1>
+
+        <div class="bg-sky-50 p-4 rounded-xl border border-sky-100">
+            <div class="flex items-start gap-3">
+                <span class="text-sky-500 mt-1"
+                    ><i class="fa fa-star text-lg"></i></span
+                >
+                <div>
+                    <span
+                        class="block text-xs text-sky-600 font-bold uppercase tracking-wider"
+                        >Field Point</span
+                    >
+                    <p class="text-gray-700 font-medium">{detail.point}</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="mt-10 p-3 bg-white rounded-lg">
-        <div class="text-lg">
-            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-            <span>채용정보</span>
+    <div class="grid grid-cols-2 gap-3 px-4 mb-4">
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+            <span class="text-xs text-gray-400 block mb-1">수수료</span>
+            <span class="text-lg font-extrabold text-orange-500"
+                >{detail.fee_type} {feeValue}</span
+            >
         </div>
-
-        <div class="my-3 font-semibold text-lg">기본정보</div>
-        <div class="leading-loose">
-            <p>대행사 : {detail.agency}</p>
-            <p>담당자 성함 : {detail.name}</p>
-            <p>
-                모집 업종 : {detail.business
-                    ? detail.business.replace(",", " / ")
-                    : ""}
-            </p>
-            <p>
-                모집 직종 : {detail.occupation
-                    ? detail.occupation.replace(",", " / ")
-                    : ""}
-            </p>
-            <p>경력 : {detail.career}</p>
-            <p>인원 : {detail.number_people}</p>
-        </div>
-
-        <div class="my-3 font-semibold text-lg">급여 및 영업지원 정보</div>
-        <div class="leading-loose">
-            <p>수수료 : {detail.fee_type} {feeValue}</p>
-            <p>
-                일비 : {detail.daily_expense ? detail.daily_expense : "없음"}
-            </p>
-            <p>
-                숙소비 : {detail.sleep_expense ? detail.sleep_expense : "없음"}
-            </p>
-            <p>
-                프로모션 : {detail.promotion ? detail.promotion : "없음"}
-            </p>
-            <p>
-                기본급여 : {detail.base_pay ? detail.base_pay : "없음"}
-            </p>
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+            <span class="text-xs text-gray-400 block mb-1">모집인원</span>
+            <span class="text-lg font-extrabold text-gray-800">
+                {detail.number_people}
+                {detail.number_people.includes("명") ? "" : "명"}
+            </span>
         </div>
     </div>
 
-    <div class="mt-3 p-3 bg-white rounded-lg">
-        <div class="text-lg">
-            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-            <span>상세정보</span>
-        </div>
-        <div class="leading-relaxed mt-3 whitespace-pre-wrap">
-            {detail.detail_content ? detail.detail_content : "-"}
-        </div>
+    <div class="px-4 space-y-4 pb-10">
+        <section
+            class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100"
+        >
+            <h2 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <span class="w-1.5 h-4 bg-sky-500 rounded-full"></span>
+                <span>기본정보</span>
+            </h2>
+            <div class="space-y-3">
+                <div class="flex justify-between border-b border-gray-50 pb-2">
+                    <span class="text-gray-500">담당자</span>
+                    <span class="font-medium text-gray-800">{detail.name}</span>
+                </div>
+                <div class="flex justify-between border-b border-gray-50 pb-2">
+                    <span class="text-gray-500">업종</span>
+                    <span class="font-medium text-gray-800"
+                        >{detail.business?.replace(",", " / ")}</span
+                    >
+                </div>
+                <div class="flex justify-between border-b border-gray-50 pb-2">
+                    <span class="text-gray-500">직종</span>
+                    <span class="font-medium text-gray-800"
+                        >{detail.occupation?.replace(",", " / ")}</span
+                    >
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">경력</span>
+                    <span class="font-medium text-gray-800"
+                        >{detail.career}</span
+                    >
+                </div>
+            </div>
+        </section>
+
+        <section
+            class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100"
+        >
+            <h2 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <span class="w-1.5 h-4 bg-orange-500 rounded-full"></span>
+                <span>영업지원 및 복지</span>
+            </h2>
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div class="flex flex-col gap-1 bg-gray-50 p-3 rounded-lg">
+                    <span class="text-gray-400 text-xs">일비</span>
+                    <span class="font-bold"
+                        >{detail.daily_expense || "없음"}</span
+                    >
+                </div>
+                <div class="flex flex-col gap-1 bg-gray-50 p-3 rounded-lg">
+                    <span class="text-gray-400 text-xs">숙소비</span>
+                    <span class="font-bold"
+                        >{detail.sleep_expense || "없음"}</span
+                    >
+                </div>
+                <div class="flex flex-col gap-1 bg-gray-50 p-3 rounded-lg">
+                    <span class="text-gray-400 text-xs">프로모션</span>
+                    <span class="font-bold">{detail.promotion || "없음"}</span>
+                </div>
+                <div class="flex flex-col gap-1 bg-gray-50 p-3 rounded-lg">
+                    <span class="text-gray-400 text-xs">기본급</span>
+                    <span class="font-bold">{detail.base_pay || "없음"}</span>
+                </div>
+            </div>
+        </section>
+
+        <section
+            class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100"
+        >
+            <h2 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <span class="w-1.5 h-4 bg-sky-500 rounded-full"></span>
+                <span>상세 모집내용</span>
+            </h2>
+
+            <div
+                class="text-gray-700 leading-relaxed whitespace-pre-wrap text-[15px] bg-gray-50/50 p-4 rounded-xl border border-dashed border-gray-200"
+            >
+                {detail.detail_content || "-"}
+            </div>
+        </section>
+
+        <section
+            class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+        >
+            <h2 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <span class="w-1.5 h-4 bg-orange-500 rounded-full"></span>
+                <span>근무지역</span>
+            </h2>
+            <p class="text-sm text-gray-500 mb-3">
+                <i class="fa fa-map-marker"></i>
+                {detail.res_addr}
+            </p>
+            <div
+                class="map-container {isApp
+                    ? 'h-[300px]'
+                    : 'h-64'} rounded-xl overflow-hidden ring-1 ring-gray-100"
+            >
+                {#if isApp}
+                    <iframe
+                        src={IFRAME_URL}
+                        style="width:100%;height:100%;border:0;"
+                        allow="geolocation"
+                        scrolling="no"
+                        title="map"
+                    ></iframe>
+                {:else}
+                    <KakaoMap
+                        getAddress={detail.addr}
+                        phText="근무지"
+                        height="300px"
+                    />
+                {/if}
+            </div>
+        </section>
     </div>
 </div>
 
-<div class="mt-3 p-3 bg-white rounded-lg">
-    <div class="text-lg font-bold mb-2">근무지역</div>
-    <div class="mb-2">{detail.res_addr}</div>
+<div
+    class="fixed bottom-0 left-0 w-full z-40 px-4 pb-6 pt-2 bg-gradient-to-t from-white via-white/95 to-transparent"
+>
     <div
-        class="map-container {isApp
-            ? 'h-[402px]'
-            : 'h-72'} border border-sky-400 rounded-md overflow-hidden"
+        class="max-w-[500px] mx-auto flex gap-2 items-center bg-white/80 backdrop-blur-md p-3 rounded-2xl shadow-[0_-10px_25px_-5px_rgba(0,0,0,0.1)] border border-gray-100"
     >
-        {#if isApp}
-            <iframe
-                src={IFRAME_URL}
-                style="width:100%;height:100%;border:0;"
-                allow="geolocation"
-                scrolling="no"
-                title="map"
-            ></iframe>
-        {:else}
-            <KakaoMap getAddress={detail.addr} phText="근무지" height="300px" />
-        {/if}
-    </div>
-</div>
-<!-- svelte-ignore event_directive_deprecated -->
-<div class={isApp ? "detail-bottom-fix" : "fixed bottom-0 left-0 w-full z-20"}>
-    <div
-        class="max-w-[530px] mx-auto flex gap-2 justify-center bg-white pt-3 pb-3 border-t border-gray-200"
-    >
-        <a href="TEL:{detail.phone}" class="w-1/4">
-            <button class="btn btn-info btn-sm w-full text-white"
-                >전화하기</button
+        <a href="TEL:{detail.phone}" class="flex-1">
+            <button
+                class="btn btn-info w-full text-white border-none bg-sky-500 hover:bg-sky-600 shadow-lg shadow-sky-100 rounded-xl h-12"
             >
+                <i class="fa fa-phone mr-1"></i> 전화하기
+            </button>
         </a>
         <a
             href="SMS:{detail.phone}?body=번개분양 보고 연락 드렸습니다."
-            class="w-1/4"
+            class="flex-1"
         >
-            <button class="btn btn-success btn-sm w-full text-white"
-                >문자하기</button
+            <button
+                class="btn btn-success w-full text-white border-none bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-100 rounded-xl h-12"
             >
+                <i class="fa fa-commenting mr-1"></i> 문자문의
+            </button>
         </a>
-
         <button
-            class="btn btn-warning btn-sm w-1/4 text-white"
+            class="btn btn-ghost w-14 h-12 rounded-xl bg-gray-100 text-gray-600"
             on:click={() => (shareModal = true)}
         >
-            공유하기
+            <i class="fa fa-share-alt text-lg"></i>
         </button>
     </div>
 </div>
-
-
 
 <CustomModal bind:visible={alertModalBool}>
     <div class="text-center">
@@ -291,14 +377,22 @@
 </CustomModal>
 
 <style>
-    /* 두 버전의 스타일 통합 */
-    .detail-bottom-fix {
-        position: fixed;
-        bottom: var(--safe-bottom, 0);
-        left: 0;
-        width: 100%;
-        z-index: 20;
+    /* 스와이퍼 페이지네이션 커스텀 */
+    :global(.swiper-pagination-bullet-active) {
+        background: #0ea5e9 !important; /* sky-500 */
+        width: 20px !important;
+        border-radius: 5px !important;
     }
+
+    .map-container {
+        mask-image: radial-gradient(white, black); /* 모서리 둥글게 유지 */
+    }
+
+    /* 폰트 보정 */
+    #detail-wrap {
+        font-family: "Pretendard", sans-serif;
+    }
+    /* 두 버전의 스타일 통합 */
     .swiper {
         width: 100%;
         height: 100%;
@@ -307,12 +401,5 @@
         display: block;
         width: 100%;
         object-fit: cover;
-    }
-    .slide-menu {
-        transform: translateY(-100%);
-        transition: transform 0.3s ease;
-    }
-    .slide-menu.show {
-        transform: translateY(0);
     }
 </style>

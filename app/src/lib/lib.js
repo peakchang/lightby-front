@@ -207,103 +207,182 @@ export function getPageList(currentPage, maxPage, displayCount = 7) {
  * @param {object} options - 추가 옵션: { folder: "폴더명", maxWidth: 숫자 }
  * @returns {function} - 업로드 실행 함수
  */
-const uploadImageAct = (back_api_url, options = {}, callback) => {
+// const uploadImageAct = (back_api_url, options = {}, callback) => {
 
+
+//     const folder = options.folder || "testfolder2";
+//     // const maxWidthOrHeight = options.maxWidth || 1200;
+
+//     const input = document.createElement("input");
+
+//     input.setAttribute("type", "file");
+//     input.setAttribute("accept", ".png,.jpg,.jpeg,.webp,.gif");
+//     input.click();
+
+//     input.onchange = async (e) => {
+//         loadingStore.set(true)
+//         const imageFile = e.target.files[0];
+//         const options = {
+//             maxSizeMB: 1, // 최대 파일 크기 (MB)
+//             // maxWidthOrHeight: 1024, // 최대 너비 또는 높이
+//             useWebWorker: true, // 웹 워커 사용
+//         };
+//         try {
+
+//             let compressedFile = {}
+//             const maxSize = 1 * 1024 * 1024; // 1MB
+
+//             if (imageFile.name.split('.')[1] == 'gif') {
+//                 if (imageFile.size >= maxSize) {
+//                     throw new Error("파일 용량이 1MB 이상입니다.");
+//                 }
+//                 compressedFile = imageFile
+//             } else {
+//                 compressedFile = await imageCompression(
+//                     imageFile,
+//                     options,
+//                 );
+//             }
+
+
+
+
+//             let imgForm = new FormData();
+//             const timestamp = new Date().getTime();
+//             const fileName = `${timestamp}${Math.random()
+//                 .toString(36)
+//                 .substring(2, 11)}.${compressedFile.name.split(".")[1]}`;
+
+
+//             imgForm.append("folder", folder);
+//             imgForm.append("onimg", compressedFile, fileName);
+
+//             // FormData의 key 값과 value값 찾기
+//             let keys = imgForm.keys();
+//             for (const pair of keys) {
+//                 console.log(`name : ${pair}`);
+//             }
+
+//             let values = imgForm.values();
+//             for (const pair of values) {
+//                 console.log(`value : ${pair}`);
+//             }
+
+//             const res = await axios.post(
+//                 back_api_url,
+//                 imgForm,
+//                 {
+//                     headers: {
+//                         "Content-Type": "multipart/form-data",
+//                     },
+//                 },
+//             );
+//             console.log('!!!!!!')
+
+//             loadingStore.set(false)
+//             if (typeof callback === "function") {
+//                 callback(null, res.data);
+//             }
+//         } catch (err) {
+
+//             loadingStore.set(true)
+//             const m = err.response?.data?.message;
+//             if (typeof callback === "function") {
+//                 callback(err, null);
+//             }
+//         }
+//     };
+
+
+// }
+
+// export default uploadImageAct;
+
+
+
+const uploadMultipleImgAct = (back_api_url, options = {}, callback) => {
+
+    console.log('여러 이미비 업로드 고고!!!');
 
     const folder = options.folder || "testfolder2";
-    // const maxWidthOrHeight = options.maxWidth || 1200;
 
     const input = document.createElement("input");
-
     input.setAttribute("type", "file");
     input.setAttribute("accept", ".png,.jpg,.jpeg,.webp,.gif");
+    input.setAttribute("multiple", "true"); // [추가] 다중 선택 가능하도록 설정
     input.click();
 
     input.onchange = async (e) => {
-        loadingStore.set(true)
+        loadingStore.set(true);
+        const files = Array.from(e.target.files); // FileList를 배열로 변환
 
-        const imageFile = e.target.files[0];
+        if (files.length === 0) {
+            loadingStore.set(false);
+            return;
+        }
 
-        console.log(imageFile);
-
-
-
-        const options = {
-            maxSizeMB: 1, // 최대 파일 크기 (MB)
-            // maxWidthOrHeight: 1024, // 최대 너비 또는 높이
-            useWebWorker: true, // 웹 워커 사용
+        const compressionOptions = {
+            maxSizeMB: 1,
+            useWebWorker: true,
         };
 
         try {
-
-            let compressedFile = {}
-            const maxSize = 1 * 1024 * 1024; // 1MB
-
-            if (imageFile.name.split('.')[1] == 'gif') {
-                if (imageFile.size >= maxSize) {
-                    throw new Error("파일 용량이 1MB 이상입니다.");
-                }
-                compressedFile = imageFile
-            } else {
-                compressedFile = await imageCompression(
-                    imageFile,
-                    options,
-                );
-            }
-
-
-
-
-            let imgForm = new FormData();
-            const timestamp = new Date().getTime();
-            const fileName = `${timestamp}${Math.random()
-                .toString(36)
-                .substring(2, 11)}.${compressedFile.name.split(".")[1]}`;
-
-
+            const imgForm = new FormData();
             imgForm.append("folder", folder);
-            imgForm.append("onimg", compressedFile, fileName);
 
-            // FormData의 key 값과 value값 찾기
-            let keys = imgForm.keys();
-            for (const pair of keys) {
-                console.log(`name : ${pair}`);
-            }
+            // 각 파일을 병렬로 압축 처리
+            const processPromises = files.map(async (imageFile) => {
+                let compressedFile;
+                const maxSize = 1 * 1024 * 1024; // 1MB
 
-            let values = imgForm.values();
-            for (const pair of values) {
-                console.log(`value : ${pair}`);
-            }
+                // GIF 처리 로직
+                if (imageFile.name.toLowerCase().endsWith('.gif')) {
+                    if (imageFile.size >= maxSize) {
+                        throw new Error(`${imageFile.name}: GIF 파일 용량이 1MB 이상입니다.`);
+                    }
+                    compressedFile = imageFile;
+                } else {
+                    // 일반 이미지 압축
+                    compressedFile = await imageCompression(imageFile, compressionOptions);
+                }
 
+                // 고유한 파일명 생성
+                const timestamp = new Date().getTime();
+                const randomStr = Math.random().toString(36).substring(2, 11);
+                const extension = compressedFile.name.split(".").pop();
+                const fileName = `${timestamp}_${randomStr}.${extension}`;
+
+                // 동일한 key('onimg')로 여러 파일 추가
+                imgForm.append("onimg", compressedFile, fileName);
+            });
+
+            // 모든 파일의 압축 및 Append가 완료될 때까지 대기
+            await Promise.all(processPromises);
+
+            // 백엔드로 전송
             const res = await axios.post(
                 back_api_url,
                 imgForm,
                 {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
-                },
+                    headers: { "Content-Type": "multipart/form-data" },
+                }
             );
-            console.log('!!!!!!')
 
-            loadingStore.set(false)
+            loadingStore.set(false);
             if (typeof callback === "function") {
                 callback(null, res.data);
             }
         } catch (err) {
-
-            loadingStore.set(true)
-            const m = err.response?.data?.message;
+            loadingStore.set(false); // 에러 시에는 false로 꺼주는 것이 맞습니다.
+            console.error("Upload Error:", err);
             if (typeof callback === "function") {
                 callback(err, null);
             }
         }
     };
+};
 
-
-}
-
-export default uploadImageAct;
+export default uploadMultipleImgAct;
 
 
 

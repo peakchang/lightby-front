@@ -7,7 +7,8 @@
         public_img_bucket,
         img_bucket,
     } from "$lib/const";
-    import uploadImageAct from "$lib/lib";
+    // import uploadImageAct from "$lib/lib";
+    import uploadMultipleImgAct from "$lib/lib";
     import { loadingStore } from "$lib/stores/stores";
 
     import fileinput from "daisyui/components/fileinput";
@@ -68,12 +69,11 @@
         updateImg({ imgArr, url: delPath, type });
 
         console.log(imgArr);
-        
     }
 
     function onFileSelected() {
-        uploadImageAct(
-            `${back_api}/img/upload_single`,
+        uploadMultipleImgAct(
+            `${back_api}/img/upload_multiple`,
             { folder },
             (err, imgData) => {
                 if (err) {
@@ -87,10 +87,17 @@
                 }
 
                 try {
-                    addVal(imgData.saveUrl);
+                    console.log(imgData.saveUrls);
+
+                    imgData.saveUrls.forEach((url) => {
+                        addVal(url);
+                    });
+
                     setDetailImgCount = imgArr.length - 1;
+
                     const type = "add";
-                    updateImg({ imgArr, url: imgData.saveUrl, type });
+                    // updateImg({ imgArr, url: imgData.saveUrl, type });
+                    updateImg({ imgArr, type });
                 } catch (err) {
                     console.error(err.message);
                 } finally {

@@ -15,7 +15,7 @@
 
 
 <div class="bg-white relative min-h-screen suit-font">
-    <div class="max-w-[530px] mx-auto pb-16">
+    <div class="max-w-[630px] mx-auto pb-16">
         {@render children()}
     </div>
 </div>

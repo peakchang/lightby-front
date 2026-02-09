@@ -620,7 +620,7 @@
     let modalCloseBtn = $state();
 
     // KakaoMap 컴포넌트에 전달할 변수
-    let getAddress = $state();
+    let getAddress = $state("");
 
     function tudeAct(e) {
         $all_data["latitude"] = e.coords.Ma;
@@ -789,46 +789,115 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <!-- 이전 공고 불러오기 리스트 모달 -->
 <CustomModal bind:visible={prevPostListModal}>
-    <div class="mb-5 font-bold">이전 등록 공고 불러오기</div>
+    <div class="py-2 px-1 suit-font">
+        <div class="flex items-center gap-2 mb-6">
+            <div class="w-1.5 h-5 bg-blue-500 rounded-full"></div>
+            <h2 class="text-xl font-extrabold text-slate-800">
+                이전 등록 공고 불러오기
+            </h2>
+        </div>
 
-    <div>
-        {#each prevPostList as post}
-            <div
-                class="mb-2 text-sm border border-gray-200 bg-gray-200 p-3 rounded-md hover:bg-white cursor-pointer flex justify-between items-center"
-                data-idx={post.idx}
-                on:click={useChkPrevPost}
+        <div
+            class="space-y-3 max-h-[400px] overflow-y-auto pr-1 custom-scrollbar"
+        >
+            {#if prevPostList.length > 0}
+                {#each prevPostList as post}
+                    <div
+                        class="group p-4 bg-slate-50 border border-slate-200 rounded-2xl cursor-pointer hover:border-blue-400 hover:bg-white hover:shadow-md hover:shadow-blue-50 transition-all flex justify-between items-center"
+                        data-idx={post.idx}
+                        on:click={useChkPrevPost}
+                    >
+                        <div class="flex flex-col gap-1 overflow-hidden">
+                            <span
+                                class="text-sm font-bold text-slate-700 truncate group-hover:text-blue-600 transition-colors"
+                            >
+                                {post.subject}
+                            </span>
+                            <span class="text-[11px] text-slate-400">
+                                {post.created_at
+                                    ? post.created_at.split("T")[0]
+                                    : "과거 등록건"}
+                            </span>
+                        </div>
+
+                        <div class="flex items-center gap-2 shrink-0 ml-4">
+                            <span
+                                class="text-xs font-bold text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                >선택하기</span
+                            >
+                            <div
+                                class="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 group-hover:bg-blue-500 group-hover:text-white group-hover:border-blue-500 transition-all"
+                            >
+                                <i class="fa fa-chevron-right text-xs"></i>
+                            </div>
+                        </div>
+                    </div>
+                {/each}
+            {:else}
+                <div class="py-20 text-center space-y-3">
+                    <div class="text-slate-200 text-5xl">
+                        <i class="fa fa-folder-open-o"></i>
+                    </div>
+                    <p class="text-slate-400 text-sm font-medium">
+                        이전에 등록한 공고가 없습니다.
+                    </p>
+                </div>
+            {/if}
+        </div>
+
+        <div class="mt-6 pt-2">
+            <button
+                class="w-full h-12 bg-slate-100 text-slate-500 rounded-xl font-bold hover:bg-slate-200 transition-colors"
+                on:click={() => (prevPostListModal = false)}
             >
-                <span>{post.subject}</span>
-                <button
-                    type="button"
-                    class="btn btn-outline btn-info btn-sm hover:text-white"
-                >
-                    적용
-                </button>
-            </div>
-        {/each}
+                닫기
+            </button>
+        </div>
     </div>
 </CustomModal>
 
 <!-- 이전 공고 선택시 기존 데이터 있으면 확인하는 모달 -->
 <!-- svelte-ignore event_directive_deprecated -->
 <CustomModal bind:visible={prevPostChkModal} closeBtn={false}>
-    <div class="text-center">
-        <div class=" text-blue-500 text-3xl mb-5">
-            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+    <div class="py-4 px-2 suit-font">
+        <div class="flex justify-center mb-6">
+            <div
+                class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 shadow-sm border border-blue-100"
+            >
+                <i
+                    class="fa fa-refresh text-3xl animate-spin-slow"
+                    aria-hidden="true"
+                ></i>
+            </div>
         </div>
-        <div class="mb-5">
-            <p>현재 작성중인 공고가 있습니다.</p>
-            <p>현재 내용을 삭제하고 불러오기를 진행 하겠습니까?</p>
+
+        <div class="text-center space-y-2 mb-8">
+            <h3 class="text-lg font-extrabold text-slate-800">
+                내용을 덮어쓰시겠어요?
+            </h3>
+            <div class="text-slate-500 text-sm leading-relaxed">
+                <p>현재 작성 중인 공고 내용이 모두 삭제되고,</p>
+                <p>
+                    선택하신 <span class="text-blue-600 font-bold"
+                        >이전 공고 내용으로 교체</span
+                    >됩니다.
+                </p>
+            </div>
         </div>
+
         <div class="flex justify-center items-center gap-3">
             <button
-                class="btn btn-info w-1/3 text-white"
+                class="flex-1 h-12 bg-slate-100 text-slate-500 rounded-xl font-bold hover:bg-slate-200 transition-colors"
+                on:click={() => (prevPostChkModal = false)}
+            >
+                취소
+            </button>
+            <button
+                class="flex-1 h-12 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 shadow-md shadow-blue-100 active:scale-95 transition-all"
                 on:click={usePrevPost}
             >
                 불러오기
             </button>
-            <button class="btn btn-soft w-1/3">취소</button>
         </div>
     </div>
 </CustomModal>
@@ -836,16 +905,53 @@
 <!-- 결제 완료 후 뜨는 모달 -->
 <!-- svelte-ignore event_directive_deprecated -->
 <CustomModal bind:visible={successPrevModal} closeBtn={false}>
-    <div class="text-center">
-        <div class=" text-green-700 text-5xl mb-5">
-            <i class="fa fa-smile-o" aria-hidden="true"></i>
+    <div class="py-8 px-4 text-center suit-font">
+        <div class="flex justify-center mb-6">
+            <div class="relative">
+                <div
+                    class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500 border border-emerald-100 shadow-sm shadow-emerald-50"
+                >
+                    <i class="fa fa-check text-4xl" aria-hidden="true"></i>
+                </div>
+                <div
+                    class="absolute -top-1 -right-1 w-6 h-6 bg-amber-400 rounded-full flex items-center justify-center text-white text-[10px] border-2 border-white shadow-sm"
+                >
+                    <i class="fa fa-star"></i>
+                </div>
+            </div>
         </div>
-        <div class="mb-2 text-xl">
-            {successPrevModalMessage}
+
+        <div class="space-y-2 mb-8">
+            <h3 class="text-2xl font-black text-slate-800 tracking-tight">
+                {successPrevModalMessage}
+            </h3>
+            <p class="text-slate-500 text-sm">
+                성공적으로 처리되었습니다.<br />
+                <span class="font-medium text-slate-400">
+                    잠시 후 이전 페이지로 자동 이동합니다.
+                </span>
+            </p>
         </div>
-        <div class="mb-5 text-sm">잠시 후 이전 페이지로 돌아갑니다.</div>
-        <div>
-            <span class="loading loading-ring loading-xl"></span>
+
+        <div class="flex flex-col items-center gap-3">
+            <div class="flex gap-1.5">
+                <span
+                    class="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"
+                    style="animation-delay: 0.1s"
+                ></span>
+                <span
+                    class="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"
+                    style="animation-delay: 0.2s"
+                ></span>
+                <span
+                    class="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"
+                    style="animation-delay: 0.3s"
+                ></span>
+            </div>
+            <span
+                class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest opacity-60"
+                >Redirecting</span
+            >
         </div>
     </div>
 </CustomModal>
@@ -853,15 +959,36 @@
 <!-- 경고창 모달 -->
 <!-- svelte-ignore event_directive_deprecated -->
 <CustomModal bind:visible={alertModalShow} closeBtn={false}>
-    <div class="text-center">
-        <div class=" text-red-500 text-3xl mb-5">
-            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+    <div class="py-4 px-2">
+        <div class="flex justify-center mb-6">
+            <div
+                class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center text-red-500 shadow-sm border border-red-100"
+            >
+                <i
+                    class="fa fa-exclamation-triangle text-2xl"
+                    aria-hidden="true"
+                ></i>
+            </div>
         </div>
-        <div class="mb-5">
-            {alertModalMessage}
+
+        <div class="text-center space-y-2 mb-8">
+            <h3 class="text-lg font-extrabold text-slate-800">
+                확인이 필요합니다
+            </h3>
+            <p
+                class="text-slate-500 text-sm leading-relaxed whitespace-pre-wrap"
+            >
+                {alertModalMessage}
+            </p>
         </div>
-        <div class="flex justify-center items-center gap-3">
-            <button class="btn btn-active w-1/3">닫기</button>
+
+        <div class="flex justify-center">
+            <button
+                class="w-full sm:w-1/2 h-12 bg-slate-800 text-white rounded-xl font-bold hover:bg-slate-700 active:scale-95 transition-all shadow-md"
+                on:click={() => (alertModalShow = false)}
+            >
+                확인했습니다
+            </button>
         </div>
     </div>
 </CustomModal>
@@ -869,156 +996,193 @@
 <!-- 페이지 벗어나려고 할 시 보이는 모달 -->
 <!-- svelte-ignore event_directive_deprecated -->
 <CustomModal bind:visible={escapePageModal} closeBtn={false}>
-    <div class="text-center">
-        <div class=" text-red-500 text-3xl mb-5">
-            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+    <div class="py-4 px-2">
+        <div class="flex justify-center mb-6">
+            <div
+                class="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center text-amber-500 shadow-sm border border-amber-100"
+            >
+                <i class="fa fa-exclamation-circle text-3xl" aria-hidden="true"
+                ></i>
+            </div>
         </div>
-        <div class="mb-5">
-            페이지에서 벗어날시 등록중인 내용은 삭제됩니다. 진행하시겠습니까?
+
+        <div class="text-center space-y-2 mb-8">
+            <h3 class="text-lg font-extrabold text-slate-800">
+                정말 나가시겠어요?
+            </h3>
+            <div class="text-slate-500 text-sm leading-relaxed">
+                <p>지금 페이지를 벗어나면</p>
+                <p>
+                    <span class="text-red-500 font-bold"
+                        >작성 중인 모든 내용이 삭제</span
+                    >됩니다.
+                </p>
+            </div>
         </div>
-        <div class="flex justify-center items-center gap-3">
+
+        <div
+            class="flex flex-col sm:flex-row justify-center items-center gap-3"
+        >
             <button
-                class="btn btn-active btn-info text-white w-1/3"
+                class="w-full sm:flex-1 h-12 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-200 transition-all order-2 sm:order-1"
                 on:click={goToBackAndArrangeImg}
             >
-                뒤로가기
+                벗어나기
             </button>
-            <button class="btn btn-active w-1/3">취소</button>
+            <button
+                class="w-full sm:flex-1 h-12 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 shadow-md shadow-indigo-100 active:scale-95 transition-all order-1 sm:order-2"
+                on:click={() => (escapePageModal = false)}
+            >
+                계속 작성하기
+            </button>
         </div>
     </div>
 </CustomModal>
 
 <!-- 상품 선택 및 결제 모달 -->
 <CustomModal bind:visible={submitPrevModal} closeBtn={false}>
-    <!-- svelte-ignore event_directive_deprecated -->
-    <div class="text-center">
-        <div>
-            <div class=" text-green-700 text-3xl mb-2">
-                <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+    <div class="py-2 px-1 suit-font">
+        <div class="text-center mb-6">
+            <div
+                class="inline-flex items-center justify-center w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full mb-3"
+            >
+                <i class="fa fa-shopping-cart text-xl"></i>
             </div>
+            {#if freebies}
+                <h3 class="text-xl font-extrabold text-slate-800">
+                    축하합니다! 첫 글 혜택 적용
+                </h3>
+                <p class="text-sm text-blue-600 font-medium mt-1">
+                    프리미엄 등록을 무료로 이용하실 수 있습니다.
+                </p>
+            {:else}
+                <h3 class="text-xl font-extrabold text-slate-800">
+                    상품 선택 및 결제
+                </h3>
+                <p class="text-sm text-slate-500 mt-1">
+                    원하시는 노출 옵션을 선택해 주세요.
+                </p>
+            {/if}
+        </div>
 
-            <div class="mb-5">
-                {#if freebies}
-                    <p class="md:text-lg">첫글 작성자 혜택!</p>
-                    <p>구인글 최초 1회 프리미엄 무료등록</p>
-                {:else}
-                    <p class="md:text-lg">상품을 선택하세요</p>
-                {/if}
-            </div>
-
-            <label>
+        <div class="space-y-3 mb-6">
+            <label class="product-card">
                 <input
                     type="radio"
                     value="premium"
-                    class="hidden peer"
+                    class="hidden"
                     bind:group={$all_data["product"]}
                     on:change={itemRateChange}
                 />
-
-                <div
-                    class="mb-5 border-2 peer-checked:border-blue-500 border-gray-200 p-2 mx-auto rounded-lg"
-                >
-                    {#if freebies}
-                        <p class="line-through text-gray-500">
-                            프리미엄 등록 특가 132,000 -> 66,000원
-                        </p>
-                        <p>첫글 등록시 프리미엄 무료!</p>
-                    {:else}
-                        <p class="text-sm md:text-base mb-2">
-                            프리미엄 등록 특가
-                            <span class="line-through text-gray-500">
-                                132,000원
-                            </span>
-                            ->
-                            <span class="font-bold">66,000원</span>
-                        </p>
-                    {/if}
-
-                    <p class="text-xs md:text-sm">
-                        시작페이지 / 지역페이지 모든 지면
-                    </p>
-                    <p class="text-xs md:text-sm">상단 10일 랜덤 노출</p>
-                    <p class="text-xs md:text-sm">
-                        등록된 내용은 마이페이지에서 수정 가능
-                    </p>
+                <div class="card-body">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="badge-premium">PREMIUM</span>
+                        <div class="text-right">
+                            {#if freebies}
+                                <span
+                                    class="block text-xs text-slate-400 line-through"
+                                    >132,000원</span
+                                >
+                                <span class="text-lg font-bold text-blue-600"
+                                    >0원 (무료)</span
+                                >
+                            {:else}
+                                <span
+                                    class="block text-xs text-slate-400 line-through"
+                                    >132,000원</span
+                                >
+                                <span class="text-lg font-bold text-slate-800"
+                                    >66,000원</span
+                                >
+                            {/if}
+                        </div>
+                    </div>
+                    <ul class="text-[11px] text-slate-500 space-y-1">
+                        <li>• 메인 + 지역페이지 최상단 랜덤 노출</li>
+                        <li>• 광고 기간 10일 제공</li>
+                    </ul>
                 </div>
             </label>
 
-            <label>
+            <label class="product-card">
                 <input
                     type="radio"
                     value="top"
-                    class="hidden peer"
+                    class="hidden"
                     bind:group={$all_data["product"]}
                     on:change={itemRateChange}
                 />
-
-                <div
-                    class="mb-5 border-2 peer-checked:border-blue-500 border-gray-200 p-2 mx-auto rounded-lg"
-                >
-                    <p class="text-sm md:text-base mb-2">
-                        지역 탑 등록 특가
-                        <span class="line-through text-gray-500">
-                            99,000원
-                        </span>
-                        ->
-                        <span class="font-bold">49,500원</span>
-                    </p>
-                    <p class="text-xs md:text-sm">
-                        지역페이지 상단 10일 랜덤 노출
-                    </p>
-                    <p class="text-xs md:text-sm">
-                        등록된 내용은 마이페이지에서 수정 가능
-                    </p>
+                <div class="card-body">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="badge-top">REGION TOP</span>
+                        <div class="text-right">
+                            <span
+                                class="block text-xs text-slate-400 line-through"
+                                >99,000원</span
+                            >
+                            <span class="text-lg font-bold text-slate-800"
+                                >49,500원</span
+                            >
+                        </div>
+                    </div>
+                    <ul class="text-[11px] text-slate-500 space-y-1">
+                        <li>• 선택한 지역페이지 상단 랜덤 노출</li>
+                        <li>• 광고 기간 10일 제공</li>
+                    </ul>
                 </div>
             </label>
 
-            <label>
+            <label class="product-card">
                 <input
                     type="radio"
                     value="free"
-                    class="hidden peer"
+                    class="hidden"
                     bind:group={$all_data["product"]}
                     on:change={itemRateChange}
                 />
-
-                <div
-                    class="mb-5 border-2 peer-checked:border-blue-500 border-gray-200 p-2 mx-auto rounded-lg"
-                >
-                    <p class="text-sm md:text-base mb-2">
-                        - 바로 등록 (무료 등록)
-                    </p>
-                    <p class="text-xs md:text-sm">
-                        일 2회 무료 등록이 가능합니다.
-                    </p>
+                <div class="card-body">
+                    <div class="flex justify-between items-center">
+                        <span class="badge-free">NORMAL</span>
+                        <span class="text-lg font-bold text-slate-800"
+                            >무료 등록</span
+                        >
+                    </div>
                 </div>
             </label>
         </div>
 
         {#if iconsShow}
-            <div class="">
-                <div class="">※ 아이콘 선택 (개당 2,200원)</div>
-                <div class="mt-1 mb-4 text-xs leading-relaxed">
-                    <p>아이콘은 1개 선택 가능하며,</p>
-                    <p>선택하신 아이콘은 메인페이지 우측 하단에 표시됩니다.</p>
+            <div
+                class="bg-slate-50 rounded-2xl p-5 mb-6 border border-slate-100"
+            >
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-sm font-bold text-slate-700">
+                        포인트 아이콘 <span
+                            class="text-xs font-normal text-slate-400 ml-1"
+                            >(개당 2,200원)</span
+                        >
+                    </span>
+                    <span
+                        class="text-[10px] px-2 py-0.5 bg-white border border-slate-200 rounded text-slate-500"
+                        >1개 선택 가능</span
+                    >
                 </div>
-                <div class="grid grid-cols-4 md:gap-x-2 gap-y-2">
+
+                <div class="grid grid-cols-4 gap-3 px-1">
                     {#each iconList as icon}
-                        <label>
+                        <label class="icon-selector">
                             <input
                                 type="checkbox"
-                                class="hidden peer"
                                 value={icon.id}
+                                class="hidden"
                                 bind:group={icons}
                                 on:change={iconsChange}
                             />
-                            <div
-                                class="border-2 peer-checked:border-blue-500 border-gray-200 w-5/6 md:w-4/5 p-2 mx-auto rounded-lg"
-                            >
+                            <div class="icon-box-new">
                                 <img
                                     src="/icons/icon-{icon.id}.png"
                                     alt=""
-                                    class="w-full"
+                                    class="w-full h-auto object-contain"
                                 />
                             </div>
                         </label>
@@ -1026,65 +1190,57 @@
                 </div>
             </div>
         {:else}
-            아이콘 선택은 프리미엄 또는 지역탑 등록시 선택 가능합니다.
+            <div
+                class="bg-slate-50 rounded-xl p-4 mb-6 text-center text-xs text-slate-400 border border-dashed border-slate-200"
+            >
+                아이콘 선택은 프리미엄 또는 지역탑 등록 시 가능합니다.
+            </div>
         {/if}
 
-        <div class="w-2/3 md:w-1/2 ml-auto my-4 text-lg font-semibold">
-            <div
-                class="flex justify-between items-center mb-2 border-b border-gray-100 text-sm"
-            >
-                <span class="text-gray-600">{productInfo.name}</span>
-                <span class="font-medium">
-                    {productInfo.price.toLocaleString()}원
-                </span>
+        <div class="bg-slate-800 rounded-2xl p-5 text-white shadow-inner mb-6">
+            <div class="flex justify-between text-xs opacity-70 mb-1">
+                <span>선택 상품: {productInfo.name}</span>
+                <span>{productInfo.price.toLocaleString()}원</span>
             </div>
-
             {#each iconNames as iconName}
-                <div
-                    class="flex justify-between items-center mb-2 border-b border-gray-100 text-sm"
-                >
-                    <span class="text-gray-600">{iconName}</span>
-                    <span class="font-medium"> 2,200 원 </span>
+                <div class="flex justify-between text-xs opacity-70 mb-1">
+                    <span>아이콘: {iconName}</span>
+                    <span>2,200원</span>
                 </div>
             {/each}
-
-            <hr class="border-gray-300" />
             <div
-                class="flex justify-between items-center py-2 border-b border-gray-100"
+                class="border-t border-white/10 mt-3 pt-3 flex justify-between items-center"
             >
-                <span class="text-gray-600">합계</span>
-
-                {#if freebies}
-                    <span class="font-medium">
-                        <span class="line-through text-gray-400">
-                            {$all_data["sum"]
-                                ? $all_data["sum"].toLocaleString()
-                                : 0}
-                        </span>
-                        >>
-                        <span>0</span>
-                        원
-                    </span>
-                {:else}
-                    <span class="font-medium">
-                        {$all_data["sum"]
-                            ? $all_data["sum"].toLocaleString()
-                            : 0}원
-                    </span>
-                {/if}
+                <span class="font-bold">최종 결제 금액</span>
+                <div class="text-right">
+                    {#if freebies}
+                        <span class="text-xs line-through opacity-50 mr-2"
+                            >{$all_data["sum"]?.toLocaleString()}원</span
+                        >
+                        <span class="text-xl font-black text-emerald-400"
+                            >0원</span
+                        >
+                    {:else}
+                        <span class="text-xl font-black"
+                            >{$all_data["sum"]?.toLocaleString()}원</span
+                        >
+                    {/if}
+                </div>
             </div>
         </div>
 
-        <div class="text-right">
-            <button class="btn btn-success text-white" on:click={uploadRegist}>
-                결제 및 등록
-            </button>
-        </div>
+        <button
+            class="w-full h-14 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-2xl font-black text-lg shadow-lg shadow-emerald-100 hover:scale-[1.02] active:scale-[0.98] transition-all"
+            on:click={uploadRegist}
+        >
+            {#if freebies || $all_data["product"] === "free"}무료로 등록하기{:else}결제
+                및 등록하기{/if}
+        </button>
     </div>
 </CustomModal>
 
 <!-- svelte-ignore event_directive_deprecated -->
-<dialog id="my_modal_1" class="modal">
+<dialog id="my_modal_1" class="modal suit-font">
     <div class="modal-box">
         <h3 class="text-lg font-bold">주소를 입력하세요</h3>
         <div
@@ -1104,407 +1260,691 @@
         <div class="modal-action">
             <form method="dialog">
                 <!-- if there is a button in form, it will close the modal -->
-                <button class="btn" bind:this={modalCloseBtn}>Close</button>
+                <button class="btn" bind:this={modalCloseBtn}>닫기</button>
             </form>
         </div>
     </div>
 </dialog>
 
-<PageHeader />
+<PageHeader pageName="구인글 등록" />
 
 <!-- svelte-ignore event_directive_deprecated -->
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="bg-white relative min-h-screen suit-font">
+<div class="bg-slate-50 min-h-screen suit-font pb-24">
     <div class="max-w-[530px] mx-auto pt-14 pb-24">
         <!-- <button on:click={testFunc}> testBtn </button> -->
-        {#if freebies}
-            <div class="text-right text-blue-700">
-                <i class="fa fa-hand-pointer-o" aria-hidden="true"></i>
-                <span>첫번째 구인공고 작성시 프리미엄 무료!</span>
-            </div>
-        {/if}
         <div
-            class=" bg-white p-3 flex justify-between items-center border-b border-gray-300"
+            class="bg-white p-5 border-b border-slate-200 shadow-sm top-14 z-10"
         >
-            {#if !data.modifyIdx}
-                <div class="text-center font-semibold text-2xl">
-                    구인글 등록
+            <div class="max-w-[530px] mx-auto flex flex-col gap-3">
+                <div class="flex justify-between items-center">
+                    <h1
+                        class="text-2xl font-black text-slate-800 tracking-tight"
+                    >
+                        {#if !data.modifyIdx}구인글 등록{:else}구인글 수정{/if}
+                    </h1>
 
-                    <span
-                        class="text-xs"
+                    {#if !data.modifyIdx}
+                        <button
+                            type="button"
+                            class="flex items-center gap-1.5 px-3 py-2 bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-slate-700 active:scale-95 transition-all shadow-md shadow-slate-100"
+                            on:click={loadPreviousPostList}
+                        >
+                            <i class="fa fa-file-text-o text-blue-400"></i>
+                            <span>이전 공고 불러오기</span>
+                        </button>
+                    {/if}
+                </div>
+
+                {#if freebies}
+                    <div class="flex">
+                        <div
+                            class="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-[11px] font-extrabold animate-pulse border border-blue-100"
+                        >
+                            <i class="fa fa-gift text-sm"></i>
+                            <span
+                                >첫번째 구인공고 작성 시 프리미엄 무료 혜택이
+                                적용됩니다!</span
+                            >
+                        </div>
+                    </div>
+                {/if}
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <section
+                class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100"
+            >
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
+                    <h2 class="font-bold text-slate-800 text-lg">
+                        현장 이미지
+                    </h2>
+                    <span class="text-xs text-slate-400 font-normal ml-auto">
+                        최대 10장, 슬라이드 형태로 표시됩니다.
+                    </span>
+                </div>
+                <div
+                    class="bg-slate-50 rounded-xl p-4 border-2 border-dashed border-slate-200"
+                >
+                    <SortableImg
+                        {updateImg}
+                        folder={"job-offer"}
+                        imgModifyList={$all_data["imgs"]
+                            ? $all_data["imgs"].split(",")
+                            : ""}
+                        maxImgCount={10}
+                    ></SortableImg>
+                </div>
+            </section>
+
+            <section
+                class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-6"
+            >
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
+                    <h2 class="font-bold text-slate-800 text-lg">
+                        공고 제목 (현장명) *
+                    </h2>
+                </div>
+
+                <div>
+                    <label
+                        class="block text-sm font-bold text-slate-600 mb-2 ml-1"
+                    >
+                        <input
+                            type="text"
+                            placeholder="예: [브랜드명] 1본부 팀원 모집"
+                            bind:value={$all_data["subject"]}
+                            class="base-input"
+                        />
+                    </label>
+                </div>
+
+                <!-- -------------------- -->
+
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
+                    <h2 class="font-bold text-slate-800 text-lg">
+                        현장 한마디*
+                    </h2>
+                </div>
+
+                <div>
+                    <label
+                        class="block text-sm font-bold text-slate-600 mb-2 ml-1"
+                    >
+                        <input
+                            type="text"
+                            placeholder="현장 한마디를 입력해주세요(필수)"
+                            bind:value={$all_data["point"]}
+                            class="base-input"
+                        />
+                    </label>
+                </div>
+            </section>
+
+            <section
+                class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-6"
+            >
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
+                    <h2 class="font-bold text-slate-800 text-lg">
+                        근무지 주소 *
+                    </h2>
+                </div>
+                <div class="flex gap-1">
+                    <input
+                        type="text"
+                        bind:value={$all_data["addr"]}
+                        on:focusout={() => {
+                            console.log(getAddress);
+                        }}
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 px-3 transition-all focus:outline-none focus:ring-1 focus:ring-blue-400"
+                    />
+                    <button
+                        class="bg-slate-800 text-white px-3.5 rounded-xl text-sm font-bold hover:bg-slate-700 transition-colors shrink-0"
+                        on:click={addressInput}>주소 검색</button
+                    >
+
+                    <button
+                        class="bg-slate-800 text-white px-3.5 rounded-xl text-sm font-bold hover:bg-slate-700 transition-colors shrink-0"
+                        class:opacity-50={!$all_data["addr"]}
+                        disabled={!$all_data["addr"]}
+                        type="button"
                         on:click={() => {
-                            console.log($all_data);
+                            $all_data["res_addr"] = $all_data["addr"];
+                            getAddress = $all_data["addr"];
                         }}
                     >
-                        lll
-                    </span>
-                </div>
-
-                <div
-                    class="border border-gray-300 px-3 py-1.5 rounded-lg flex justify-center items-center cursor-pointer"
-                >
-                    <span class=" text-blue-700 text-lg mr-2">
-                        <i class="fa fa-file-text-o" aria-hidden="true"></i>
-                    </span>
-                    <button
-                        class="text-xs bg-blue-400 text-white px-3 py-1.5 rounded-lg"
-                        on:click={loadPreviousPostList}
-                    >
-                        이전 등록한 공고 불러오기
+                        <span>맵적용</span>
                     </button>
                 </div>
-            {:else}
-                <div class="text-center font-semibold text-2xl">
-                    구인글 수정
-                </div>
-            {/if}
-        </div>
 
-        <div class="mt-2 bg-white p-5">
-            <div class="font-semibold text-lg">이미지 등록</div>
-            <div class="text-xs">
-                이미지는 최대 10장, 슬라이드 형태로 표시됩니다.
-            </div>
-            <div class="my-3">
-                <SortableImg
-                    {updateImg}
-                    folder={"job-offer"}
-                    imgModifyList={$all_data["imgs"]
-                        ? $all_data["imgs"].split(",")
-                        : ""}
-                    maxImgCount={10}
-                ></SortableImg>
-            </div>
-
-            <div class="font-semibold text-lg">공고제목 (현장명)*</div>
-            <div class="mt-1.5">
-                <input
-                    type="text"
-                    placeholder="공고 제목(현장명을 입력하세요)(필수)"
-                    bind:value={$all_data["subject"]}
-                    class="input input-bordered input-info w-full bg-white"
-                />
-            </div>
-
-            <div class="mt-3 font-semibold text-lg">현장 한마디*</div>
-            <div class="mt-1.5">
-                <input
-                    type="text"
-                    class="input input-bordered input-info w-full bg-white"
-                    placeholder="현장 한마디를 입력해주세요(필수)"
-                    bind:value={$all_data["point"]}
-                />
-            </div>
-
-            <div class="mt-3 font-semibold text-lg">근무지*</div>
-
-            <div class="mt-1.5 flex w-full items-center gap-1">
-                <input
-                    type="text"
-                    class="input input-bordered input-info input-sm w-full bg-white"
-                    bind:value={$all_data["addr"]}
-                />
-                <!-- {#if $all_data["res_addr"]}
+                {#if getAddress}
                     <div
-                        class="border w-full py-1.5 px-2 text-sm border-sky-400 rounded-md"
+                        class="rounded-2xl overflow-hidden border border-slate-200 shadow-inner h-64"
                     >
-                        {$all_data["res_addr"]}
+                        <KakaoMap
+                            {getAddress}
+                            phText="근무지"
+                            height="100%"
+                            {tudeAct}
+                        />
                     </div>
                 {:else}
-
-
                     <div
-                        class="border w-full py-1.5 px-2 text-sm border-sky-400 rounded-md text-gray-400"
+                        class="h-24 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 text-sm"
                     >
-
-
-                        우측 주소 입력을 클릭해 주소를 입력해주세요
+                        <i class="fa fa-map-marker mb-2 text-lg"></i>
+                        주소를 입력하면 지도가 표시됩니다.
                     </div>
-                {/if} -->
+                {/if}
+            </section>
 
-                <button
-                    class="btn btn-outline btn-info btn-sm"
-                    type="button"
-                    on:click={addressInput}
-                >
-                    <span>주소 입력</span>
-                </button>
+            <section
+                class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-6"
+            >
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
+                        <h2 class="font-bold text-slate-800 text-lg">
+                            활동 지역 선택 *
+                        </h2>
+                    </div>
 
-                <button
-                    class="btn btn-outline btn-info btn-sm"
-                    type="button"
-                    on:click={() => {
-                        $all_data["res_addr"] = $all_data["addr"];
-                        getAddress = $all_data["addr"];
-                    }}
-                >
-                    <span>맵적용</span>
-                </button>
-            </div>
-
-            <div class="mt-1 text-xs text-right leading-normal">
-                <p>주소입력 클릭 후, 주소 검색 및 적용 하시면 됩니다.</p>
-                <p>원하는 주소가 없을시 직접 입력 후 (맵적용)을 클릭해주세요</p>
-            </div>
-
-            <!-- <div class="my-2">
-                    <input
-                        type="text"
-                        bind:value={detailAddr}
-                        bind:this={detailAddrArea}
-                        placeholder="상세 주소를 입력하세요"
-                        class="border w-full py-1.5 px-2 text-sm border-sky-400 rounded-md focus:outline-none focus:border-2"
-                    />
-                </div> -->
-
-            {#if getAddress}
-                <div
-                    class="mt-2 h-72 border w-full text-sm border-sky-400 rounded-md overflow-hidden"
-                >
-                    <KakaoMap
-                        {getAddress}
-                        phText="근무지"
-                        height="300px"
-                        {tudeAct}
-                    />
-                </div>
-            {:else}
-                <div
-                    class="mt-2 h-24 border border-sky-400 rounded-md flex justify-center items-center bg-gray-200"
-                >
-                    <div class="">주소를 입력하면 지도가 표시됩니다.</div>
-                </div>
-            {/if}
-
-            <div class="mt-5">
-                <div class="mt-3 font-semibold text-lg">지역선택*</div>
-                <div class="mt-3 grid grid-cols-2 gap-1">
-                    {#each regions as region, idx}
-                        <label class="button-checkbox">
-                            <input
-                                type="radio"
-                                hidden
-                                value={region}
-                                bind:group={$all_data["location"]}
-                            />
-                            <div>{region}</div>
-                        </label>
-                    {/each}
-                </div>
-            </div>
-        </div>
-
-        <div class="mt-2 bg-white p-5">
-            <div class="font-semibold text-lg">기본정보</div>
-
-            <QuestionItem
-                sbj="분양대행사 *"
-                placeholder="필수입력"
-                bind:iptVal={$all_data["agency"]}
-            />
-            <QuestionItem
-                sbj="담당자 성함 *"
-                placeholder="필수입력"
-                bind:iptVal={$all_data["name"]}
-            />
-
-            <!-- <QuestionItem
-                sbj="담당자 연락처 *"
-                placeholder="필수입력"
-                bind:iptVal={$all_data["phone"]}
-            /> -->
-
-            <div class="mt-5 flex w-full items-center">
-                <div class="w-1/5 text-center text-sm">담당자 연락처 *</div>
-                <div class="w-4/5">
-                    <input
-                        bind:value={$all_data["phone"]}
-                        on:input={formatPhoneNumber}
-                        type="text"
-                        placeholder="ex) 010-1234-5678"
-                        class="input input-bordered input-info w-full bg-white"
-                    />
-                </div>
-            </div>
-
-            <div class="mt-5">
-                <div class="pl-3 text-left text-sm">
-                    <span>업종분류 *</span>
-                    <span class="text-xs">(여러개 선택 가능)</span>
-                </div>
-                <div class="mt-3 grid grid-cols-2 gap-1">
-                    {#each businessCategorys as businessCategory, idx}
-                        <label class="button-checkbox">
-                            <input
-                                type="checkbox"
-                                value={businessCategory}
-                                bind:group={businessArr}
-                                hidden
-                            />
-                            <div>{businessCategory}</div>
-                        </label>
-                    {/each}
-                </div>
-            </div>
-
-            <div class="mt-5">
-                <div class="pl-3 text-left text-sm">
-                    <span>직종분류 *</span>
-                    <span class="text-xs">(여러개 선택 가능)</span>
-                </div>
-                <div class="mt-3 grid grid-cols-2 gap-1">
-                    {#each jobCategorys as jobCategory, idx}
-                        <label class="button-checkbox">
-                            <input
-                                type="checkbox"
-                                value={jobCategory}
-                                bind:group={occupationArr}
-                                hidden
-                            />
-                            <div>{jobCategory}</div>
-                        </label>
-                    {/each}
-                </div>
-            </div>
-
-            <QuestionItem
-                sbj="경력 "
-                placeholder="ex) 10년 / 초보"
-                bind:iptVal={$all_data["career"]}
-            />
-
-            <QuestionItem
-                sbj="인원 "
-                placeholder="ex) 2명 / 00명"
-                bind:iptVal={$all_data["number_people"]}
-            />
-        </div>
-
-        <div class="mt-2 bg-white p-5">
-            <div class="font-semibold text-lg">급여 및 영업지원</div>
-
-            <div class="mt-2">
-                <div class="flex w-full items-center">
-                    <div class="w-1/5 text-center text-sm">수수료 *</div>
-                    <div class="w-4/5 flex gap-1">
-                        {#each feeBases as feeBase}
-                            <label class="button-checkbox w-full">
+                    <div class="grid grid-cols-3 gap-2">
+                        {#each regions as region}
+                            <label class="button-checkbox-new">
                                 <input
                                     type="radio"
-                                    value={feeBase}
                                     hidden
-                                    bind:group={$all_data["fee_type"]}
+                                    value={region}
+                                    bind:group={$all_data["location"]}
                                 />
-                                <div class="">{feeBase}</div>
+                                <div class="transition-all">{region}</div>
+                            </label>
+                        {/each}
+                    </div>
+                </div>
+            </section>
+
+            <section
+                class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-6"
+            >
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
+                    <h2 class="font-bold text-slate-800 text-lg">기본 정보</h2>
+                </div>
+
+                <div class="space-y-5">
+                    <div class="space-y-2">
+                        <label
+                            for="agency"
+                            class="block text-sm font-bold text-slate-600 ml-1"
+                        >
+                            분양대행사 <span class="text-blue-500">*</span>
+                        </label>
+                        <input
+                            id="agency"
+                            type="text"
+                            placeholder="대행사명을 입력해 주세요"
+                            bind:value={$all_data["agency"]}
+                            class="base-input"
+                        />
+                    </div>
+
+                    <div class="space-y-2">
+                        <label
+                            for="manager-name"
+                            class="block text-sm font-bold text-slate-600 ml-1"
+                        >
+                            담당자 성함 <span class="text-blue-500">*</span>
+                        </label>
+                        <input
+                            id="manager-name"
+                            type="text"
+                            placeholder="성함을 입력해 주세요"
+                            bind:value={$all_data["name"]}
+                            class="base-input"
+                        />
+                    </div>
+
+                    <div class="space-y-2">
+                        <label
+                            for="manager-phone"
+                            class="block text-sm font-bold text-slate-600 ml-1"
+                        >
+                            담당자 연락처 <span class="text-blue-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <input
+                                id="manager-phone"
+                                type="text"
+                                placeholder="ex) 010-1234-5678"
+                                bind:value={$all_data["phone"]}
+                                on:input={formatPhoneNumber}
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 pl-10 text-slate-800 shadow-sm transition-all focus:outline-none focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-50"
+                            />
+                            <span
+                                class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                            >
+                                <i class="fa fa-phone" aria-hidden="true"></i>
+                            </span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 ml-1">
+                            연락처는 구인 희망자에게만 노출됩니다.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section
+                class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-6"
+            >
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
+                        <h2 class="font-bold text-slate-800 text-lg">
+                            업종분류 *
+                        </h2>
+                        <span
+                            class="text-xs text-slate-400 font-normal ml-auto"
+                        >
+                            여러개 선택 가능합니다.
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2">
+                        {#each businessCategorys as businessCategory, idx}
+                            <label class="button-checkbox-new">
+                                <input
+                                    type="checkbox"
+                                    value={businessCategory}
+                                    bind:group={businessArr}
+                                    hidden
+                                />
+                                <div class="transition-all">
+                                    {businessCategory}
+                                </div>
+                            </label>
+                        {/each}
+                    </div>
+                </div>
+            </section>
+
+            <section
+                class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-6"
+            >
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
+                        <h2 class="font-bold text-slate-800 text-lg">
+                            직종분류 *
+                        </h2>
+                        <span
+                            class="text-xs text-slate-400 font-normal ml-auto"
+                        >
+                            여러개 선택 가능합니다.
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2">
+                        {#each jobCategorys as jobCategory, idx}
+                            <label class="button-checkbox-new">
+                                <input
+                                    type="checkbox"
+                                    value={jobCategory}
+                                    bind:group={occupationArr}
+                                    hidden
+                                />
+                                <div class="transition-all">{jobCategory}</div>
                             </label>
                         {/each}
                     </div>
                 </div>
 
-                <div class="flex justify-end items-center gap-3 mt-2">
-                    <div class="w-4/5 flex items-center gap-3">
-                        <input
-                            type="text"
-                            bind:value={$all_data["fee"]}
-                            on:input={handleFeeInput}
-                            placeholder="숫자만 입력해주세요"
-                            class="input input-bordered input-info w-full bg-white"
-                        />
-                        <div class=" w-12">만 원</div>
+                <div class="space-y-2">
+                    <label
+                        for="agency"
+                        class="block text-sm font-bold text-slate-600 ml-1"
+                    >
+                        경력
+                    </label>
+                    <input
+                        id="agency"
+                        type="text"
+                        placeholder="ex) 10년 / 초보"
+                        bind:value={$all_data["career"]}
+                        class="base-input"
+                    />
+                </div>
+
+                <div class="space-y-2">
+                    <label
+                        for="agency"
+                        class="block text-sm font-bold text-slate-600 ml-1"
+                    >
+                        인원
+                    </label>
+                    <input
+                        id="agency"
+                        type="text"
+                        placeholder="ex) 2명 / 00명"
+                        bind:value={$all_data["number_people"]}
+                        class="base-input"
+                    />
+                </div>
+            </section>
+
+            <section
+                class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-6"
+            >
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="w-1.5 h-5 bg-emerald-500 rounded-full"></span>
+                    <h2 class="font-bold text-slate-800 text-lg">
+                        급여 및 영업지원
+                    </h2>
+                </div>
+
+                <div
+                    class="bg-emerald-50/50 rounded-2xl p-5 border border-emerald-100 space-y-4"
+                >
+                    <div class="space-y-3">
+                        <label
+                            class="block text-sm font-bold text-emerald-800 ml-1"
+                            >수수료 타입 *</label
+                        >
+                        <div class="grid grid-cols-3 gap-2">
+                            {#each feeBases as feeBase}
+                                <label class="fee-type-chip">
+                                    <input
+                                        type="radio"
+                                        value={feeBase}
+                                        bind:group={$all_data["fee_type"]}
+                                        class="hidden"
+                                    />
+                                    <div class="chip-content">{feeBase}</div>
+                                </label>
+                            {/each}
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label
+                            class="block text-sm font-bold text-emerald-800 ml-1"
+                            >수수료 금액 *</label
+                        >
+                        <div class="flex items-center gap-3">
+                            <div class="relative flex-1">
+                                <input
+                                    type="text"
+                                    bind:value={$all_data["fee"]}
+                                    on:input={handleFeeInput}
+                                    placeholder="숫자만 입력"
+                                    class="base-input !border-emerald-200 focus:!border-emerald-500 focus:!ring-emerald-100 pr-12"
+                                />
+                                <span
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-emerald-700"
+                                    >만 원</span
+                                >
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1.5 px-1">
+                            <i
+                                class="fa fa-info-circle text-emerald-600 text-xs"
+                            ></i>
+                            <p
+                                class="text-[11px] text-emerald-700 leading-tight mt-0.5"
+                            >
+                                정확한 수수료를 입력하시면 구인글 메인에 강조
+                                노출되어 지원율이 높아집니다.
+                            </p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="text-xs text-right mt-1 text-green-700">
-                    <p>
-                        수수료는 만 원 단위로, 구인글 메인에 노출됩니다.
-                        정확하게 입력해주시면
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label
+                            class="block text-sm font-bold text-slate-600 ml-1"
+                            >일비</label
+                        >
+                        <input
+                            type="text"
+                            class="base-input"
+                            placeholder="ex) 월 100만 / 일 3만"
+                            bind:value={$all_data["daily_expense"]}
+                        />
+                    </div>
+                    <div class="space-y-2">
+                        <label
+                            class="block text-sm font-bold text-slate-600 ml-1"
+                            >숙소비</label
+                        >
+                        <input
+                            type="text"
+                            class="base-input"
+                            placeholder="ex) 원룸 제공 / 지원금"
+                            bind:value={$all_data["sleep_expense"]}
+                        />
+                    </div>
+                    <div class="space-y-2">
+                        <label
+                            class="block text-sm font-bold text-slate-600 ml-1"
+                            >프로모션</label
+                        >
+                        <input
+                            type="text"
+                            class="base-input"
+                            placeholder="ex) 5채 판매시 추가 100만"
+                            bind:value={$all_data["promotion"]}
+                        />
+                    </div>
+                    <div class="space-y-2">
+                        <label
+                            class="block text-sm font-bold text-slate-600 ml-1"
+                            >기본급여</label
+                        >
+                        <input
+                            type="text"
+                            class="base-input"
+                            placeholder="ex) 기본급 200만"
+                            bind:value={$all_data["base_pay"]}
+                        />
+                    </div>
+                </div>
+            </section>
+
+            <section
+                class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-6 mb-10"
+            >
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="w-1.5 h-5 bg-indigo-500 rounded-full"></span>
+                    <h2 class="font-bold text-slate-800 text-lg">상세 내용</h2>
+                </div>
+
+                <div class="space-y-4">
+                    <textarea
+                        id="detail_content"
+                        class="base-input leading-relaxed resize-none"
+                        placeholder="현장의 장점, 근무 조건, 팀 분위기 등을 자유롭게 작성해 주세요."
+                        rows="10"
+                        bind:value={$all_data["detail_content"]}
+                    ></textarea>
+
+                    <p class="text-[11px] text-slate-400 ml-1 italic">
+                        * 허위 사실 기재 시 공고가 임의 삭제될 수 있습니다.
                     </p>
-                    <p>더 많은 사람들이 회원님의 공고를 확인하게 됩니다.</p>
                 </div>
-            </div>
-            <QuestionItem
-                sbj="일비"
-                placeholder="있을 경우만 입력 (ex, 월 100만원 / 일 3만원)"
-                bind:iptVal={$all_data["daily_expense"]}
-            />
 
-            <QuestionItem
-                sbj="숙소비"
-                placeholder="있을 경우만 입력 (ex, 원룸 제공)"
-                bind:iptVal={$all_data["sleep_expense"]}
-            />
-
-            <QuestionItem
-                sbj="프로모션"
-                placeholder="있을 경우만 입력 (ex, 5채 판매시 추가 100만)"
-                bind:iptVal={$all_data["promotion"]}
-            />
-
-            <QuestionItem
-                sbj="기본급여"
-                placeholder="있을 경우만 입력 (ex, 기본급 200만)"
-                bind:iptVal={$all_data["base_pay"]}
-            />
-        </div>
-
-        <div class="mt-2 bg-white p-5">
-            <div class="font-semibold">상세내용</div>
-            <div class="mt-1.5">
-                <textarea
-                    class="textarea textarea-info w-full p-2 text-base bg-white"
-                    placeholder="현장에 대한 상세 내용을 입력해주세요"
-                    rows="8"
-                    bind:value={$all_data["detail_content"]}
-                ></textarea>
-            </div>
-
-            {#if data.modifyIdx}
-                <div class="mt-1.5">
-                    <button
-                        class="btn btn-success w-full text-white"
-                        on:click={updateRegist}
-                    >
-                        수정하기
-                    </button>
+                <div class="pt-2">
+                    {#if data.modifyIdx}
+                        <button
+                            class="main-submit-btn bg-gradient-to-r from-emerald-500 to-teal-600 shadow-emerald-100"
+                            on:click={updateRegist}
+                        >
+                            <i class="fa fa-save mr-2"></i> 수정 내용 저장하기
+                        </button>
+                    {:else}
+                        <button
+                            class="main-submit-btn bg-gradient-to-r from-blue-600 to-indigo-600 shadow-blue-100"
+                            on:click={uploadChkRegist}
+                        >
+                            <i class="fa fa-paper-plane mr-2"></i> 구인공고 등록하기
+                        </button>
+                    {/if}
                 </div>
-            {:else}
-                <div class="mt-1.5">
-                    <button
-                        class="btn btn-success w-full text-white"
-                        on:click={uploadChkRegist}
-                    >
-                        등록하기
-                    </button>
-                </div>
-            {/if}
+            </section>
         </div>
     </div>
 </div>
 
 <style>
-    .button-checkbox div {
-        display: block;
-        background-color: #f0f0f0;
-        color: #333;
-        font-size: 14px;
-        border: 1.5px solid #ccc;
-        border-radius: 5px;
-        padding: 8px 0;
+    /* 아이콘이 아주 천천히 돌게 해서 '교체'의 느낌을 줌 (선택사항) */
+    @keyframes spin-slow {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+    .animate-spin-slow {
+        animation: spin-slow 8s linear infinite;
+    }
+
+    /* 리스트 영역 스크롤바 커스텀 */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #e2e8f0;
+        border-radius: 10px;
+    }
+
+    /* 메인 제출 버튼 커스텀 스타일 */
+    .main-submit-btn {
+        width: 100%;
+        height: 3.5rem; /* h-14 */
+        color: #ffffff;
+        font-size: 1.125rem; /* text-lg */
+        font-weight: 800;
+        border-radius: 1rem; /* rounded-2xl */
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .main-submit-btn:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.1);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .main-submit-btn:active {
+        transform: translateY(0);
+        filter: brightness(0.95);
+    }
+
+    /* textarea 전용 base-input 보정 (글자 줄간격) */
+    textarea.base-input {
+        line-height: 1.6;
+    }
+
+    /* 커스텀 체크박스 스타일 (Blue) */
+    .button-checkbox-new div {
+        background-color: #fff;
+        color: #64748b;
+        font-size: 13px;
+        font-weight: 600;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 10px 0;
         text-align: center;
         cursor: pointer;
-        transition: all 0.3s;
+    }
+    .button-checkbox-new input:checked + div {
+        background-color: #eff6ff;
+        color: #2563eb;
+        border-color: #3b82f6;
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
     }
 
-    .button-checkbox input[type="checkbox"]:checked + div {
-        background-color: #08b9ff;
-        color: white;
-        border-color: #0099ff;
+    .fee-type-chip {
+        cursor: pointer;
+        user-select: none;
     }
 
-    .button-checkbox input[type="radio"]:checked + div {
-        background-color: #08b9ff;
-        color: white;
-        border-color: #0099ff;
+    .fee-type-chip .chip-content {
+        padding: 0.6rem 0;
+        background-color: #ffffff;
+        color: #059669; /* emerald-600 */
+        font-size: 0.875rem;
+        font-weight: 700;
+        border: 1px solid #d1fae5; /* emerald-100 */
+        border-radius: 0.75rem;
+        text-align: center;
+        transition: all 0.2s;
+    }
+
+    .fee-type-chip input:checked + .chip-content {
+        background-color: #059669; /* emerald-600 */
+        color: #ffffff;
+        border-color: #059669;
+        box-shadow: 0 4px 10px rgba(5, 150, 105, 0.2);
+    }
+
+    /* 애니메이션 효과 */
+    .suit-font {
+        font-family: "SUIT", sans-serif;
+    }
+
+    /* 아이콘 선택기 컨테이너 */
+    .icon-selector {
+        cursor: pointer;
+        display: block;
+    }
+
+    /* 아이콘을 감싸는 박스 (네모 모양) */
+    .icon-box-new {
+        aspect-ratio: 1 / 1; /* 정사각형 유지 */
+        padding: 10px; /* 아이콘 크기를 줄이기 위한 내부 여백 */
+        background-color: #ffffff;
+        border: 2px solid #f1f5f9; /* 기본 테두리 (연한 회색) */
+        border-radius: 1rem; /* 둥근 네모 모양 (rounded-xl) */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* 마우스를 올렸을 때 */
+    .icon-selector:hover .icon-box-new {
+        border-color: #e2e8f0;
+        transform: translateY(-2px);
+    }
+
+    /* ★ 아이콘이 선택(체크) 되었을 때 ★ */
+    .icon-selector input:checked + .icon-box-new {
+        background-color: #eff6ff; /* 연한 파란 배경 */
+        border-color: #3b82f6; /* 선명한 파란색 테두리 */
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15); /* 푸른 광채 */
+    }
+
+    /* 이미지 크기 조절 */
+    .icon-box-new img {
+        max-width: 85%;
+        max-height: 85%;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.05));
     }
 </style>

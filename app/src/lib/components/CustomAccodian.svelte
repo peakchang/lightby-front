@@ -1,4 +1,3 @@
-<!-- Accordion.svelte -->
 <script>
     import CustomModal from "$lib/components/CustomModal.svelte";
     import { slide } from "svelte/transition";
@@ -6,16 +5,12 @@
     // Props
     let { items = [], allowMultiple = true, answerStatus = false } = $props();
 
-    console.log(items);
-
     // 상태 관리
     let openItems = $state(allowMultiple ? {} : null);
-
-    let alertModal = $state(""); // 없는 질문 클릭 했을시
+    let alertModal = $state(false);
 
     // 토글 함수
     function toggleItem(id) {
-        // 답변이 없으면 동작하지 않음
         const item = items.find((item) => item.idx === id);
         if (!item || !item.answer) {
             alertModal = true;
@@ -23,78 +18,109 @@
         }
 
         if (allowMultiple) {
-            // 여러 개 열기 가능
             if (openItems[id]) {
                 delete openItems[id];
             } else {
                 openItems[id] = true;
             }
         } else {
-            // 하나만 열기 가능 (전형적인 accordion)
             openItems = openItems === id ? null : id;
         }
     }
 
-    // 열린 상태 체크 함수
     function isOpen(id) {
         return allowMultiple ? openItems[id] : openItems === id;
     }
 </script>
 
 <CustomModal bind:visible={alertModal}>
-    <div class="text-center">
-        <div class=" text-red-400 text-4xl mb-3">
-            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+    <div class="p-4 text-center">
+        <div
+            class="w-16 h-16 bg-orange-50 text-orange-400 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl"
+        >
+            <i class="fa fa-clock-o"></i>
         </div>
-        <div>아직 답변이 등록 되지 않았습니다.</div>
+        <h3 class="text-lg font-bold text-gray-800 mb-1">답변 준비 중입니다</h3>
+        <p class="text-gray-400 text-sm">
+            조금만 기다려주시면<br />최대한 빠르게 답변해 드릴게요!
+        </p>
     </div>
 </CustomModal>
 
-<div class="accordion-container">
+<div class="accordion-container space-y-3">
     {#each items as item (item.idx)}
         <div
-            class="bg-base-100 border border-gray-400 mb-2 rounded-lg overflow-hidden"
+            class="group border-none rounded-[20px] overflow-hidden transition-all duration-300"
+            class:bg-white={!isOpen(item.idx)}
+            class:bg-sky-50={isOpen(item.idx)}
+            class:shadow-sm={!isOpen(item.idx)}
+            class:ring-1={isOpen(item.idx)}
+            class:ring-sky-100={isOpen(item.idx)}
         >
-            <!-- 질문 DIV (클릭 가능) -->
-            <!-- svelte-ignore a11y_click_events_have_key_events -->
-            <!-- svelte-ignore a11y_no_static_element_interactions -->
-            <!-- svelte-ignore event_directive_deprecated -->
             <div
-                class=" py-3 px-4 transition-colors flex justify-between items-center cursor-pointer bg-white"
+                class="py-4 px-5 flex justify-between items-start gap-3 cursor-pointer select-none"
                 on:click={() => toggleItem(item.idx)}
             >
-                <span class="font-semibold">{item.question}</span>
-                {#if item.answer}
-                    <div class="flex items-center gap-2">
-                        {#if answerStatus}
-                            <div class="badge badge-sm badge-soft badge-accent">
-                                답변완료
-                            </div>
+                <div class="flex gap-3 items-start flex-1">
+                    <span
+                        class="text-lg font-black {isOpen(item.idx)
+                            ? 'text-sky-500'
+                            : 'text-gray-300'}">Q.</span
+                    >
+                    <span
+                        class="font-bold text-[15px] leading-tight mt-0.5 {isOpen(
+                            item.idx,
+                        )
+                            ? 'text-sky-900'
+                            : 'text-gray-700'}"
+                    >
+                        {item.question}
+                    </span>
+                </div>
+
+                <div class="flex flex-col items-end gap-2 flex-shrink-0">
+                    {#if answerStatus}
+                        {#if item.answer}
+                            <span
+                                class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-600"
+                                >답변완료</span
+                            >
+                        {:else}
+                            <span
+                                class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-400"
+                                >검토중</span
+                            >
                         {/if}
-                        <span
-                            class="text-lg transition-transform duration-200 {isOpen(
-                                item.idx,
-                            )
-                                ? 'rotate-180'
-                                : ''}"
-                        >
-                            <i class="fa fa-caret-down" aria-hidden="true"></i>
-                        </span>
-                    </div>
-                {:else if answerStatus}
-                    <div class="badge badge-sm badge-soft badge-error">
-                        미답변
-                    </div>
-                {/if}
+                    {/if}
+                    <span
+                        class="text-gray-300 transition-transform duration-300 {isOpen(
+                            item.idx,
+                        )
+                            ? 'rotate-180 text-sky-500'
+                            : ''}"
+                    >
+                        <i class="fa fa-chevron-down text-xs"></i>
+                    </span>
+                </div>
             </div>
 
-            <!-- 답변 DIV (조건부 렌더링 + 슬라이드 애니메이션) -->
             {#if isOpen(item.idx) && item.answer}
                 <div
-                    class="text-sm px-4 pb-3 border-t border-gray-200 pt-3 bg-gray-50 whitespace-pre-wrap leading-relaxed"
-                    transition:slide
+                    class="px-5 pb-5 animate-fade-in"
+                    transition:slide={{ duration: 300 }}
                 >
-                    {item.answer}
+                    <div
+                        class="flex gap-3 p-4 bg-white/60 rounded-2xl border border-sky-100/50"
+                    >
+                        <span class="text-lg font-black text-orange-400"
+                            >A.</span
+                        >
+                        <div
+                            class="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap pt-0.5"
+                        >
+                            {item.answer}
+                        </div>
+                    </div>
                 </div>
             {/if}
         </div>
@@ -103,6 +129,18 @@
 
 <style>
     .accordion-container {
-        /* 필요한 경우 추가 스타일링 */
+        /* 마진 등 부모에서 조절 */
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease;
     }
 </style>

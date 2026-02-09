@@ -9,9 +9,7 @@
     } from "$lib/stores/stores";
     import { raiseViewCount } from "$lib/lib";
     let { value } = $props();
-
     
-
     const feeValue = /^[0-9]+$/.test(value.fee)
         ? Number(value.fee).toLocaleString()
         : `${value.fee} 만`;
