@@ -25,9 +25,14 @@
     let shareModal = $state(false);
     let alertModalBool = $state(false);
     let feeValue = $state("");
+
+    let swiperContainer = $state();
+
+    // 상단 고정
     let headerShowBool = $state(true);
     let showBool = $state(true);
-    let swiperContainer = $state();
+
+    let notLoginAlertModal = $state(false);
 
     const IFRAME_URL = $derived(
         `https://lightby.co.kr/embed_map?address=${detail.addr}`,
@@ -61,10 +66,13 @@
     });
 
     $effect(() => {
-        console.log($scrollY);
+        if ($scrollY != 0) showBool = false;
+        headerShowBool = $scrollY <= 150;
 
-        if ($scrollY !== 0) showBool = false;
-        headerShowBool = $scrollY <= 250;
+        // console.log($scrollY);
+
+        // if ($scrollY !== 0) showBool = false;
+        // headerShowBool = $scrollY <= 250;
     });
 
     async function deletePost() {
@@ -80,15 +88,52 @@
             console.error(error.message);
         }
     }
+
+    async function apllyJob() {
+        if (!$user_info.idx) {
+            notLoginAlertModal = true;
+            return;
+        }
+
+        try {
+            const res = await axios.post(`${back_api}/detail/apply`, {
+                site_idx: detail.idx,
+                user_idx: $user_info.idx,
+            });
+
+            if (res.data.status) {
+                toastStore.set({
+                    show: true,
+                    message: "지원이 완료되었습니다.",
+                    color: "#10b981",
+                });
+            } else {
+                toastStore.set({
+                    show: true,
+                    message: res.data.message || "지원 중 오류가 발생했습니다.",
+                    color: "#ef4444",
+                });
+            }
+        } catch (error) {
+            console.error(error);
+            toastStore.set({
+                show: true,
+                message:
+                    error.response?.data?.message ||
+                    "서버 오류가 발생했습니다.",
+                color: "#ef4444",
+            });
+        }
+    }
 </script>
 
 <div
-    class="fixed top-0 left-0 w-full z-50 transition-all duration-300 shadow-lg"
-    class:translate-y-[-100%]={headerShowBool}
-    class:translate-y-0={!headerShowBool}
+    class="fixed top-0 left-0 w-full z-50 slide-menu"
+    class:hidden={showBool}
+    class:show={!headerShowBool}
 >
     <div
-        class="max-w-[630px] mx-auto bg-white/90 backdrop-blur-md border-b border-gray-100"
+        class="max-w-[640px] mx-auto bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100"
     >
         {#if isApp}
             <DetailMenu item_id={item.pageId} />
@@ -99,15 +144,14 @@
 </div>
 
 <div id="detail-wrap" class="bg-gray-50 min-h-screen" class:pb-24={!isApp}>
-    <div
-        class="max-w-[630px] mx-auto bg-white/90 backdrop-blur-md border-b border-gray-100"
-    >
+    <div class="">
         {#if isApp}
             <DetailMenu item_id={item.pageId} />
         {:else}
             <DetailMenu />
         {/if}
     </div>
+
     <div class="relative group bg-white">
         {#if mainImage.length > 1}
             <div class="swiper" bind:this={swiperContainer}>
@@ -130,7 +174,7 @@
                     src="{public_img_bucket}{mainImage[0]}"
                     alt=""
                     class="w-full h-full object-cover"
-                    on:error={(e) => {
+                    onerror={(e) => {
                         e.target.style.display = "none";
                         e.target.parentElement.style.display = "none";
                     }}
@@ -142,13 +186,13 @@
             <div class="absolute top-4 right-4 z-10 flex gap-2">
                 <button
                     class="btn btn-circle btn-sm bg-white/80 border-none shadow-md hover:bg-info hover:text-white"
-                    on:click={() => goto(`/joboffer?modifyidx=${detail.idx}`)}
+                    onclick={() => goto(`/joboffer?modifyidx=${detail.idx}`)}
                 >
                     <i class="fa fa-pencil"></i>
                 </button>
                 <button
                     class="btn btn-circle btn-sm bg-white/80 border-none shadow-md hover:bg-error hover:text-white"
-                    on:click={() => (alertModalBool = true)}
+                    onclick={() => (alertModalBool = true)}
                 >
                     <i class="fa fa-trash"></i>
                 </button>
@@ -318,31 +362,42 @@
 </div>
 
 <div
-    class="fixed bottom-0 left-0 w-full z-40 px-4 pb-6 pt-2 bg-gradient-to-t from-white via-white/95 to-transparent"
+    class="fixed bottom-0 left-0 w-full z-40 px-1 pb-6 pt-2 bg-gradient-to-t from-white via-white/95 to-transparent"
 >
     <div
-        class="max-w-[500px] mx-auto flex gap-2 items-center bg-white/80 backdrop-blur-md p-3 rounded-2xl shadow-[0_-10px_25px_-5px_rgba(0,0,0,0.1)] border border-gray-100"
+        class="max-w-[640px] mx-auto flex gap-2 items-center bg-white/80 backdrop-blur-md p-2.5 rounded-2xl shadow-[0_-10px_25px_-5px_rgba(0,0,0,0.1)] border border-gray-100"
     >
-        <a href="TEL:{detail.phone}" class="flex-1">
-            <button
-                class="btn btn-info w-full text-white border-none bg-sky-500 hover:bg-sky-600 shadow-lg shadow-sky-100 rounded-xl h-12"
+        <div class="flex flex-[3] gap-2 items-center">
+            <a href="TEL:{detail.phone}" class="flex-1">
+                <button
+                    class="btn border-none bg-sky-500 hover:bg-sky-600 text-white w-full h-10 md:h-12 rounded-xl shadow-md shadow-sky-100 px-0 min-h-0"
+                >
+                    <i class="fa fa-phone mr-1"></i> 전화하기
+                </button>
+            </a>
+
+            <a
+                href="SMS:{detail.phone}?body=번개분양 보고 연락 드렸습니다."
+                class="flex-1"
             >
-                <i class="fa fa-phone mr-1"></i> 전화하기
-            </button>
-        </a>
-        <a
-            href="SMS:{detail.phone}?body=번개분양 보고 연락 드렸습니다."
-            class="flex-1"
-        >
+                <button
+                    class="btn border-none bg-emerald-500 hover:bg-emerald-600 text-white w-full h-10 md:h-12 rounded-xl shadow-md shadow-emerald-100 px-0 min-h-0"
+                >
+                    <i class="fa fa-commenting mr-1"></i> 문자하기
+                </button>
+            </a>
+
             <button
-                class="btn btn-success w-full text-white border-none bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-100 rounded-xl h-12"
+                class="flex-1 btn border-none bg-yellow-500 hover:bg-yellow-600 text-white h-10 md:h-12 rounded-xl shadow-md shadow-yellow-100 px-0 min-h-0"
+                onclick={apllyJob}
             >
-                <i class="fa fa-commenting mr-1"></i> 문자문의
+                <i class="fa fa-paper-plane mr-1"></i> 지원하기
             </button>
-        </a>
+        </div>
+
         <button
-            class="btn btn-ghost w-14 h-12 rounded-xl bg-gray-100 text-gray-600"
-            on:click={() => (shareModal = true)}
+            class="btn btn-ghost w-12 h-12 min-h-0 rounded-xl bg-gray-100 text-gray-600 border-none p-0"
+            onclick={() => (shareModal = true)}
         >
             <i class="fa fa-share-alt text-lg"></i>
         </button>
@@ -368,10 +423,34 @@
             </div>
         {/if}
         <div class="flex justify-center items-center gap-3">
-            <button class="btn btn-error w-1/3 text-white" on:click={deletePost}
+            <button class="btn btn-error w-1/3 text-white" onclick={deletePost}
                 >삭제</button
             >
             <button class="btn btn-active w-1/3">취소</button>
+        </div>
+    </div>
+</CustomModal>
+
+<CustomModal bind:visible={notLoginAlertModal} closeBtn={false}>
+    <div class="p-4 text-center">
+        <div
+            class="w-16 h-16 bg-cyan-50 text-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl"
+        >
+            <i class="fa fa-briefcase"></i>
+        </div>
+        <h3 class="text-lg font-bold text-gray-800 mb-2">로그인이 필요해요</h3>
+        <p class="text-sm text-gray-400 mb-8 leading-relaxed">
+            현장에 지원하기 위해서는 로그인이 필요합니다.
+        </p>
+        <div class="flex gap-2">
+            <button
+                class="btn flex-1 bg-gray-100 border-none text-gray-500 rounded-xl h-12"
+                onclick={() => (notLoginAlertModal = false)}>닫기</button
+            >
+            <button
+                class="btn flex-1 bg-sky-500 border-none text-white rounded-xl h-12 shadow-lg shadow-sky-100"
+                onclick={() => goto("/auth/login")}>로그인</button
+            >
         </div>
     </div>
 </CustomModal>
@@ -401,5 +480,15 @@
         display: block;
         width: 100%;
         object-fit: cover;
+    }
+    .slide-menu {
+        transform: translateY(-100%);
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .slide-menu.show {
+        transform: translateY(0);
+    }
+    :global(body) {
+        background-color: #f9fafb;
     }
 </style>

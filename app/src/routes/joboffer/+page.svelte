@@ -2,94 +2,79 @@
     import axios from "axios";
     import Cookies from "js-cookie";
     import moment from "moment-timezone";
-
-    import PageHeader from "$lib/components/PageHeader.svelte";
-    import QuestionItem from "$lib/components/QuestionItem.svelte";
-    import SortableImg from "$lib/components/SortableImg.svelte";
-    import KakaoMap from "$lib/components/kakaoMap_pre.svelte";
-    import CustomModal from "$lib/components/CustomModal.svelte";
-
     import { onDestroy, onMount, tick } from "svelte";
     import { goto, beforeNavigate } from "$app/navigation";
     import { browser } from "$app/environment";
 
-    import { formatPhoneNum, removeSpecialCharactersAndSpaces } from "$lib/lib";
+    // Components
+    import PageHeader from "$lib/components/PageHeader.svelte";
+    import SortableImg from "$lib/components/SortableImg.svelte";
+    import KakaoMap from "$lib/components/kakaoMap_pre.svelte";
+    import CustomModal from "$lib/components/CustomModal.svelte";
 
-    import { feeBases, iconList } from "./jopoffer";
+    // Lib & Stores
+    import { formatPhoneNum, removeSpecialCharactersAndSpaces } from "$lib/lib";
+    import { feeBases } from "./jopoffer";
     import {
         user_info,
         all_data,
-        paymentActRegistered,
         loadingStore,
         prev,
         toastStore,
         pageScrollStatus,
     } from "$lib/stores/stores";
-
     import {
         back_api,
         regions,
         businessCategorys,
         jobCategorys,
+        iconList,
+        colorMap,
     } from "$lib/const";
 
     let { data } = $props();
 
-    let businessArr = $state([]); // 업종분류 변수 담을 임시 배열
-    let occupationArr = $state([]); // 직종분류 변수 담을 임시 배열
+    // --- States ---
+    let businessArr = $state([]);
+    let occupationArr = $state([]);
     let imgModifyList = $state("");
+    let getAddress = $state("");
 
-    // 로그인 체크 모달
+    // Modals
     let notLoginChkModal = $state(false);
-
-    // 이전 게시물 열어보기 모달
     let prevPostListModal = $state(false);
     let prevPostList = $state([]);
     let prevPostChkModal = $state(false);
-    let setPrevPostIdx = $state(0); // 이전 게시물 불러오는데 만약 입력된 값들이 있을 경우 대비해서 아이디 값만 저장!
+    let setPrevPostIdx = $state(null);
 
-    // 등록 전 결제 및 물어보는거 모달
-    let submitPrevModal = $state(false); // 모달 변수
-    let paymentStatus = $state(false); // 업로드시에 결제 완료 여부 체크 변수!! (true 면 상품 등록 진행, free 는 임의로 true로, 기타 유료는 결제 완료시 true로 변경)
-    let popup = $state();
-    let popupCheckInterval = $state(); // 팝업이 닫혔을때 감지!!
+    let submitPrevModal = $state(false);
+    let paymentStatus = $state(false);
+    let popup = $state(null);
+    let popupCheckInterval = $state(null);
 
-    // 모달 내 계산기 관련
-    let productInfo = $state({ name: "일반", price: 0 }); // 상품 정보가 담김!
-    let iconNames = $state([]); // 아이콘 이름이 한글로 담김!
-    let icons = $state([]); // 아이콘 이름이 영어로 담김!
-    let iconSum = $state(0); // 아이콘 갯수에 따른 가격 합계
+    // Calc & Info
+    let productInfo = $state({ name: "일반", price: 0 });
+    let iconNames = $state([]);
+    let icons = $state([]);
+    let iconSum = $state(0);
     let iconsShow = $state(false);
 
-    // 글 작성중 뒤로가기 또는 새로고침시 필요한 변수 (이미지 삭제 관련)
+    // Page Safety
     let escapePageModal = $state(false);
     let delImgList = $state([]);
     let toPage = $state("");
-    let blockBack = $state(true); // 뒤로가기시 nav 에 막혀서 안움직일시 임시 변수
+    let blockBack = $state(true);
 
-    // 토스트 관련 변수
-    let toastShow = $state(0);
-    let toastMessage = $state("토스트 메세지!!");
-
-    // alert modal 변수!!
+    // Alerts
     let alertModalShow = $state(false);
     let alertModalMessage = $state("");
-
-    // 상태값 변경 임시변수
-    let prevItem = $state("");
-
-    // effct 함수 내에서 무한루프가 되는거 방지! (반복되는 코드 부분 상태값 변경으로 한번만 실행되게 함)
-    let loopPrevent = $state(true);
-
-    // 최종 업로드 체크체크
     let successPrevModal = $state(false);
     let successPrevModalMessage = $state("");
 
-    // 첫 글 무료 셋팅 변수!
+    // 무료등록 변수
     let freebies = $state(true);
 
     const chkBoolList = [
-        // { var: "imgs", label: "현장 이미지" },
         { var: "subject", label: "공고 제목(현장명)" },
         { var: "point", label: "현장 한마디" },
         { var: "res_addr", label: "근무지 주소" },
@@ -99,8 +84,6 @@
         { var: "phone", label: "담당자 연락처" },
         { var: "business", label: "업종분류선택" },
         { var: "occupation", label: "직종분류선택" },
-        // { var: "career", label: "경력 입력" },
-        // { var: "number_people", label: "인원 입력" },
         { var: "fee_type", label: "수수료 타입" },
         { var: "fee", label: "수수료 입력" },
     ];
@@ -209,34 +192,14 @@
         // delImgList 에 리스트 담기!! (글쓰는 페이지!)
 
         if (delImgList.length > 0) {
-            const delImgListStr = delImgList.join(",");
-            Cookies.set("del_img_list", delImgListStr, {
+            Cookies.set("del_img_list", delImgList.join(","), {
                 path: "/joboffer",
                 expires: 7,
-                sameSite: "Lax",
             });
         } else {
-            Cookies.remove("del_img_list", { path: "/" });
+            Cookies.remove("del_img_list", { path: "/joboffer" });
         }
     });
-
-    function handleFeeInput(event) {
-        let value = event.target.value;
-        let numVal = value.replace(/[^0-9]/g, "");
-        let commaVal = numVal.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        $all_data["fee"] = commaVal;
-    }
-
-    async function useChkPrevPost() {
-        setPrevPostIdx = this.dataset.idx;
-        const hasData = chkBoolList.some((item) => $all_data[item.var]);
-        if (hasData) {
-            prevPostChkModal = true;
-        } else {
-            usePrevPost();
-        }
-        prevPostListModal = false;
-    }
 
     async function usePrevPost() {
         if (delImgList && delImgList.length > 0) {
@@ -253,26 +216,34 @@
             const res = await axios.post(`${back_api}/regist/load_prev_post`, {
                 postIdx: setPrevPostIdx,
             });
-            $all_data = res.data.prevPost;
-            imgModifyList = $all_data["imgs"];
+            const prevData = res.data.prevPost;
 
-            $all_data["product"] = "free";
-            $all_data["icons"] = "";
+            // 필요한 데이터만 복사 (idx, 날짜 등 제외)
+            const {
+                created_at,
+                updated_at,
+                sum,
+                idx,
+                ad_start_date,
+                ad_end_date,
+                ...cleanData
+            } = prevData;
+            $all_data = {
+                ...cleanData,
+                product: "free",
+                icons: "",
+                phone: formatPhoneNum(prevData.phone),
+            };
 
-            $all_data["phone"] = formatPhoneNum($all_data["phone"]);
+            console.log($all_data);
+
             getAddress = $all_data["addr"];
-            delete $all_data.created_at;
-            delete $all_data.updated_at;
-            delete $all_data.sum;
-            delete $all_data.idx;
-
-            delete $all_data.ad_end_date;
-            delete $all_data.ad_start_date;
-            delete $all_data.icons;
-
             businessArr = $all_data["business"].split(",");
             occupationArr = $all_data["occupation"].split(",");
-        } catch (error) {}
+            prevPostChkModal = false;
+        } catch (err) {
+            console.error(err);
+        }
     }
 
     // '이전 등록한 공고 불러오기' 버튼 클릭하면, 모달 열면서 기존 공고 불러오기
@@ -351,13 +322,7 @@
             }
         }
 
-        console.log(paymentStatus);
-        console.log($all_data["product"]);
-        console.log($user_info);
-
-        // 유료 상품이면 팝업 열고 리턴 처리!!
-
-        // 등급이 서브관리자 (3 이상) 이상이면 패스, 이하면 들어와서 체크
+        // 등급이 서브관리자 (3 이상) 이상이면 패스, 이하면 결제 팝업 오픈
         if (!$user_info.rate || Number($user_info.rate) < 3) {
             if ($all_data["product"] != "free" && paymentStatus == false) {
                 const payProductName = `${productInfo.name} + 아이콘${iconNames.length}`;
@@ -541,32 +506,21 @@
     }
 
     // 상품 변경시 처리 함수
-    function itemRateChange() {
-        if (this.value == "premium") {
-            productInfo.name = "프리미엄";
-            productInfo.price = 66000;
+    function itemRateChange(e) {
+        const val = e.target.value;
+        if (val === "premium") {
+            productInfo = { name: "프리미엄", price: 66000 };
             iconsShow = true;
-        } else if (this.value == "top") {
-            productInfo.name = "지역 탑";
-            productInfo.price = 49500;
+        } else if (val === "top") {
+            productInfo = { name: "지역 탑", price: 49500 };
             iconsShow = true;
-        } else if (this.value == "free") {
-            productInfo.name = "일반";
-            productInfo.price = 0;
+        } else {
+            productInfo = { name: "일반", price: 0 };
             iconsShow = false;
-            if (icons && icons.length > 0) {
-                icons = [];
-                iconNames = [];
-
-                toastStore.set({
-                    show: true,
-                    message: "아이콘 선택은 유료 상품에서만 가능합니다.",
-                    color: "#3DB7CC",
-                });
-                iconSum = 0;
-            }
+            icons = [];
+            iconNames = [];
+            iconSum = 0;
         }
-
         $all_data["sum"] = productInfo.price + iconSum;
     }
 
@@ -618,9 +572,6 @@
 
     // 모달 열고 닫기
     let modalCloseBtn = $state();
-
-    // KakaoMap 컴포넌트에 전달할 변수
-    let getAddress = $state("");
 
     function tudeAct(e) {
         $all_data["latitude"] = e.coords.Ma;
@@ -730,6 +681,26 @@
         }
 
         $all_data["phone"] = value;
+    }
+
+    // ------------------------------------ 미수정 함수
+
+    function handleFeeInput(event) {
+        let value = event.target.value;
+        let numVal = value.replace(/[^0-9]/g, "");
+        let commaVal = numVal.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        $all_data["fee"] = commaVal;
+    }
+
+    async function useChkPrevPost() {
+        setPrevPostIdx = this.dataset.idx;
+        const hasData = chkBoolList.some((item) => $all_data[item.var]);
+        if (hasData) {
+            prevPostChkModal = true;
+        } else {
+            usePrevPost();
+        }
+        prevPostListModal = false;
     }
 </script>
 
@@ -1075,8 +1046,8 @@
                     on:change={itemRateChange}
                 />
                 <div class="card-body">
-                    <div class="flex justify-between items-start mb-2">
-                        <span class="badge-premium">PREMIUM</span>
+                    <div class="flex justify-between items-start">
+                        <span class="badge-premium">프리미엄</span>
                         <div class="text-right">
                             {#if freebies}
                                 <span
@@ -1113,8 +1084,8 @@
                     on:change={itemRateChange}
                 />
                 <div class="card-body">
-                    <div class="flex justify-between items-start mb-2">
-                        <span class="badge-top">REGION TOP</span>
+                    <div class="flex justify-between items-start">
+                        <span class="badge-top">지역 탑</span>
                         <div class="text-right">
                             <span
                                 class="block text-xs text-slate-400 line-through"
@@ -1142,11 +1113,14 @@
                 />
                 <div class="card-body">
                     <div class="flex justify-between items-center">
-                        <span class="badge-free">NORMAL</span>
-                        <span class="text-lg font-bold text-slate-800"
-                            >무료 등록</span
-                        >
+                        <span class="badge-free">무료 공고</span>
+                        <span class="text-lg font-bold text-slate-800">
+                            무료 등록
+                        </span>
                     </div>
+                    <ul class="text-[11px] text-slate-500 space-y-1">
+                        <li>• 노출 기간 10일 제공</li>
+                    </ul>
                 </div>
             </label>
         </div>
@@ -1179,11 +1153,13 @@
                                 on:change={iconsChange}
                             />
                             <div class="icon-box-new">
-                                <img
-                                    src="/icons/icon-{icon.id}.png"
-                                    alt=""
-                                    class="w-full h-auto object-contain"
-                                />
+                                <div
+                                    class="border w-[90%] text-sm text-center rounded-lg {colorMap[
+                                        icon.color
+                                    ]}"
+                                >
+                                    {icon.name}
+                                </div>
                             </div>
                         </label>
                     {/each}
@@ -1193,7 +1169,9 @@
             <div
                 class="bg-slate-50 rounded-xl p-4 mb-6 text-center text-xs text-slate-400 border border-dashed border-slate-200"
             >
-                아이콘 선택은 프리미엄 또는 지역탑 등록 시 가능합니다.
+                <p>무료 등록시 게시글은 10일동안 유지가 되며,</p>
+                <p>이후, 노출을 원하실 경우 재등록 해주셔야 합니다.</p>
+                <p>아이콘 선택은 프리미엄 또는 지역탑 등록 시 가능합니다.</p>
             </div>
         {/if}
 
@@ -1708,6 +1686,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="space-y-2">
+                        <!-- svelte-ignore a11y_label_has_associated_control -->
                         <label
                             class="block text-sm font-bold text-slate-600 ml-1"
                             >일비</label
@@ -1803,6 +1782,34 @@
 </div>
 
 <style>
+    /* 상품 카드 기본 스타일 (클릭 가능하게) */
+    .product-card {
+        display: block;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    /* ★ 라디오 버튼이 선택되었을 때 card-body의 스타일 ★ */
+    .product-card input:checked + .card-body {
+        border-color: #3b82f6; /* 파란색 테두리 */
+        background-color: #eff6ff; /* 연한 파란색 배경 */
+        box-shadow:
+            0 0 0 1px #3b82f6,
+            0 4px 12px rgba(59, 130, 246, 0.1); /* 이중 테두리 효과 */
+    }
+
+    /* card-body 기본 형태 잡기 (만약 클래스가 이미 정의되어 있다면 border 부분만 확인하세요) */
+    .card-body {
+        padding: 1rem;
+        border: 2px solid #f1f5f9; /* 기본 테두리 */
+        border-radius: 1rem;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* 호버 시 살짝 반응하기 */
+    .product-card:hover .card-body {
+        border-color: #cbd5e1;
+    }
     /* 아이콘이 아주 천천히 돌게 해서 '교체'의 느낌을 줌 (선택사항) */
     @keyframes spin-slow {
         from {
@@ -1917,8 +1924,8 @@
 
     /* 아이콘을 감싸는 박스 (네모 모양) */
     .icon-box-new {
-        aspect-ratio: 1 / 1; /* 정사각형 유지 */
-        padding: 10px; /* 아이콘 크기를 줄이기 위한 내부 여백 */
+        aspect-ratio: 1.3 / 1; /* 정사각형 유지 */
+        padding: 0px; /* 아이콘 크기를 줄이기 위한 내부 여백 */
         background-color: #ffffff;
         border: 2px solid #f1f5f9; /* 기본 테두리 (연한 회색) */
         border-radius: 1rem; /* 둥근 네모 모양 (rounded-xl) */

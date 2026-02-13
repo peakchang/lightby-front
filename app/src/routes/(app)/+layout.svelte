@@ -156,11 +156,37 @@
 </CustomModal>
 
 <CustomModal bind:visible={successModal} closeBtn={false}>
-    <div class="text-center">
-        <div class=" text-green-700 text-3xl mb-2">
-            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+    <div class="py-10 px-6 text-center suit-font">
+        <div class="mb-6 relative inline-block group">
+            <div
+                class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto transition-all group-hover:scale-110 success-pulse"
+            >
+                <i
+                    class="fa fa-check text-emerald-500 text-4xl"
+                    aria-hidden="true"
+                ></i>
+            </div>
+            <span
+                class="absolute -top-1 -right-1 text-yellow-400 text-xl animate-pulse"
+                >✨</span
+            >
         </div>
-        <div>{successMessage}</div>
+
+        <h3 class="text-xl font-extrabold text-slate-800 mb-2 tracking-tight">
+            처리가 완료되었습니다
+        </h3>
+
+        <div
+            class="bg-slate-50 rounded-2xl p-5 border border-slate-100 shadow-sm max-w-[280px] mx-auto"
+        >
+            <p class="text-slate-600 font-semibold leading-relaxed">
+                {successMessage}
+            </p>
+        </div>
+
+        <p class="text-[11px] text-slate-300 mt-6 tracking-widest uppercase">
+            success
+        </p>
     </div>
 </CustomModal>
 
@@ -483,3 +509,22 @@
 
     <div></div>
 </div>
+
+<style>
+    /* 은은하게 퍼지는 파동 효과 */
+    .success-pulse {
+        animation: soft-pulse 2s infinite ease-in-out;
+    }
+
+    @keyframes soft-pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.2);
+        }
+        70% {
+            box-shadow: 0 0 0 15px rgba(16, 185, 129, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+        }
+    }
+</style>

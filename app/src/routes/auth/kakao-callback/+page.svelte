@@ -83,10 +83,13 @@
         if (type == "nickname") {
             if (nickname) {
                 try {
-                    const res = await axios.post(`${back_api}/auth/duplicate_chk`, {
-                        type,
-                        value: nickname,
-                    });
+                    const res = await axios.post(
+                        `${back_api}/auth/duplicate_chk`,
+                        {
+                            type,
+                            value: nickname,
+                        },
+                    );
                     nicknameErrBool = false;
                     nicknameSuccessBool = true;
                 } catch (error) {
@@ -97,10 +100,13 @@
         } else {
             if (phone) {
                 try {
-                    const res = await axios.post(`${back_api}/auth/duplicate_chk`, {
-                        type,
-                        value: removeSpecialCharactersAndSpaces(phone),
-                    });
+                    const res = await axios.post(
+                        `${back_api}/auth/duplicate_chk`,
+                        {
+                            type,
+                            value: removeSpecialCharactersAndSpaces(phone),
+                        },
+                    );
                     clearInterval(interval);
                     return true;
                 } catch (error) {
@@ -154,7 +160,7 @@
             console.log(res);
 
             $user_info["idx"] = res.data.userId;
-            $user_info['rate'] = 1;
+            $user_info["rate"] = 1;
 
             // 카카오 로그인 시 user 의 idx 값을 보내기!!
             $joinStatus["type"] = "kakao";
@@ -256,14 +262,44 @@
 </script>
 
 <CustomModal bind:visible={successModal} closeBtn={false}>
-    <div class="text-center">
-        <div class=" text-green-700 text-3xl mb-2">
-            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+    <div class="py-10 px-6 text-center suit-font">
+        <div class="relative inline-block mb-6">
+            <div
+                class="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mx-auto success-pulse"
+            >
+                <i
+                    class="fa fa-check-circle text-green-500 text-6xl"
+                    aria-hidden="true"
+                ></i>
+            </div>
+            <span
+                class="absolute -top-1 -right-2 text-yellow-400 text-2xl animate-bounce"
+                >✨</span
+            >
         </div>
-        <div>{successMessage}</div>
+
+        <h3 class="text-2xl font-extrabold text-slate-800 mb-3 tracking-tight">
+            성공적으로 완료!
+        </h3>
+
+        <div
+            class="bg-slate-50 rounded-2xl p-5 mb-8 max-w-sm mx-auto border border-slate-100 shadow-sm"
+        >
+            <p class="text-slate-600 font-semibold leading-relaxed">
+                {successMessage}
+            </p>
+        </div>
+
         {#if modalLoading}
-            <div class="mt-2">
-                <span class="loading loading-ring loading-xl"></span>
+            <div class="flex flex-col items-center gap-4 py-2">
+                <div class="relative w-12 h-12">
+                    <span
+                        class="loading loading-ring loading-lg text-blue-500 scale-150"
+                    ></span>
+                </div>
+                <p class="text-xs font-medium text-slate-400 animate-pulse">
+                    잠시 후 다음 단계로 이동합니다...
+                </p>
             </div>
         {/if}
     </div>
@@ -419,3 +455,25 @@
         </div>
     </div>
 </div>
+
+<style>
+    /* 성공 아이콘 주변으로 퍼지는 부드러운 파동 효과 */
+    .success-pulse {
+        animation: success-shadow-pulse 2s infinite;
+    }
+
+    @keyframes success-shadow-pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.2);
+            transform: scale(1);
+        }
+        50% {
+            box-shadow: 0 0 0 20px rgba(34, 197, 94, 0);
+            transform: scale(1.05);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+            transform: scale(1);
+        }
+    }
+</style>

@@ -98,6 +98,7 @@
 		"faq",
 		"mytalent",
 		"manage_board",
+		"manage_applicants",
 	];
 
 	const unsubscribe = page.subscribe(($page) => {

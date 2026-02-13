@@ -3,9 +3,8 @@
     import { user_info } from "$lib/stores/stores";
     import CustomModal from "$lib/components/CustomModal.svelte";
     import { page } from "$app/stores";
-    import { onMount, tick } from "svelte";
+    import { onMount } from "svelte";
     import axios from "axios";
-    import { back_api } from "$lib/const";
 
     let id = $state("");
     let password = $state("");
@@ -28,44 +27,32 @@
         }
     });
 
-    $effect(() => {});
-
     async function loginSubmit(e) {
         e.preventDefault();
         const movePath = $page.url.searchParams.get("path");
 
-        let errorMessage = "";
-
         try {
-            const res = await axios.post(`/auth/login`, {
-                id,
-                password,
-            });
+            const res = await axios.post(`/auth/login`, { id, password });
 
-            successMessage = "로그인 완료! 잠시후 메인으로 이동합니다.";
+            successMessage = "반갑습니다! 곧 메인으로 이동합니다.";
             successModal = true;
             modalLoading = true;
+
             const random = Math.floor(Math.random() * (1200 - 800 + 1)) + 800;
             setTimeout(() => {
                 successModal = false;
                 modalLoading = false;
-                if (movePath) {
-                    location.href = movePath;
-                } else {
-                    location.href = "/";
-                }
+                location.href = movePath ? movePath : "/";
             }, random);
         } catch (err) {
-            const m = err.response.data.message;
-
+            const m = err.response?.data?.message;
             alertModal = true;
-            alertMessage = `${m ? m : ""} 다시 시도해주세요.`;
+            alertMessage = `${m ? m : "로그인 정보가 올바르지 않습니다."}`;
         }
     }
 
     const kakao_login = () => {
         const kakaoInfo = {
-            // kakao_restapi: "e6c8c90ba06c8dcbe1825e0785679d30",
             kakao_restapi: import.meta.env.VITE_KAKAO_RESTAPI,
             kakao_redirect: import.meta.env.VITE_KAKAO_REDIRECT_URI,
         };
@@ -73,107 +60,228 @@
     };
 </script>
 
-<CustomModal bind:visible={successModal} closeBtn={false}>
-    <div class="text-center">
-        <div class=" text-green-700 text-3xl mb-2">
-            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
-        </div>
-        <div>{successMessage}</div>
-        {#if modalLoading}
-            <div class="mt-2">
-                <span class="loading loading-ring loading-xl"></span>
-            </div>
-        {/if}
-    </div>
-</CustomModal>
-
-<CustomModal bind:visible={alertModal} closeBtn={true}>
-    <div class="text-center">
-        <div class=" text-red-500 text-3xl mb-2">
-            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
-        </div>
-        <div>{alertMessage}</div>
-        {#if modalLoading}
-            <div class="mt-2">
-                <span class="loading loading-ring loading-xl"></span>
-            </div>
-        {/if}
-    </div>
-</CustomModal>
-
-<!-- svelte-ignore event_directive_deprecated -->
-<div class="bg-green-50 relative min-h-screen suit-font">
-    <div class="max-w-[530px] mx-auto pt-12 pb-10 bg-white p-14 min-h-screen">
-        <div class="text-center bg-white">
-            <a href="/">
-                <img src="/logo.png" alt="" class=" max-w-[150px] mx-auto" />
+<div
+    class="min-h-screen bg-slate-50 flex items-center justify-center py-12 px-4 suit-font"
+>
+    <div
+        class="max-w-md w-full bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100"
+    >
+        <div
+            class="pt-12 pb-8 text-center bg-gradient-to-b from-blue-50 to-white"
+        >
+            <a
+                href="/"
+                class="inline-block transition-transform hover:scale-105"
+            >
+                <img src="/logo.png" alt="번개분양 로고" class="h-12 mx-auto" />
             </a>
+            <h2 class="mt-5 text-xl font-bold text-slate-800 tracking-tight">
+                서비스 이용을 위해 로그인해주세요
+            </h2>
         </div>
 
-        <div class="mt-12">
-            <form on:submit={loginSubmit}>
-                <label class="input input-info mt-5 w-full bg-white">
-                    <span class="min-w-4 flex justify-center">
-                        <i class="fa fa-id-card-o opacity-70" aria-hidden="true"
-                        ></i>
-                    </span>
-
-                    <input
-                        type="text"
-                        class="grow"
-                        placeholder="아이디를 입력하세요"
-                        bind:value={id}
-                    />
-                </label>
-
-                <label class="input input-info mt-5 w-full bg-white">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 16 16"
-                        fill="currentColor"
-                        class="h-4 w-4 opacity-70"
-                    >
-                        <path
-                            fill-rule="evenodd"
-                            d="M14 6a4 4 0 0 1-4.899 3.899l-1.955 1.955a.5.5 0 0 1-.353.146H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2.293a.5.5 0 0 1 .146-.353l3.955-3.955A4 4 0 1 1 14 6Zm-4-2a.75.75 0 0 0 0 1.5.5.5 0 0 1 .5.5.75.75 0 0 0 1.5 0 2 2 0 0 0-2-2Z"
-                            clip-rule="evenodd"
+        <div class="p-8 pt-2">
+            <form onsubmit={loginSubmit} class="space-y-4">
+                <div class="form-control">
+                    <div class="relative flex items-center">
+                        <span class="absolute left-4 z-10 text-slate-400">
+                            <i class="fa fa-user-o" aria-hidden="true"></i>
+                        </span>
+                        <input
+                            type="text"
+                            class="input input-bordered w-full h-14 pl-12 bg-slate-50 border-gray-200 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all text-slate-700"
+                            placeholder="아이디"
+                            bind:value={id}
+                            required
                         />
-                    </svg>
-                    <input
-                        type="password"
-                        class="grow"
-                        placeholder="비밀번호를 입력하세요"
-                        bind:value={password}
-                    />
-                </label>
-
-                <div class="mt-5">
-                    <button class="btn btn-info w-full text-white">
-                        로그인하기
-                    </button>
+                    </div>
                 </div>
+
+                <div class="form-control">
+                    <div class="relative flex items-center">
+                        <span class="absolute left-4 z-10 text-slate-400">
+                            <i class="fa fa-lock" aria-hidden="true"></i>
+                        </span>
+                        <input
+                            type="password"
+                            class="input input-bordered w-full h-14 pl-12 bg-slate-50 border-gray-200 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all text-slate-700"
+                            placeholder="비밀번호"
+                            bind:value={password}
+                            required
+                        />
+                    </div>
+                </div>
+
+                <button
+                    class="btn btn-primary w-full h-14 rounded-2xl text-lg font-semibold border-none shadow-lg shadow-blue-100 mt-2"
+                >
+                    로그인
+                </button>
             </form>
 
-            <div class="mt-3">
-                <button
-                    class=" bg-[#ffe500] font-semibold w-full p-3 rounded-lg flex justify-center items-center gap-2 cursor-pointer"
-                    on:click={kakao_login}
-                >
-                    <img src="/kakao_logo.png" alt="" width="24" height="24" />
-                    카카오 간편 로그인
-                </button>
+            <div class="relative my-8">
+                <div class="absolute inset-0 flex items-center">
+                    <span class="w-full border-t border-slate-100"></span>
+                </div>
+                <div class="relative flex justify-center text-xs uppercase">
+                    <span class="bg-white px-2 text-slate-400">또는</span>
+                </div>
             </div>
 
-            <div class="mt-3 text-center">
+            <div class="space-y-3">
                 <button
-                    class="btn btn-success text-white w-full"
-                    on:click={() => {
-                        goto("/auth/join");
-                    }}
+                    class="w-full h-14 bg-[#FEE500] hover:bg-[#FADA0A] text-slate-800 font-semibold rounded-2xl flex justify-center items-center gap-3 transition-all active:scale-95"
+                    onclick={kakao_login}
                 >
-                    회원이 아니신가요? 회원가입 바로가기
+                    <img src="/kakao_logo.png" alt="카카오" class="w-6 h-6" />
+                    카카오 로그인
+                </button>
+
+                <button
+                    class="w-full h-14 text-sm bg-white border border-slate-200 text-slate-600 rounded-2xl hover:bg-slate-50 transition-all flex justify-center items-center gap-2"
+                    onclick={() => goto("/auth/join")}
+                >
+                    아직 회원이 아니신가요?
+                    <span
+                        class="text-blue-600 font-bold underline underline-offset-4"
+                    >
+                        회원가입
+                    </span>
                 </button>
             </div>
+        </div>
+
+        <div class="pb-8 text-center">
+            <button
+                class="text-sm text-slate-400 hover:text-slate-600 transition-colors"
+                >아이디/비밀번호 찾기</button
+            >
         </div>
     </div>
 </div>
+
+<CustomModal bind:visible={successModal} closeBtn={false}>
+    <div class="py-8 px-4 text-center suit-font">
+        <div class="mb-6 relative inline-block">
+            <div
+                class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto transition-transform hover:scale-110 success-pulse"
+            >
+                <i
+                    class="fa fa-check-circle text-green-500 text-5xl"
+                    aria-hidden="true"
+                ></i>
+            </div>
+            <span
+                class="absolute -top-1 -right-2 text-yellow-400 text-xl animate-bounce"
+                >✨</span
+            >
+        </div>
+
+        <h3 class="text-2xl font-extrabold text-slate-800 mb-2 tracking-tight">
+            완료되었습니다!
+        </h3>
+
+        <div
+            class="bg-slate-50 rounded-2xl p-5 mb-6 border border-slate-100 flex items-center justify-center"
+        >
+            <p class="text-slate-600 font-semibold leading-relaxed">
+                {successMessage}
+            </p>
+        </div>
+
+        {#if modalLoading}
+            <div class="flex flex-col items-center gap-3 py-2">
+                <span class="loading loading-dots loading-md text-blue-500"
+                ></span>
+                <p class="text-xs text-slate-400">잠시만 기다려주세요...</p>
+            </div>
+        {/if}
+    </div>
+</CustomModal>
+
+<CustomModal bind:visible={alertModal}>
+    <div class="py-6 px-4 text-center suit-font">
+        <div class="mb-6 relative inline-block">
+            <div
+                class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto transition-transform hover:scale-110"
+            >
+                <i
+                    class="fa fa-exclamation-triangle text-red-500 text-4xl"
+                    aria-hidden="true"
+                ></i>
+            </div>
+            <div
+                class="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-sm"
+            >
+                <i class="fa fa-question-circle text-red-300 text-xs"></i>
+            </div>
+        </div>
+
+        <h3 class="text-xl font-bold text-slate-800 mb-3 tracking-tight">
+            확인이 필요합니다
+        </h3>
+        <div
+            class="bg-slate-50 rounded-2xl p-4 mb-8 border border-slate-100 min-h-[60px] flex items-center justify-center"
+        >
+            <p class="text-slate-600 font-medium leading-relaxed">
+                {alertMessage}
+            </p>
+        </div>
+
+        <button
+            class="btn btn-lg w-full max-w-[200px] bg-slate-800 hover:bg-slate-900 border-none text-white rounded-2xl font-bold shadow-md transition-all active:scale-95"
+            onclick={() => (alertModal = false)}
+        >
+            확인
+        </button>
+    </div>
+</CustomModal>
+
+<style>
+    :global(.suit-font) {
+        font-family: "SUIT", sans-serif;
+    }
+    .btn-primary {
+        background-color: #3b82f6;
+    }
+    .btn-primary:hover {
+        background-color: #2563eb;
+    }
+
+    /* 애니메이션 효과 */
+    .bg-red-50 {
+        animation: pulse-red 2s infinite;
+    }
+
+    @keyframes pulse-red {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    /* 성공 아이콘 부드러운 맥박 애니메이션 */
+    .success-pulse {
+        animation: success-pulse 2s infinite;
+    }
+
+    @keyframes success-pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.2);
+            transform: scale(1);
+        }
+        50% {
+            box-shadow: 0 0 0 15px rgba(34, 197, 94, 0);
+            transform: scale(1.05);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+            transform: scale(1);
+        }
+    }
+</style>

@@ -1,6 +1,6 @@
 <script>
     import { goto } from "$app/navigation";
-    import { public_img_bucket } from "$lib/const.js";
+    import { public_img_bucket, iconList, colorMap } from "$lib/const.js";
     import {
         prev,
         nonMemberViewLimitNum,
@@ -49,6 +49,20 @@
 
     function isNumeric(str) {
         return /^\d+$/.test(str);
+    }
+
+    function getIconDetail(targetId) {
+        // 1. iconList에서 해당 ID를 가진 객체를 찾습니다.
+        const icon = iconList.find((item) => item.id === targetId);
+
+        // 2. 만약 찾지 못했다면 빈 값을 반환하거나 기본값을 설정합니다.
+        if (!icon) return { name: "", color: "", class: "" };
+
+        // 3. 기존 정보에 colorMap의 클래스 정보를 추가해서 반환합니다.
+        return {
+            ...icon,
+            class: colorMap[icon.color] || "", // colorMap에 해당 색상이 없으면 빈 문자열
+        };
     }
 </script>
 
@@ -135,9 +149,11 @@
                 {#if value.icons}
                     <div class="absolute bottom-[-2px] right-[-2px]">
                         <span
-                            class="text-[10px] md:text-xs flex-shrink-0 badge badge-outline border-red-500 text-red-600 font-bold px-1.5 py-2 animate-pulse"
+                            class="{getIconDetail(value.icons)[
+                                'class'
+                            ]}text-[10px] md:text-xs flex-shrink-0 badge badge-outline font-bold px-1.5 py-2 animate-pulse"
                         >
-                            HOT 현장
+                            {getIconDetail(value.icons)["name"]}
                         </span>
                         <!-- <div
                             class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-lg p-1 shadow-sm border border-gray-200"

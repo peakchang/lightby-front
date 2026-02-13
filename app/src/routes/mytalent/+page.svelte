@@ -244,6 +244,7 @@
     </div>
 </CustomModal>
 
+<!-- svelte-ignore event_directive_deprecated -->
 <CustomModal bind:visible={successModal} closeBtn={false}>
     <div class="px-4 py-8 text-center suit-font animate-fade-in">
         <div class="relative mx-auto w-20 h-20 mb-6">
@@ -318,22 +319,54 @@
     </div>
 </CustomModal>
 
+<!-- svelte-ignore event_directive_deprecated -->
 <CustomModal bind:visible={skipModal} closeBtn={false}>
-    <div class="text-center">
-        <div class=" text-green-700 text-3xl mb-2">
-            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+    <div class="py-10 px-6 text-center suit-font">
+        <div class="relative inline-block mb-8">
+            <div
+                class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto"
+            >
+                <i
+                    class="fa fa-check-circle text-green-500 text-5xl"
+                    aria-hidden="true"
+                ></i>
+            </div>
+            <span
+                class="absolute -top-1 -right-1 text-yellow-400 text-xl animate-bounce"
+                >✨</span
+            >
         </div>
-        <div class="mb-8">
-            내 인재 정보는 마이 > 내 인재 글 관리에서 언제든 수정 가능합니다.
-        </div>
-        <button
-            class="btn btn-success w-1/3 text-white"
-            on:click={() => {
-                goto("/");
-            }}
+
+        <h2 class="text-2xl font-extrabold text-slate-800 mb-4 tracking-tight">
+            설정이 완료되었습니다!
+        </h2>
+
+        <div
+            class="bg-slate-50 rounded-2xl p-5 mb-10 max-w-sm mx-auto border border-slate-100"
         >
-            번개분양 시작하기
-        </button>
+            <p class="text-slate-600 text-[15px] leading-relaxed">
+                내 인재 정보는 <span class="font-bold text-slate-800"
+                    >마이 > 내 인재 글 관리</span
+                >에서<br />
+                언제든 자유롭게 수정하실 수 있습니다.
+            </p>
+        </div>
+
+        <div class="flex flex-col gap-3 items-center">
+            <button
+                class="btn btn-lg bg-green-500 hover:bg-green-600 border-none w-full max-w-[280px] text-white font-extrabold shadow-lg shadow-green-100 transition-all active:scale-95"
+                on:click={() => {
+                    goto("/");
+                }}
+            >
+                번개분양 시작하기
+                <i class="fa fa-bolt ml-2"></i>
+            </button>
+
+            <p class="text-xs text-slate-400 mt-2">
+                지금 바로 맞춤 현장을 확인해보세요!
+            </p>
+        </div>
     </div>
 </CustomModal>
 
@@ -341,8 +374,11 @@
     <PageHeader pageName={"프로필 관리"} />
 {/if}
 
+<!-- svelte-ignore a11y_consider_explicit_label -->
+<!-- svelte-ignore event_directive_deprecated -->
+<!-- svelte-ignore a11y_label_has_associated_control -->
 <div class="bg-gray-50 relative min-h-screen suit-font">
-    <div class="max-w-[530px] mx-auto pt-14 pb-24 px-4">
+    <div class="max-w-[640px] mx-auto pt-14 pb-24 px-4">
         <div class="text-center mb-10 animate-fade-in">
             <div class="inline-block p-3 bg-white rounded-2xl shadow-sm mb-4">
                 <span class="text-2xl">📝</span>
@@ -386,6 +422,7 @@
                             />
                         {/if}
                     </div>
+
                     <button
                         class="absolute -bottom-2 -right-2 w-10 h-10 bg-sky-500 text-white rounded-2xl shadow-lg flex justify-center items-center hover:bg-sky-600 transition-all"
                         on:click={changeProfile}

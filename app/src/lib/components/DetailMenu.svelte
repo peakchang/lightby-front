@@ -17,10 +17,8 @@
     async function favorateAct() {
         if (!$user_info.idx) {
             notLoginAlertModal = true;
+            return;
         }
-
-        console.log("좋아요 클릭?!?!?!?");
-        console.log(this.value);
 
         try {
             const res = await axios.post(`${back_api}/detail/postlike_act`, {
@@ -63,15 +61,13 @@
             <button
                 class="flex flex-col items-center gap-2 group"
                 onclick={() => {
-                    navigator.clipboard
-                        .writeText($page.url.href)
-                        .then(() =>
-                            toastStore.set({
-                                show: true,
-                                message: "주소가 복사되었습니다",
-                                color: "#34d399",
-                            }),
-                        );
+                    navigator.clipboard.writeText($page.url.href).then(() =>
+                        toastStore.set({
+                            show: true,
+                            message: "주소가 복사되었습니다",
+                            color: "#34d399",
+                        }),
+                    );
                 }}
             >
                 <div
